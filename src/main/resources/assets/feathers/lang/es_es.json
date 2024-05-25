@@ -1,0 +1,47 @@
+{
+  "feathers.max_feathers": "Plumas Máximas",
+  "feathers.feather_regen": "Recuperación de Plumas",
+
+  "effect.feathers.endurance": "Resistencia",
+  "item.minecraft.potion.effect.endurance_potion": "Poción de Resistencia",
+  "item.minecraft.splash_potion.effect.endurance_potion": "Poción Arrojadiza de Resistencia",
+  "item.minecraft.lingering_potion.effect.endurance_potion": "Poción Persistente de Resistencia",
+  "item.minecraft.tipped_arrow.effect.endurance_potion": "Flecha de Resistencia",
+
+  "item.minecraft.potion.effect.long_endurance_potion": "Poción de Resistencia",
+  "item.minecraft.splash_potion.effect.long_endurance_potion": "Poción Arrojadiza de Resistencia",
+  "item.minecraft.lingering_potion.effect.long_endurance_potion": "Poción Persistente de Resistencia",
+  "item.minecraft.tipped_arrow.effect.long_endurance_potion": "Flecha de Resistencia",
+
+  "item.minecraft.potion.effect.strong_endurance_potion": "Poción de Resistencia",
+  "item.minecraft.splash_potion.effect.strong_endurance_potion": "Poción Arrojadiza de Resistencia",
+  "item.minecraft.lingering_potion.effect.strong_endurance_potion": "Poción Persistente de Resistencia",
+  "item.minecraft.tipped_arrow.effect.strong_endurance_potion": "Flecha de Resistencia",
+
+  "effect.feathers.cold": "Frío",
+  "item.minecraft.potion.effect.cold_potion": "Poción de Frialdad",
+  "item.minecraft.splash_potion.effect.cold_potion": "Poción Arrojadiza de Frialdad",
+  "item.minecraft.lingering_potion.effect.cold_potion": "Poción Persistente de Frialdad",
+  "item.minecraft.tipped_arrow.effect.cold_potion": "Flecha de Frialdad",
+
+  "effect.feathers.energized": "Energizado",
+  "item.minecraft.potion.effect.energized_potion": "Poción de Energía",
+  "item.minecraft.splash_potion.effect.energized_potion": "Poción Arrojadiza de Energía",
+  "item.minecraft.lingering_potion.effect.energized_potion": "Poción Persistente de Energía",
+  "item.minecraft.tipped_arrow.effect.energized_potion": "Flecha de Energía",
+
+  "item.minecraft.potion.effect.strong_energized_potion": "Poción de Energía",
+  "item.minecraft.splash_potion.effect.strong_energized_potion": "Poción Arrojadiza de Energía",
+  "item.minecraft.lingering_potion.effect.strong_energized_potion": "Poción Persistente de Energía",
+  "item.minecraft.tipped_arrow.effect.strong_energized_potion": "Flecha de Resistencia",
+
+  "item.minecraft.potion.effect.long_energized_potion": "Poción de Energía",
+  "item.minecraft.splash_potion.effect.long_energized_potion": "Poción Arrojadiza de Energía",
+  "item.minecraft.lingering_potion.effect.long_energized_potion": "Poción Persistente de Energía",
+  "item.minecraft.tipped_arrow.effect.long_energized_potion": "Flecha de Energía",
+
+  "enchantment.feathers.lightweight": "Ligero",
+  "enchantment.feathers.heavy": "Maldición de Pesadez",
+
+  "text.feathers.tooltip": "+%s Peso"
+}

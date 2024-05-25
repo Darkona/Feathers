@@ -23,8 +23,10 @@ public class FeathersAttributes {
     public static final HashMap<RegistryObject<Attribute>, UUID> UUIDS = new HashMap<>();
     public static final DeferredRegister<Attribute> ATTRIBUTES = DeferredRegister.create(ForgeRegistries.ATTRIBUTES, Feathers.MODID);
 
-    public static final RegistryObject<Attribute> MAX_FEATHERS = registerAttribute("feathers.max_feathers", (id) -> new RangedAttribute(id, 20.0D, 0.0D, 1024.0D).setSyncable(true), "1ce4960d-c50e-44bf-ad23-7bcd77f4c1dc");
-    public static final RegistryObject<Attribute> FEATHER_REGEN = registerAttribute("feathers.feather_regen", (id) -> new RangedAttribute(id, 1.0D, 0.0D, 1024.0D).setSyncable(true), "d74ded8f-c5b6-4222-80e2-dbea7ccf8d02");
+    public static final RegistryObject<Attribute> MAX_FEATHERS = registerAttribute("feathers.max_feathers",
+            (id) -> new RangedAttribute(id, 20.0D, 0.0D, 1024.0D).setSyncable(true), "1ce4960d-c50e-44bf-ad23-7bcd77f4c1dc");
+    public static final RegistryObject<Attribute> FEATHER_REGEN = registerAttribute("feathers.feather_regen",
+            (id) -> new RangedAttribute(id, 1.0D, 0.0D, 1024.0D).setSyncable(true), "d74ded8f-c5b6-4222-80e2-dbea7ccf8d02");
 
     public static RegistryObject<Attribute> registerAttribute(String name, Function<String, Attribute> attribute, String uuid) {
         return registerAttribute(name, attribute, UUID.fromString(uuid));

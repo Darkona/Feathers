@@ -16,7 +16,7 @@ public class ColdSyncSTCPacket {
 	private final boolean cold;
 	
 	public ColdSyncSTCPacket(boolean cold) {
-	this.cold = cold;
+		this.cold = cold;
 	}
 
 	public ColdSyncSTCPacket(FriendlyByteBuf buf) {

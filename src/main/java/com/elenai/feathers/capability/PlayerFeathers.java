@@ -18,7 +18,22 @@ public class PlayerFeathers {
 	private final int MIN_COOLDOWN = 0;
 	
 	private boolean cold = false;
+	private boolean hot = true;
 
+	public int getMaxCooldown() {
+		return maxCooldown;
+	}
+
+	public void setMaxCooldown(int cooldown) {
+		this.maxCooldown = cooldown;
+	}
+	public void setHot(boolean hot){
+		this.hot = hot;
+	}
+
+	public boolean isHot(){
+		return hot;
+	}
 	public int getFeathers() {
 		return feathers;
 	}
@@ -80,7 +95,7 @@ public class PlayerFeathers {
 	}
 
 	public int getCooldown() {
-		return cooldown;
+		return Math.round( cooldown);
 	}
 
 	public void setCooldown(int cooldown) {
@@ -90,7 +105,6 @@ public class PlayerFeathers {
 	public void addCooldown(int ticks) {
 		this.cooldown = Math.min(this.cooldown + ticks, maxCooldown);
 	}
-
 	public void subCooldown(int ticks) {
 		this.cooldown = Math.max(this.cooldown - ticks, MIN_COOLDOWN);
 	}

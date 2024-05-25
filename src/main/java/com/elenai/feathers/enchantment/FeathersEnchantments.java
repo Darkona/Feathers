@@ -16,12 +16,12 @@ public class FeathersEnchantments {
 			.create(ForgeRegistries.ENCHANTMENTS, Feathers.MODID);
 
 	public static RegistryObject<Enchantment> LIGHTWEIGHT = ENCHANTMENTS.register("lightweight",
-			() -> new LightweightEnchantment(Rarity.UNCOMMON, EnchantmentCategory.ARMOR, new EquipmentSlot[] {
-					EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.HEAD, EquipmentSlot.LEGS }));
+			() -> new LightweightEnchantment(Rarity.UNCOMMON, EnchantmentCategory.ARMOR,
+					EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.HEAD, EquipmentSlot.LEGS));
 
 	public static RegistryObject<Enchantment> HEAVY = ENCHANTMENTS.register("heavy",
-			() -> new HeavyCurse(Rarity.RARE, EnchantmentCategory.ARMOR, new EquipmentSlot[] {
-					EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.HEAD, EquipmentSlot.LEGS }));
+			() -> new HeavyCurse(Rarity.RARE, EnchantmentCategory.ARMOR,
+					EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.HEAD, EquipmentSlot.LEGS));
 
 	public static void register(IEventBus eventBus) {
 		ENCHANTMENTS.register(eventBus);

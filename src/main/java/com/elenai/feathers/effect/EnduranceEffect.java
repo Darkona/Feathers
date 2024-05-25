@@ -22,7 +22,7 @@ public class EnduranceEffect extends MobEffect {
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
                 f.setEnduranceFeathers((strength + 1) * 8);
                 FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(),
-                        FeathersHelper.getPlayerWeight(player), f.getEnduranceFeathers()), player);
+                        FeathersHelper.getPlayerWeight(player), f.getEnduranceFeathers(), f.getMaxCooldown()), player);
             });
         }
         super.addAttributeModifiers(target, map, strength);
@@ -34,7 +34,7 @@ public class EnduranceEffect extends MobEffect {
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
                 f.setEnduranceFeathers(0);
                 FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(),
-                        FeathersHelper.getPlayerWeight(player), f.getEnduranceFeathers()), player);
+                        FeathersHelper.getPlayerWeight(player), f.getEnduranceFeathers(), f.getMaxCooldown()), player);
             });
         }
         super.removeAttributeModifiers(target, map, strength);

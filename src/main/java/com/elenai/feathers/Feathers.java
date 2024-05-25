@@ -26,6 +26,8 @@ public class Feathers {
 	public static final String MODID = "feathers";
 	public static final Logger logger = LogManager.getLogger(MODID);
 	public static final boolean OB_LOADED = ModList.get().isLoaded("overflowingbars");
+	public static final boolean THIRST_LOADED = ModList.get().isLoaded("thirst");
+	public static final boolean COLD_SWEAT_LOADED = ModList.get().isLoaded("cold_sweat");
 
 	public Feathers() {
 		IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -49,6 +51,8 @@ public class Feathers {
 	private void registerBrewingRecipes() {
 		// Cold
 		PotionBrewing.addMix(Potions.AWKWARD, Items.SNOWBALL, FeathersPotions.COLD_POTION.get());
+		//Hot
+		PotionBrewing.addMix(Potions.AWKWARD, Items.MAGMA_BLOCK, FeathersPotions.HOT_POTION.get());
 
 		// Endurance
 		PotionBrewing.addMix(Potions.AWKWARD, Items.FEATHER, FeathersPotions.ENDURANCE_POTION.get());

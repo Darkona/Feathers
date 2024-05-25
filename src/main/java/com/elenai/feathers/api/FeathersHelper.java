@@ -11,6 +11,7 @@ import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.ColdSyncSTCPacket;
 import com.elenai.feathers.networking.packet.FeatherSyncCTSPacket;
 import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
+import com.elenai.feathers.networking.packet.HotSyncSTCPacket;
 import com.elenai.feathers.util.ArmorHandler;
 
 import net.minecraft.client.Minecraft;
@@ -33,7 +34,7 @@ public class FeathersHelper {
 		player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
 			f.setFeathers(feathers);
 			f.setCooldown(0);
-			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers()), player);
+			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers(), getMaxFeathers()), player);
 		});
 	}
 
@@ -49,7 +50,7 @@ public class FeathersHelper {
 			if (player.getAttributeValue(FeathersAttributes.MAX_FEATHERS.get()) != feathers)
 				player.getAttribute(FeathersAttributes.MAX_FEATHERS.get()).setBaseValue(feathers);
 			f.setMaxFeathers(feathers);
-			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers()), player);
+			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers(), f.getMaxCooldown()), player);
 		});
 	}
 
@@ -63,7 +64,7 @@ public class FeathersHelper {
 	public static void setFeatherRegen(ServerPlayer player, int ticks) {
 		player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
 			f.setRegen(ticks);
-			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers()), player);
+			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers(), f.getMaxCooldown()), player);
 		});
 	}
 
@@ -141,7 +142,7 @@ public class FeathersHelper {
 		player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
 			f.addFeathers(feathers);
 			f.setCooldown(0);
-			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers()), player);
+			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers(), f.getMaxCooldown()), player);
 		});
 	}
 
@@ -160,7 +161,7 @@ public class FeathersHelper {
 		player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
 			f.subFeathers(feathers);
 			f.setCooldown(0);
-			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers()), player);
+			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers(), f.getMaxCooldown()), player);
 		});
 	}
 
@@ -193,7 +194,7 @@ public class FeathersHelper {
 				}
 				
 				f.setCooldown(0);
-				FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers()), player);
+				FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers(), f.getMaxCooldown()), player);
 			});
 			return true;
 		}
@@ -299,9 +300,7 @@ public class FeathersHelper {
 	 * @return if the player is cold
 	 */
 	public static boolean getCold(ServerPlayer player) {
-		return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).map(f -> {
-			return f.isCold();
-		}).orElse(false);
+		return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).map(PlayerFeathers::isCold).orElse(false);
 	}
 	
 	/**
@@ -319,7 +318,7 @@ public class FeathersHelper {
 		});
 	}
 	
-	/**
+	/**e
 	 * Checks whether the player has any feathers remaining
 	 * 
 	 * @side client
@@ -328,5 +327,22 @@ public class FeathersHelper {
 	public static boolean checkFeathersRemaining() {
 		return getFeathers() + getEndurance() > ClientFeathersData.getWeight();
 	}
-	
+
+	public static void setHot(ServerPlayer player, boolean b) {
+		player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
+			f.setHot(b);
+			FeathersMessages.sendToPlayer(new HotSyncSTCPacket(f.isHot()), player);
+		});
+	}
+
+	/**
+	 * Returns the given player's hotness
+	 *
+	 * @side server
+	 * @param player
+	 * @return if the player is hot ;)
+	 */
+	public static boolean getHot(ServerPlayer player) {
+		return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).map(PlayerFeathers::isHot).orElse(false);
+	}
 }

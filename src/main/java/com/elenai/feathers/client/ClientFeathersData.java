@@ -10,10 +10,12 @@ public class ClientFeathersData {
     private static int animationCooldown = 0;
 	private static int fadeCooldown = 0;
     private static boolean cold = false;
+	private static boolean hot = false;
     private static boolean energized = false;
 	private static boolean overflowing = false;
+	private static int maxCooldown;
 
-    public static void setFeathers(int feathers) {
+	public static void setFeathers(int feathers) {
         ClientFeathersData.feathers = feathers;
     }
 
@@ -55,6 +57,14 @@ public class ClientFeathersData {
 		ClientFeathersData.cold = cold;
 	}
 
+	public static boolean isHot() {
+		return hot;
+	}
+
+	public static void setHot(boolean hot) {
+		ClientFeathersData.hot = hot;
+	}
+
 	public static boolean isOverflowing() {
 		return overflowing;
 	}
@@ -85,5 +95,13 @@ public class ClientFeathersData {
 
 	public static void setPreviousFeathers(int previousFeathers) {
 		ClientFeathersData.previousFeathers = previousFeathers;
+	}
+
+	public static void setMaxCooldown(int maxCooldown) {
+		ClientFeathersData.maxCooldown = maxCooldown;
+	}
+
+	public static int getMaxCooldown() {
+		return maxCooldown;
 	}
 }

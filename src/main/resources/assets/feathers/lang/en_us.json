@@ -24,6 +24,12 @@
 	"item.minecraft.lingering_potion.effect.cold_potion": "Lingering Potion of Coldness",
 	"item.minecraft.tipped_arrow.effect.cold_potion": "Arrow of Coldness",
 
+	"effect.feathers.hot": "Hot",
+	"item.minecraft.potion.effect.hot_potion": "Potion of Heat",
+	"item.minecraft.splash_potion.effect.hot_potion": "Splash Potion of Heat",
+	"item.minecraft.lingering_potion.effect.hot_potion": "Lingering Potion of Heat",
+	"item.minecraft.tipped_arrow.effect.hot_potion": "Arrow of Heat",
+
 	"effect.feathers.energized": "Energized",
 	"item.minecraft.potion.effect.energized_potion": "Potion of Energy",
 	"item.minecraft.splash_potion.effect.energized_potion": "Splash Potion of Energy",

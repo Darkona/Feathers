@@ -37,6 +37,7 @@ public class ClientEvents {
 		public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
 			event.registerAbove(VanillaGuiOverlay.FOOD_LEVEL.id(), "feathers", FeathersHudOverlay.FEATHERS);
 		}
+
 	}
 
 	@Mod.EventBusSubscriber(modid = Feathers.MODID, value = Dist.CLIENT)
@@ -104,5 +105,6 @@ public class ClientEvents {
 				}
 			}
 		}
+
 	}
 }

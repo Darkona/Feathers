@@ -13,17 +13,50 @@ import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 public class FeathersHudOverlay {
 
 	public final static ResourceLocation ICONS = new ResourceLocation(Feathers.MODID, "textures/gui/icons.png");
-	public final static int NONE = 16;
 	public final static int FULL = 34;
-	public final static int FULL_FLOW = 70;
 	public final static int HALF = 25;
-	public final static int HALF_FLOW = 61;
-	public final static int ARMORED = 52;
-	public final static int HALF_ARMORED = 43;
+
+	private static GuiIconCoord NORMAL_BACKGROUND = new GuiIconCoord(16, 0, 9, 9);
+	private static GuiIconCoord NORMAL_HALF_FEATHER = new GuiIconCoord(25, 0, 9, 9);
+	private static GuiIconCoord NORMAL_FULL_FEATHER = new GuiIconCoord(34, 0, 9, 9);
+
+	private static GuiIconCoord ENDURANCE_HALF_FEATHER = new GuiIconCoord(25, 9, 9, 9);
+	private static GuiIconCoord ENDURANCE_FULL_FEATHER = new GuiIconCoord(34, 9, 9, 9);
+
+	private static GuiIconCoord HALF_RED_FEATHER = new GuiIconCoord(61, 9, 9, 9);
+	private static GuiIconCoord FULL_RED_FEATHER = new GuiIconCoord(70, 9, 9, 9);
+
+
+	private static GuiIconCoord ARMORED_HALF_FEATHER = new GuiIconCoord(43, 0, 9, 9);
+	private static GuiIconCoord ARMORED_FULL_FEATHER = new GuiIconCoord(52, 0, 9, 9);
+
+
+	private static GuiIconCoord REGEN_BACKGROUND = new GuiIconCoord(16, 9, 9, 9);
+	private static GuiIconCoord ENERGIZED_HALF_FEATHER = new GuiIconCoord(43, 27, 9, 9);
+	private static GuiIconCoord ENERGIZED_FULL_FEATHER = new GuiIconCoord(52, 27, 9, 9);
+
+
+	private static GuiIconCoord COLD_BACKGROUND = new GuiIconCoord(16, 18, 9, 9);
+	private static GuiIconCoord COLD_HALF_FEATHER = new GuiIconCoord(25, 18, 9, 9);
+	private static GuiIconCoord COLD_FULL_FEATHER = new GuiIconCoord(34, 18, 9, 9);
+
+	private static GuiIconCoord ALTER_FULL_FEATHER = new GuiIconCoord(34, 27, 9, 9);
+	private static GuiIconCoord ALTER_HALF_FEATHER = new GuiIconCoord(25, 27, 9, 9);
+
+	private static GuiIconCoord HOT_HALF_FEATHER = new GuiIconCoord(61, 0, 9, 9);
+	private static GuiIconCoord HOT_FULL_FEATHER = new GuiIconCoord(70, 0, 9, 9);
+
+
+	private static GuiIconCoord OVERFLOW_HALF_FEATHER = new GuiIconCoord(61, 18, 9, 9);
+	private static GuiIconCoord OVERFLOW_FULL_FEATHER = new GuiIconCoord(70, 18, 9, 9);
+
+
 
 	public static int k = 0;
 	static float alpha = 1.0f;
 
+	public static final int ICON_WIDTH = 9;
+	public static final int ICON_HEIGHT = 9;
 	/**
 	 * Renders the Feathers to the hotbar
 	 */
@@ -66,30 +99,33 @@ public class FeathersHudOverlay {
 			/*
 			 * Always render the background up to the maximum feather amount
 			 */
+
 			for (int i = 0; i < 10; i++) {
 				if ((i + 1 <= Math.ceil((double) ClientFeathersData.getMaxFeathers() / 2.0d))) {
-					int cold = ((ClientFeathersData.isCold()) ? 18 : 0);
-					int height = (k > i * 10 && k < (i + 1) * 10) ? 2 : 0;
-					guiGraphics.blit(ICONS, x + 81 - (i * 8) + xOffset, y - rightOffset - height + yOffset, NONE,
-							cold, 9, 9, 256, 256);
+
+					GuiIconCoord icon = ((ClientFeathersData.isCold()) ? COLD_BACKGROUND : NORMAL_BACKGROUND);
+
+					int height = getHeight(i);
+
+					guiGraphics.blit(ICONS, getXPos(x, i, xOffset), getYPos(y, rightOffset, height, yOffset),
+							icon.x, icon.y, icon.width, icon.height, 256, 256);
 				}
 			}
 
 			/*
 			 * Only render the currently active feathers
 			 */
+			double halvedFeathers = Math.ceil((double) ClientFeathersData.getFeathers() / 2.0d);
 			for (int i = 0; i < 10; i++) {
-				if ((i + 1 <= Math.ceil((double) ClientFeathersData.getFeathers() / 2.0d))
-						&& ClientFeathersData.getFeathers() > 0) {
-					// Check if feather is half or full
-					int type = ((i + 1 == Math.ceil((double) ClientFeathersData.getFeathers() / 2.0d)
-							&& (ClientFeathersData.getFeathers() % 2 != 0)) ? HALF : FULL);
+				if ((i + 1 <= halvedFeathers) && ClientFeathersData.getFeathers() > 0) {
 
-					int height = (k > i * 10 && k < (i + 1) * 10) ? 2 : 0;
+					GuiIconCoord icon = (i + 1 == Math.ceil((double) ClientFeathersData.getFeathers() / 2.0d)
+							&& (ClientFeathersData.getFeathers() % 2 != 0)) ? getIconHalf() : getIconFull();
 
-					int cold = ((ClientFeathersData.isCold()) ? 18 : 0);
-					guiGraphics.blit(ICONS, x + 81 - (i * 8) + xOffset, y- rightOffset - height + yOffset,
-							type, cold, 9, 9, 256, 256);
+					int height = getHeight(i);
+
+					guiGraphics.blit(ICONS, getXPos(x, i, xOffset), getYPos(y, rightOffset, height, yOffset),
+							icon.x, icon.y, icon.width, icon.height, 256, 256);
 				} else {
 					break;
 				}
@@ -100,23 +136,20 @@ public class FeathersHudOverlay {
 			 */
 			//if (Math.ceil(ClientFeathersData.getFeathers() / 20.0d) <= Math.ceil(ClientFeathersData.getWeight() / 20.0d)) {
 			for (int i = 0; i < 10; i++) {
-				if ((i + 1 <= Math.ceil((double) ClientFeathersData.getWeight() / 2.0d))
-						&& (i + 1 <= Math.ceil((double) ClientFeathersData.getFeathers() / 2.0d))) {
-					int height = (k > i * 10 && k < (i + 1) * 10) ? 2 : 0;
+				if ((i + 1 <= Math.ceil((double) ClientFeathersData.getWeight() / 2.0d)) && (i + 1 <= halvedFeathers)) {
 
-					// Check if feather is half or full
-					int type = ((i + 1 == Math.ceil((double) ClientFeathersData.getWeight() / 2.0d)
-							&& (ClientFeathersData.getWeight() % 2 != 0)) ? HALF_ARMORED : ARMORED);
+					GuiIconCoord icon = (i + 1 == Math.ceil((double) ClientFeathersData.getWeight() / 2.0d)
+							&& (ClientFeathersData.getWeight() % 2 != 0)) ? ARMORED_HALF_FEATHER : ARMORED_FULL_FEATHER;
 
-					int lowerFeathers = (i >= Math.floor((double) ClientFeathersData.getFeathers() / 2.0d)) ? 9 : 0;
+					int height = getHeight(i);
 
-					guiGraphics.blit(ICONS, x + 81 - (i * 8) + xOffset, y - rightOffset - height + yOffset,
-							type, lowerFeathers, 9, 9, 256, 256);
+					guiGraphics.blit(ICONS, getXPos(x, i, xOffset), getYPos(y, rightOffset, height, yOffset),
+							icon.x, icon.y, icon.width, icon.height, 256, 256);
 				} else {
 					break;
 				}
 			}
-			//}
+
 
 			/*
 			 * Render feathers past 20 in a different color
@@ -124,13 +157,14 @@ public class FeathersHudOverlay {
 			if (ClientFeathersData.isOverflowing()) {
 				for (int i = 0; i < 10; i++) {
 					if (i + 1 <= Math.ceil((double) (ClientFeathersData.getFeathers() - 20) / 2.0d)) {
-						// Check if feather is half or full
-						int type = (i + 1 == Math.ceil((double) (ClientFeathersData.getFeathers() - 20) / 2.0d)
-								&& ClientFeathersData.getFeathers() % 2 != 0 ? HALF_FLOW : FULL_FLOW);
-						int height = (k > i * 10 && k < (i + 1) * 10) ? 2 : 0;
-						int cold = ((ClientFeathersData.isCold()) ? 18 : 0);
-						guiGraphics.blit(ICONS, x + 81 - (i * 8) + xOffset, y- rightOffset - height + yOffset,
-								type, cold, 9, 9, 256, 256);
+
+						GuiIconCoord icon = (i + 1 == Math.ceil((double) (ClientFeathersData.getFeathers() - 20) / 2.0d)
+								&& ClientFeathersData.getFeathers() % 2 != 0) ? OVERFLOW_HALF_FEATHER : OVERFLOW_FULL_FEATHER;
+
+						int height = getHeight(i);
+
+						guiGraphics.blit(ICONS, getXPos(x, i, xOffset), getYPos(y, rightOffset, height, yOffset),
+								icon.x, icon.y, icon.width, icon.height, 256, 256);
 					} else {
 						break;
 					}
@@ -141,12 +175,12 @@ public class FeathersHudOverlay {
 			 * Render the Regeneration effect
 			 */
 			for (int i = 0; i < 10; i++) {
-				if (ClientFeathersData.getAnimationCooldown() >= 18
-						|| ClientFeathersData.getAnimationCooldown() == 10) {
+				if (ClientFeathersData.getAnimationCooldown() >= 18|| ClientFeathersData.getAnimationCooldown() == 10) {
 					if ((i + 1 <= Math.ceil((double) ClientFeathersData.getMaxFeathers() / 2.0d))) {
-						int height = (k > i * 10 && k < (i + 1) * 10) ? 2 : 0;
-						guiGraphics.blit(ICONS, x + 81 - (i * 8) + xOffset, y - rightOffset - height + yOffset,
-								NONE, 9, 9, 9, 256, 256);
+						int height = getHeight(i);
+						GuiIconCoord icon = REGEN_BACKGROUND;
+						guiGraphics.blit(ICONS, getXPos(x, i, xOffset), getYPos(y, rightOffset, height, yOffset),
+								icon.x, icon.y, icon.width, icon.height, 256, 256);
 					}
 				}
 			}
@@ -173,16 +207,15 @@ public class FeathersHudOverlay {
 			for (int i = 0; i < Math.ceil((double) ClientFeathersData.getEnduranceFeathers() / 20.0d); i++) { //TODO: fix half feathers
 				lines += 10;
 				for (int j = 0; j < 10; j++) {
-					if ((((i) * 10.0d) + (j + 1) <= Math
-							.ceil((double) ClientFeathersData.getEnduranceFeathers() / 2.0d))
+					if ((((i) * 10.0d) + (j + 1) <= Math.ceil((double) ClientFeathersData.getEnduranceFeathers() / 2.0d))
 							&& ClientFeathersData.getEnduranceFeathers() > 0) {
 
-						// Check if feather is half or full
-						int type = (((j + 1) + (10 * i) == Math.ceil((double) ClientFeathersData.getEnduranceFeathers() / 2.0d)
-								&& (ClientFeathersData.getEnduranceFeathers() % 2 != 0)) ? HALF : FULL);
+						GuiIconCoord icon = (((j + 1) + (10 * i) == Math.ceil((double) ClientFeathersData.getEnduranceFeathers() / 2.0d)
+								&& (ClientFeathersData.getEnduranceFeathers() % 2 != 0)) ? ENDURANCE_HALF_FEATHER : ENDURANCE_FULL_FEATHER);
 
-						guiGraphics.blit(ICONS, x + 81 - (j * 8) + xOffset,
-								y /*- 58*/ - rightOffset + yOffset - ((i) * 10), type, 9, 9, 9, 256, 256);
+						guiGraphics.blit(ICONS, getXPos(x, j, xOffset),
+								y /*- 58*/ - rightOffset + yOffset - ((i) * 10),
+								icon.x, icon.y, icon.width, icon.height, 256, 256);
 					} else {
 						break;
 					}
@@ -193,7 +226,8 @@ public class FeathersHudOverlay {
 			}
 
 			if (Feathers.OB_LOADED) {
-				RowCountRenderer.drawBarRowCount(guiGraphics, x + 100 + xOffset, y - rightOffset + 10 + yOffset, ClientFeathersData.getFeathers(), true, minecraft.font);
+				RowCountRenderer.drawBarRowCount(guiGraphics, x + 100 + xOffset, y - rightOffset + 10 + yOffset,
+						ClientFeathersData.getFeathers(), true, minecraft.font);
 			}
 
 		}
@@ -201,5 +235,45 @@ public class FeathersHudOverlay {
 		RenderSystem.disableBlend();
 
 	};
+
+	private static int getYPos(int y, int rightOffset, int height, int yOffset) {
+		return y - rightOffset - height + yOffset;
+	}
+
+	private static int getXPos(int x, int i, int xOffset) {
+		return x + 81 - (i * 8) + xOffset;
+	}
+
+	private static int getHeight(int i) {
+		return (k > i * 10 && k < (i + 1) * 10) ? 2 : 0;
+	}
+
+	private static GuiIconCoord getIconFull(){
+		if (ClientFeathersData.isCold()) {
+			return COLD_FULL_FEATHER;
+		}
+		if (ClientFeathersData.isHot()) {
+			return HOT_FULL_FEATHER;
+		}
+		if(ClientFeathersData.isEnergized()){
+			return ENERGIZED_FULL_FEATHER;
+		}
+		return FeathersClientConfig.ALTERNATIVE_FEATHER_COLOR.get() ? ALTER_FULL_FEATHER : NORMAL_FULL_FEATHER;
+	}
+
+	private static GuiIconCoord getIconHalf(){
+		if (ClientFeathersData.isCold()) {
+			return COLD_HALF_FEATHER;
+		}
+		if (ClientFeathersData.isHot()) {
+			return HOT_HALF_FEATHER;
+		}
+		if(ClientFeathersData.isEnergized()){
+			return ENERGIZED_HALF_FEATHER;
+		}
+		return FeathersClientConfig.ALTERNATIVE_FEATHER_COLOR.get() ? ALTER_HALF_FEATHER : NORMAL_HALF_FEATHER;
+	}
+
+
 
 }
