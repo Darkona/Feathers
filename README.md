@@ -1,15 +1,15 @@
-# Feathers
+# Green Feathers
 
-Feathers is a stamina mod that serves as an API for all my future projects
+Green Feathers is a fork of Feathers, a stamina mod for Minecraft. It add Stamina in the form of Feathers that can be consumed to do things by other mods through an API. Green Feathers provides the Stamina system, regeneration and methods to alter, spend, and otherwise make use of the system. It aims to be highly configurable and easy to use by other mods.
 
 ## Installation
 
-Simply drag and drop the mod downloaded from the files section [here](https://www.curseforge.com/minecraft/mc-mods/feathers/files) into your mods folder after installing [Minecraft Forge](files.minecraftforge.net).
+Simply drag and drop the mod downloaded from the files section *URL PENDING* into your mods folder after installing [Minecraft Forge](files.minecraftforge.net).
 The mods folder is located at  ```%appdata%/.minecraft/mods```.
 
 ## Developer Information
 
-Adding support to Feathers is easy. To import it, simply add this line to your ```build.gradle``` file's ```repositories```.
+Adding support to Green Feathers is easy. To import it, simply add this line to your ```build.gradle``` file's ```repositories```.
 
 ```gradle
 repositories {
@@ -19,7 +19,7 @@ repositories {
 And this to your project's dependencies.
 ```gradle
 dependencies {
-	implementation fg.deobf("curse.maven:feathers-699933:FILE_VERSION") 
+	implementation fg.deobf("curse.maven:feathers-PENDING:FILE_VERSION") 
 }
 ```
 Where ```FILE_VERSION``` is the file ID of the version you want to use. You can find this by opening the URL of an Feathers file download and looking at the url. The numbers at the end are the file ID.
