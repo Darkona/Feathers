@@ -35,9 +35,9 @@ public class FeatherSyncCTSPacket {
 			NetworkEvent.Context context = supplier.get();
 			context.enqueueWork(() -> {
 				context.getSender().getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
-							f.setFeathers(feathers);
-							f.setCooldown(cooldown);
-							f.setEnduranceFeathers(endurance);
+							f.setStamina(feathers);
+							f.setStaminaDelta(cooldown);
+							f.setEnduranceStamina(endurance);
 				});
 
 			});

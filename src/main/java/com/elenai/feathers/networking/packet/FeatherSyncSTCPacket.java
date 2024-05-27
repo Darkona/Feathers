@@ -1,56 +1,59 @@
 package com.elenai.feathers.networking.packet;
 
+import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.client.ClientFeathersData;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
+
 public class FeatherSyncSTCPacket {
-    private final int feathers;
-    private final int maxFeathers;
-    private final int regenRate;
-    private final int weight;
-    private final int endurance;
 
-    private final int maxCooldown;
+    private final int stamina;
+    private final int maxStamina;
+    private final int enduranceStamina;
+    private final int staminaDelta;
+    private final boolean cold;
+    private final boolean hot;
 
-    public FeatherSyncSTCPacket(int feathers, int maxFeathers, int regenRate, int weight, int endurance, int maxCooldown) {
-        this.feathers = feathers;
-        this.maxFeathers = maxFeathers;
-        this.regenRate = regenRate;
-        this.weight = weight;
-        this.endurance = endurance;
-        this.maxCooldown = maxCooldown;
+    public FeatherSyncSTCPacket(PlayerFeathers feathers) {
+        stamina = feathers.getStamina();
+        maxStamina = feathers.getMaxStamina();
+        enduranceStamina = feathers.getEnduranceStamina();
+        staminaDelta = feathers.getStaminaDelta();
+        cold = feathers.isCold();
+        hot = feathers.isHot();
     }
 
     public FeatherSyncSTCPacket(FriendlyByteBuf buf) {
-        this.feathers = buf.readInt();
-        this.maxFeathers = buf.readInt();
-        this.regenRate = buf.readInt();
-        this.weight = buf.readInt();
-        this.endurance = buf.readInt();
-        this.maxCooldown = buf.readInt();
+        stamina = buf.readInt();
+        maxStamina = buf.readInt();
+        enduranceStamina = buf.readInt();
+        staminaDelta = buf.readInt();
+        cold = buf.readBoolean();
+        hot = buf.readBoolean();
     }
 
     public void toBytes(FriendlyByteBuf buf) {
-        buf.writeInt(feathers);
-        buf.writeInt(maxFeathers);
-        buf.writeInt(regenRate);
-        buf.writeInt(weight);
-        buf.writeInt(endurance);
-        buf.writeInt(maxCooldown);
+        buf.writeInt(stamina);
+        buf.writeInt(maxStamina);
+        buf.writeInt(enduranceStamina);
+        buf.writeInt(staminaDelta);
+        buf.writeBoolean(cold);
+        buf.writeBoolean(hot);
     }
+
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
-            ClientFeathersData.setFeathers(feathers);
-            ClientFeathersData.setMaxFeathers(maxFeathers);
-            ClientFeathersData.setRegenRate(regenRate);
-            ClientFeathersData.setWeight(weight);
-            ClientFeathersData.setEnduranceFeathers(endurance);
-            ClientFeathersData.setMaxCooldown(maxCooldown);
+            ClientFeathersData.stamina = stamina;
+            ClientFeathersData.maxStamina = maxStamina;
+            ClientFeathersData.staminaDelta = staminaDelta;
+            ClientFeathersData.enduranceFeathers = enduranceStamina;
+            ClientFeathersData.hot = hot;
+            ClientFeathersData.cold = cold;
         });
         return true;
     }

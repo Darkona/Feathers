@@ -25,7 +25,7 @@ public class EnergizedSyncSTCPacket {
 	public boolean handle(Supplier<NetworkEvent.Context> supplier) {
 		NetworkEvent.Context context = supplier.get();
 		context.enqueueWork(() -> {
-			ClientFeathersData.setEnergized(energized);
+			ClientFeathersData.energized = energized;
 		});
 		return true;
 	}

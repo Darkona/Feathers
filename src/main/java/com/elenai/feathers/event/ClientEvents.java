@@ -29,82 +29,82 @@ import java.util.List;
 
 public class ClientEvents {
 
-	public static int currentWeight;
+    public static int currentWeight;
 
-	@Mod.EventBusSubscriber(modid = Feathers.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
-	public static class ClientModBusEvents {
-		@SubscribeEvent
-		public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
-			event.registerAbove(VanillaGuiOverlay.FOOD_LEVEL.id(), "feathers", FeathersHudOverlay.FEATHERS);
-		}
+    @Mod.EventBusSubscriber(modid = Feathers.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
+    public static class ClientModBusEvents {
+        @SubscribeEvent
+        public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
+            event.registerAbove(VanillaGuiOverlay.FOOD_LEVEL.id(), "feathers", FeathersHudOverlay.FEATHERS);
+        }
 
-	}
+    }
 
-	@Mod.EventBusSubscriber(modid = Feathers.MODID, value = Dist.CLIENT)
-	public static class ClientForgeEvents {
+    @Mod.EventBusSubscriber(modid = Feathers.MODID, value = Dist.CLIENT)
+    public static class ClientForgeEvents {
 
-		@SubscribeEvent
-		public static void clientTickEvents(ClientTickEvent event) {
-			if (event.phase == TickEvent.Phase.START) {
-				if (Minecraft.getInstance().level != null) {
-					ClientFeathersData.setOverflowing(ClientFeathersData.getFeathers() > 20);
+        @SubscribeEvent
+        public static void clientTickEvents(ClientTickEvent event) {
+            if (event.phase == TickEvent.Phase.START) {
+                if (Minecraft.getInstance().level != null) {
+                    ClientFeathersData.overflowing = ClientFeathersData.feathers > 20;
 
-					if (ClientFeathersData.getAnimationCooldown() > 0) {// TODO: improve this animation
-						ClientFeathersData.setAnimationCooldown(ClientFeathersData.getAnimationCooldown() - 1);
-					}
+                    if (ClientFeathersData.animationCooldown > 0) {// TODO: improve this animation
+                        ClientFeathersData.animationCooldown = ClientFeathersData.animationCooldown - 1;
+                    }
 
-					if (ClientFeathersData.getFeathers() != ClientFeathersData.getPreviousFeathers()) {
-						if (ClientFeathersData.getFeathers() > ClientFeathersData.getPreviousFeathers()
-								&& FeathersClientConfig.REGEN_EFFECT.get()) {
-							ClientFeathersData.setAnimationCooldown(18);
-						}
-						ClientFeathersData.setPreviousFeathers(ClientFeathersData.getFeathers());
-					}
+                    if (ClientFeathersData.feathers != ClientFeathersData.previousFeathers) {
+                        if (ClientFeathersData.feathers > ClientFeathersData.previousFeathers
+                                && FeathersClientConfig.REGEN_EFFECT.get()) {
+                            ClientFeathersData.animationCooldown = 18;
+                        }
+                        ClientFeathersData.previousFeathers = ClientFeathersData.feathers;
+                    }
 
-					if (FeathersClientConfig.FADE_WHEN_FULL.get()) {
-						int cooldown = ClientFeathersData.getFadeCooldown();
-						if (ClientFeathersData.getFeathers() == ClientFeathersData.getMaxFeathers()
-						|| ClientFeathersData.getEnduranceFeathers() > 0) {
-							if (cooldown < FeathersClientConfig.FADE_COOLDOWN.get()) {
-								ClientFeathersData.setFadeCooldown(ClientFeathersData.getFadeCooldown() + 1);
-							}
-						} else { ClientFeathersData.setFadeCooldown(0); }
-					}
-				}
-			}
-		}
+                    if (FeathersClientConfig.FADE_WHEN_FULL.get()) {
+                        int cooldown = ClientFeathersData.fadeCooldown;
+                        if (ClientFeathersData.feathers == ClientFeathersData.maxFeathers
+                                || ClientFeathersData.enduranceFeathers > 0) {
+                            if (cooldown < FeathersClientConfig.FADE_COOLDOWN.get()) {
+                                ClientFeathersData.fadeCooldown = ClientFeathersData.fadeCooldown + 1;
+                            }
+                        } else {ClientFeathersData.fadeCooldown = 0;}
+                    }
+                }
+            }
+        }
 
-		@SubscribeEvent
-		public static void tooltipRenderer(ItemTooltipEvent event) {
-			if (Minecraft.getInstance().level != null) {
-				if (!event.getItemStack().isEmpty() && event.getItemStack().getItem() instanceof ArmorItem
-						&& FeathersClientConfig.DISPLAY_WEIGHTS.get()) { // Surprisingly easy way to render feathers using
-					// fonts
+        @SubscribeEvent
+        public static void tooltipRenderer(ItemTooltipEvent event) {
+            if (Minecraft.getInstance().level != null) {
+                if (!event.getItemStack().isEmpty() && event.getItemStack().getItem() instanceof ArmorItem
+                        && FeathersClientConfig.DISPLAY_WEIGHTS.get()) { // Surprisingly easy way to render feathers using
+                    // fonts
 
-					FeathersMessages.sendToServer(new RequestWeightCTSPacket(Item.getId(event.getItemStack().getItem()),
-							ArmorHandler.getItemEnchantmentLevel(FeathersEnchantments.LIGHTWEIGHT.get(), event.getItemStack()),
-							ArmorHandler.getItemEnchantmentLevel(FeathersEnchantments.HEAVY.get(), event.getItemStack())));
-					if (currentWeight > 0) {
-						StringBuilder s = new StringBuilder();
-						List<Component> tooltip = event.getToolTip();
-						if (FeathersClientConfig.VISUAL_WEIGHTS.get()) {
-							for (int i = 2; i <= currentWeight + 1; i += 2) {
-								if (i - 1 == currentWeight) {
-									s.append("b");
-								} else {
-									s.append("a ");
-								}
-							}
-							s.reverse();
-							tooltip.add(Component.literal(s.toString())
-									.withStyle(Style.EMPTY.withFont(new ResourceLocation(Feathers.MODID, "feather_font"))));
-						} else {
-							tooltip.add(Component.translatable("text.feathers.tooltip", currentWeight).withStyle(ChatFormatting.BLUE));
-						}
-					}
-				}
-			}
-		}
+                    FeathersMessages.sendToServer(new RequestWeightCTSPacket(Item.getId(event.getItemStack().getItem()),
+                            ArmorHandler.getItemEnchantmentLevel(FeathersEnchantments.LIGHTWEIGHT.get(), event.getItemStack()),
+                            ArmorHandler.getItemEnchantmentLevel(FeathersEnchantments.HEAVY.get(), event.getItemStack())));
+                    if (currentWeight > 0) {
+                        StringBuilder s = new StringBuilder();
+                        List<Component> tooltip = event.getToolTip();
+                        if (FeathersClientConfig.VISUAL_WEIGHTS.get()) {
+                            for (int i = 2; i <= currentWeight + 1; i += 2) {
+                                if (i - 1 == currentWeight) {
+                                    s.append("b");
+                                } else {
+                                    s.append("a ");
+                                }
+                            }
+                            s.reverse();
+                            tooltip.add(Component.literal(s.toString())
+                                                 .withStyle(Style.EMPTY.withFont(new ResourceLocation(Feathers.MODID, "feather_font"))));
+                        } else {
+                            tooltip.add(Component.translatable("text.feathers.tooltip", currentWeight).withStyle(ChatFormatting.BLUE));
+                        }
+                    }
+                }
+            }
+        }
 
-	}
+    }
 }

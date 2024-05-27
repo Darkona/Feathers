@@ -1,6 +1,7 @@
 package com.elenai.feathers;
 
 import com.elenai.feathers.attributes.FeathersAttributes;
+import com.elenai.feathers.commands.CommandInit;
 import com.elenai.feathers.config.FeathersClientConfig;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.effect.FeathersEffects;
@@ -40,6 +41,7 @@ public class Feathers {
 		FeathersEffects.register(modEventBus);
 		FeathersPotions.register(modEventBus);
 		FeathersEnchantments.register(modEventBus);
+		CommandInit.ARGUMENTS.register(modEventBus);
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 

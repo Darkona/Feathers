@@ -2,134 +2,129 @@ package com.elenai.feathers.capability;
 
 import com.elenai.feathers.config.FeathersCommonConfig;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
 
-public class PlayerFeathers {
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
-	private int feathers = 20;
-	private int maxFeathers = 20;
-	private int cooldownReduction = 1;
-	private final int MIN_FEATHERS = 0;
-	
-	private int enduranceFeathers = 0;
-	
-	private int cooldown = 0;
-	private int maxCooldown = FeathersCommonConfig.COOLDOWN.get();
-	private final int MIN_COOLDOWN = 0;
-	
+@Getter
+@Setter
+public class PlayerFeathers implements Serializable {
+
+	private int stamina = 200;
+	private int maxStamina = 200;
+	private final int ZERO = 0;
+	private int enduranceStamina = 0;
+	private int staminaDelta = 0;
+	private int strain = 0;
+	private int maxStrain = 200;
+
 	private boolean cold = false;
 	private boolean hot = true;
+	private boolean shouldRecalculate = false;
 
-	public int getMaxCooldown() {
-		return maxCooldown;
-	}
+	private Map<String, Function<Integer,Integer>> staminaDeltaModifiers = new HashMap<>();
 
-	public void setMaxCooldown(int cooldown) {
-		this.maxCooldown = cooldown;
-	}
-	public void setHot(boolean hot){
-		this.hot = hot;
+	private static final Function <Integer, Integer> regeneration = (i) -> i + FeathersCommonConfig.REGENERATION.get();
+
+	public PlayerFeathers() {
+		addDeltaModifier("regeneration", regeneration);
 	}
 
-	public boolean isHot(){
-		return hot;
-	}
-	public int getFeathers() {
-		return feathers;
-	}
 
-	public void setFeathers(int feathers) {
-		this.feathers = feathers;
-	}
+	public void addDeltaModifier(String key, @NonNull Function<Integer, Integer> modifier) {
 
-	public int getMaxFeathers() {
-		return maxFeathers;
-	}
-
-	public void setMaxFeathers(int feathers) {
-		this.maxFeathers = feathers;
-		if (getFeathers() > feathers) {
-			setFeathers(feathers);
+		var prev = staminaDeltaModifiers.put(key, modifier);
+		if(prev != modifier){
+			shouldRecalculate = true;
 		}
 	}
 
-	public int getRegen() {
-		return this.cooldownReduction;
+
+	public void recalculateStaminaDelta(){
+		if(!shouldRecalculate)return;
+
+		staminaDeltaModifiers.forEach((key, modifier) -> {
+			if(modifier != null)
+				staminaDelta += modifier.apply(staminaDelta);
+		});
+		shouldRecalculate = false;
 	}
 
-	public void setRegen(int ticks) {
-		this.cooldownReduction = ticks;
+	public void removeDeltaModifier(String key) {
+
+		if(staminaDeltaModifiers.remove(key) != null)
+			shouldRecalculate = true;
+	}
+	public void applyStaminaDelta(){
+
+		stamina = Math.min(Math.max(stamina + staminaDelta, ZERO), maxStamina);
+	}
+
+	public void setMaxStamina(int feathers) {
+
+		this.maxStamina = feathers;
+		if (getStamina() > feathers) {
+			setStamina(feathers);
+		}
 	}
 
 	public void addFeathers(int feathers) {
-		this.feathers = Math.min(this.feathers + feathers, maxFeathers);
+
+		this.stamina = Math.min(this.stamina + feathers, maxStamina);
 	}
 
 	public void subFeathers(int feathers) {
-		this.feathers = Math.max(this.feathers - feathers, MIN_FEATHERS);
+
+		this.stamina = Math.max(this.stamina - feathers, ZERO);
 	}
 
 	public void copyFrom(PlayerFeathers source) {
-		this.feathers = source.feathers;
-		this.cooldown = source.cooldown;
-		this.enduranceFeathers = source.enduranceFeathers;
+
+		this.stamina = source.stamina;
+		this.enduranceStamina = source.enduranceStamina;
 		this.cold = source.cold;
 	}
 
 	public void saveNBTData(CompoundTag nbt) {
-		nbt.putInt("feathers", this.feathers);
-		nbt.putInt("max_feathers", this.maxFeathers);
-		nbt.putInt("cooldown", this.cooldown);
-		nbt.putInt("cooldown_reduction", this.cooldownReduction);
-		nbt.putInt("endurance_feathers", this.enduranceFeathers);
+
+		nbt.putInt("feathers", this.stamina);
+		nbt.putInt("max_feathers", this.maxStamina);
+		nbt.putInt("stamina_delta", this.staminaDelta);
+		nbt.putInt("endurance_feathers", this.enduranceStamina);
 		nbt.putBoolean("cold", this.cold);
+		nbt.putBoolean("hot", this.hot);
+		nbt.putBoolean("should_recalculate", this.shouldRecalculate);
 	}
 
 	public void loadNBTData(CompoundTag nbt) {
-		this.feathers = nbt.getInt("feathers");
-		this.maxFeathers = nbt.getInt("max_feathers");
-		this.cooldown = nbt.getInt("cooldown");
-		this.cooldownReduction = nbt.getInt("cooldown_reduction");
-		this.enduranceFeathers = nbt.getInt("endurance_feathers");
+
+		this.stamina = nbt.getInt("feathers");
+		this.maxStamina = nbt.getInt("max_feathers");
+		this.staminaDelta = nbt.getInt("stamina_delta");
+		this.enduranceStamina = nbt.getInt("endurance_feathers");
+		this.shouldRecalculate = nbt.getBoolean("should_recalculate");
 		this.cold = nbt.getBoolean("cold");
-	}
-
-	public int getCooldown() {
-		return Math.round( cooldown);
-	}
-
-	public void setCooldown(int cooldown) {
-		this.cooldown = cooldown;
-	}
-
-	public void addCooldown(int ticks) {
-		this.cooldown = Math.min(this.cooldown + ticks, maxCooldown);
-	}
-	public void subCooldown(int ticks) {
-		this.cooldown = Math.max(this.cooldown - ticks, MIN_COOLDOWN);
-	}
-
-	public boolean isCold() {
-		return cold;
-	}
-
-	public void setCold(boolean cold) {
-		this.cold = cold;
-	}
-
-	public int getEnduranceFeathers() {
-		return enduranceFeathers;
-	}
-
-	public void setEnduranceFeathers(int enduranceFeathers) {
-		this.enduranceFeathers = enduranceFeathers;
+		this.hot = nbt.getBoolean("hot");
 	}
 
 	public void addEndurance(int feathers) {
-		this.enduranceFeathers = this.enduranceFeathers + feathers;
+
+		this.enduranceStamina = this.enduranceStamina + feathers;
 	}
 
-	public void subEndurance(int feathers) { //TODO: Put this in the api to access it, we need to ensure if we overlap into regular feathers 
-		this.enduranceFeathers = Math.max(this.enduranceFeathers - feathers, 0);
+	public void subEndurance(int feathers) {
+
+		this.enduranceStamina = Math.max(this.enduranceStamina - feathers, 0);
+	}
+
+	public boolean isEnergized() {
+
+		return enduranceStamina > 0;
 	}
 }

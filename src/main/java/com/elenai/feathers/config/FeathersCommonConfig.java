@@ -15,7 +15,7 @@ public class FeathersCommonConfig {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
 
-    public static final ForgeConfigSpec.ConfigValue<Integer> COOLDOWN;
+    public static final ForgeConfigSpec.ConfigValue<Integer> REGENERATION;
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_ARMOR_WEIGHTS;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ARMOR_WEIGHTS;
@@ -57,9 +57,9 @@ public class FeathersCommonConfig {
         boolean isColdSweatLoaded = ModList.get().isLoaded("cold_sweat");
         BUILDER.push("Feathers' Config");
 
-        COOLDOWN = BUILDER
-                .comment("How many ticks it takes to regenerate half a feather.")
-                          .define("Feathers Cooldown", 40);
+        REGENERATION = BUILDER
+                .comment("How many stamina regenerates per tick. 10 stamina = 1 feather.")
+                          .define("Base Stamina Regeneration", 2);
 
         /*
          * Add all current armor types on config creation
@@ -77,11 +77,11 @@ public class FeathersCommonConfig {
 
         ENABLE_ARMOR_WEIGHTS = BUILDER
                 .comment("If enabled, armor types have weight, this reduces the amount of feathers you can use based on how heavy your armor is")
-                .define("Enable Armor Weights", true);
+                .define("Enable Armor Weights", false);
         
         ENABLE_COLD_EFFECTS = BUILDER
                 .comment("Whether the Cold Effect is enabled. When the effect is active, feathers regenerate slower.")
-                .define("Enable Cold Effect", true);
+                .define("Enable Cold Effect", false);
 
         COLD_EFFECT_COOLDOWN_MULTIPLIER = BUILDER
                 .comment("How muc does the cooldown multiply by when Cold Effect is applied. Values can range from 1 (which would have no effect) up to 20. " +
@@ -90,7 +90,7 @@ public class FeathersCommonConfig {
 
         ENABLE_HOT_EFFECTS = BUILDER
                 .comment("Whether the Hot Effect is enabled. When the effect is active, feathers are reduced. Fatigue is applied when the player is hot or burning")
-                .define("Enable Hot Effect", true);
+                .define("Enable Hot Effect", false);
 
         HOT_FEATHER_REDUCTION = BUILDER.
                 comment("Multiplier for the feather reduction when affected by heat. Values can range from 0 to 20." +
@@ -100,16 +100,16 @@ public class FeathersCommonConfig {
 
         ENABLE_LIGHTWEIGHT_ENCHANTMENT = BUILDER
                 .comment("Whether the Lightweight enchantment can be applied in an enchantment table, or if it is treasure only.")
-                .define("Enable Lightweight Enchantment in Table", true);
+                .define("Enable Lightweight Enchantment in Table", false);
 
         ENABLE_ENDURANCE = BUILDER
                 .comment("Whether the Endurance effect is enabled and the potions registered.")
-                .define("Enable Endurance effect", true);
+                .define("Enable Endurance effect", false);
 
         ENDURANCE_ENCHANTMENT_REGEN = BUILDER
                 .comment("Whether the Endurance effect also regenerates the extra feathers while active. " +
                         "If false, the effect only adds temporal extra feathers.")
-                .define("Endurance Enchantment Regeneration", true);
+                .define("Endurance Enchantment Regeneration", false);
 
         COLD_LINGER = BUILDER
                 .comment("How long does the Cold Effect linger after stopping being cold")

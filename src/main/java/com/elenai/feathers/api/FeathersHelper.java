@@ -23,6 +23,8 @@ import net.minecraft.world.item.Items;
 
 public class FeathersHelper {
 
+
+
 	/**
 	 * Sets the inputted players feathers and syncs them to the client
 	 * 
@@ -32,9 +34,8 @@ public class FeathersHelper {
 	 */
 	public static void setFeathers(ServerPlayer player, int feathers) {
 		player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
-			f.setFeathers(feathers);
-			f.setCooldown(0);
-			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers(), getMaxFeathers()), player);
+			f.setStamina(feathers);
+			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
 		});
 	}
 
@@ -49,8 +50,8 @@ public class FeathersHelper {
 		player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
 			if (player.getAttributeValue(FeathersAttributes.MAX_FEATHERS.get()) != feathers)
 				player.getAttribute(FeathersAttributes.MAX_FEATHERS.get()).setBaseValue(feathers);
-			f.setMaxFeathers(feathers);
-			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers(), f.getMaxCooldown()), player);
+			f.setMaxStamina(feathers);
+			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
 		});
 	}
 
@@ -59,12 +60,12 @@ public class FeathersHelper {
 	 *
 	 * @side server
 	 * @param player Player to set max feathers for
-	 * @param ticks Amount of feathers to set
+	 * @param staminaPerTick Amount of stamina per tick for regeneration
 	 */
-	public static void setFeatherRegen(ServerPlayer player, int ticks) {
+	public static void setFeatherRegen(ServerPlayer player, int staminaPerTick) {
 		player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
-			f.setRegen(ticks);
-			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers(), f.getMaxCooldown()), player);
+			f.setStaminaDelta(staminaPerTick);
+			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
 		});
 	}
 
@@ -76,7 +77,14 @@ public class FeathersHelper {
 	 * @return the player's feathers
 	 */
 	public static int getFeathers(ServerPlayer player) {
-		return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).map(PlayerFeathers::getFeathers).orElse(0);
+		return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
+					 .map(PlayerFeathers::getStamina).orElse(0);
+	}
+
+
+	public static int getUseableFeathers(ServerPlayer player){
+		return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
+					 .map(PlayerFeathers::getStamina).orElse(0);
 	}
 
 	/**
@@ -87,7 +95,7 @@ public class FeathersHelper {
 	 * @return the player's feathers
 	 */
 	public static int getMaxFeathers(ServerPlayer player) {
-		return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).map(PlayerFeathers::getMaxFeathers).orElse(0);
+		return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).map(PlayerFeathers::getMaxStamina).orElse(0);
 	}
 
 	/**
@@ -97,7 +105,7 @@ public class FeathersHelper {
 	 * @return the player's feathers
 	 */
 	public static int getFeathers() {
-		return ClientFeathersData.getFeathers();
+		return ClientFeathersData.stamina / 10;
 	}
 
 	/**
@@ -107,7 +115,7 @@ public class FeathersHelper {
 	 * @return the player's feathers
 	 */
 	public static int getMaxFeathers() {
-		return ClientFeathersData.getMaxFeathers();
+		return ClientFeathersData.maxStamina / 10;
 	}
 
 	/**
@@ -118,7 +126,7 @@ public class FeathersHelper {
 	 * @return the player's feathers
 	 */
 	public static int getEndurance(ServerPlayer player) {
-		return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).map(PlayerFeathers::getEnduranceFeathers).orElse(0);
+		return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).map(PlayerFeathers::getEnduranceStamina).orElse(0);
 	}
 
 	/**
@@ -128,7 +136,7 @@ public class FeathersHelper {
 	 * @return the player's feathers
 	 */
 	public static int getEndurance() {
-		return ClientFeathersData.getEnduranceFeathers();
+		return ClientFeathersData.enduranceFeathers;
 	}
 
 	/**
@@ -141,8 +149,7 @@ public class FeathersHelper {
 	public static void addFeathers(ServerPlayer player, int feathers) {
 		player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
 			f.addFeathers(feathers);
-			f.setCooldown(0);
-			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers(), f.getMaxCooldown()), player);
+			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
 		});
 	}
 
@@ -160,8 +167,7 @@ public class FeathersHelper {
 	public static void subFeathers(ServerPlayer player, int feathers) {
 		player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
 			f.subFeathers(feathers);
-			f.setCooldown(0);
-			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers(), f.getMaxCooldown()), player);
+			FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
 		});
 	}
 
@@ -185,16 +191,15 @@ public class FeathersHelper {
 		if (Math.min(getPlayerWeight(player), 20) <= (getFeathers(player) + getEndurance(player) - feathers)) {
 			player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
 				
-				int amount = f.getEnduranceFeathers()-feathers;
-				if(f.getEnduranceFeathers() > 0) {
-					f.setEnduranceFeathers(Math.max(0, amount));
+				int amount = f.getEnduranceStamina()-feathers;
+				if(f.getEnduranceStamina() > 0) {
+					f.setEnduranceStamina(Math.max(0, amount));
 				}
 				if(amount < 0) {
 					f.addFeathers(amount);
 				}
 				
-				f.setCooldown(0);
-				FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f.getFeathers(), f.getMaxFeathers(), f.getRegen(), getPlayerWeight(player), f.getEnduranceFeathers(), f.getMaxCooldown()), player);
+				FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
 			});
 			return true;
 		}
@@ -218,18 +223,18 @@ public class FeathersHelper {
 		Minecraft instance = Minecraft.getInstance();
 		if (instance.player.isCreative() || instance.player.isSpectator()) { return true; }
 		
-		if (Math.min(ClientFeathersData.getWeight(), 20) <= (getFeathers() + getEndurance() - feathers)) {
+		if (Math.min(ClientFeathersData.weight, 20) <= (getFeathers() + getEndurance() - feathers)) {
 				
-				int amount = ClientFeathersData.getEnduranceFeathers()-feathers;
-				if(ClientFeathersData.getEnduranceFeathers() > 0) {
-					ClientFeathersData.setEnduranceFeathers(Math.max(0, amount));
-					ClientFeathersData.setFadeCooldown(0);
+				int amount = ClientFeathersData.enduranceFeathers-feathers;
+				if(ClientFeathersData.enduranceFeathers > 0) {
+					ClientFeathersData.enduranceFeathers = Math.max(0, amount);
+					ClientFeathersData.fadeCooldown = 0;
 				}
 				if(amount < 0) {
-					ClientFeathersData.setFeathers(ClientFeathersData.getFeathers() + amount);
+					ClientFeathersData.feathers = ClientFeathersData.feathers + amount;
 				}
 				
-				FeathersMessages.sendToServer(new FeatherSyncCTSPacket(ClientFeathersData.getFeathers(), ClientFeathersData.getEnduranceFeathers(), 0));
+				FeathersMessages.sendToServer(new FeatherSyncCTSPacket(ClientFeathersData.feathers, ClientFeathersData.enduranceFeathers, 0));
 			return true;
 		}
 		return false;
@@ -325,7 +330,7 @@ public class FeathersHelper {
 	 * @return Whether the player has feathers to spend
 	 */
 	public static boolean checkFeathersRemaining() {
-		return getFeathers() + getEndurance() > ClientFeathersData.getWeight();
+		return getFeathers() + getEndurance() > ClientFeathersData.weight;
 	}
 
 	public static void setHot(ServerPlayer player, boolean b) {

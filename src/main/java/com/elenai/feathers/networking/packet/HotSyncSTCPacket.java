@@ -25,7 +25,7 @@ public class HotSyncSTCPacket {
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
-            ClientFeathersData.setHot(hot);
+            ClientFeathersData.hot = (hot);
         });
         return true;
     }
