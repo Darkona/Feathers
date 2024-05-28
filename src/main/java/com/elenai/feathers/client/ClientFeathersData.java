@@ -31,4 +31,8 @@ public class ClientFeathersData {
     public static int getMaxFeathers(){
         return maxStamina / FeathersConstants.STAMINA_PER_FEATHER;
     }
+
+    public static void setFeathers(int i) {
+        stamina = i * FeathersConstants.STAMINA_PER_FEATHER;
+    }
 }

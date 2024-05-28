@@ -3,6 +3,7 @@ package com.elenai.feathers.capability;
 import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.config.FeathersCommonConfig;
 
+import com.elenai.feathers.event.FeatherChangeEvent;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -19,6 +20,10 @@ public class PlayerFeathers  {
 
 	private int stamina = FeathersCommonConfig.MAX_STAMINA.get();
 	private int maxStamina = FeathersCommonConfig.MAX_STAMINA.get();
+
+	private int feathers = 0;
+	private int maxFeathers = FeathersCommonConfig.MAX_STAMINA.get() / FeathersConstants.STAMINA_PER_FEATHER;
+
 	private final int ZERO = 0;
 
 	private int enduranceStamina = 0;
@@ -52,20 +57,16 @@ public class PlayerFeathers  {
 
 	public void setStamina(int stamina) {
 		this.stamina = Math.min(Math.max(stamina, ZERO), maxStamina);
+		synchronizeFeathers();
 	}
 
 	public int getFeathers(){
 		return stamina / FeathersConstants.STAMINA_PER_FEATHER;
 	}
 
-	public int getMaxFeathers(){
-		return maxStamina / FeathersConstants.STAMINA_PER_FEATHER;
-	}
-
 	public void setFeathers(int feathers){
 		this.stamina = feathers * FeathersConstants.STAMINA_PER_FEATHER;
 	}
-
 
 	public void addDeltaModifier(String key, @NonNull Function<Integer, Integer> modifier) {
 
@@ -99,25 +100,38 @@ public class PlayerFeathers  {
 		if(stamina > maxStamina) stamina = maxStamina;
 
 		if(stamina < ZERO) stamina = ZERO;
+
+		synchronizeFeathers();
+	}
+
+	private void synchronizeFeathers(){
+		feathers = stamina / FeathersConstants.STAMINA_PER_FEATHER;
 	}
 
 	public void setMaxStamina(int maxStamina) {
 		this.maxStamina = Math.min(maxStamina, FeathersConstants.STAMINA_CAP);
 	}
 
+	public int gainFeathers(int feathers){
+
+		addFeathers(feathers);
+		return feathers;
+	}
 	public int useFeathers(int feathers) {
 
-		this.stamina = Math.max(this.stamina - feathers, ZERO);
-		return this.stamina;
+		subFeathers(feathers);
+		return feathers;
 	}
-	public void addFeathers(int feathers) {
+	private void addFeathers(int feathers) {
 
-		this.stamina = Math.min(this.stamina + feathers, maxStamina);
+		this.stamina = Math.min(this.stamina + feathers * FeathersConstants.STAMINA_PER_FEATHER, maxStamina);
+		synchronizeFeathers();
 	}
 
-	public void subFeathers(int feathers) {
+	private void subFeathers(int feathers) {
 
-		this.stamina = Math.max(this.stamina - feathers, ZERO);
+		this.stamina = Math.max(this.stamina - feathers * FeathersConstants.STAMINA_PER_FEATHER, ZERO);
+		synchronizeFeathers();
 	}
 
 	public void copyFrom(PlayerFeathers source) {
@@ -153,6 +167,7 @@ public class PlayerFeathers  {
 		this.cold = nbt.getBoolean("cold");
 		this.hot = nbt.getBoolean("hot");
 		this.energized = nbt.getBoolean("energized");
+		synchronizeFeathers();
 	}
 
 	public void addEndurance(int enduranceStamina) {

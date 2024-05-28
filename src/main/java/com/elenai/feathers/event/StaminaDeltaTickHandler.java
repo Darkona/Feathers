@@ -31,11 +31,11 @@ public class StaminaDeltaTickHandler {
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
 
                     if (f.getStamina() == 0) {
-                        MinecraftForge.EVENT_BUS.post(new FeathersEvents.FeathersEmptyEvent(player));
+                        MinecraftForge.EVENT_BUS.post(new FeatherAmountEvent.Empty(player));
                         FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
                     }
                     if (f.getStamina() == f.getMaxStamina()) {
-                        MinecraftForge.EVENT_BUS.post(new FeathersEvents.FeathersFullEvent(player));
+                        MinecraftForge.EVENT_BUS.post(new FeatherAmountEvent.Full(player));
                         FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
                     }
 
@@ -47,7 +47,7 @@ public class StaminaDeltaTickHandler {
                     }
 
                     if (f.getStamina() < f.getMaxStamina() && f.getStaminaDelta() > 0) {
-                        MinecraftForge.EVENT_BUS.post(new FeathersEvents.FeathersRegenerateEvent(player));
+                        MinecraftForge.EVENT_BUS.post(new FeatherChangeEvent.Regenerate(player));
                     }
 
                     f.applyStaminaDelta();

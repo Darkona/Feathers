@@ -10,6 +10,7 @@ import com.elenai.feathers.networking.packet.Effect;
 import com.elenai.feathers.networking.packet.EffectChangeSTCPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -57,13 +58,13 @@ public class EffectHandler {
         ServerPlayer player = (ServerPlayer) event.player;
         if (PlayerSituationProvider.isInColdSituation(player)) {
 
-            if (!player.hasEffect(FeathersEffects.COLD.get()) ||
-                    player.getActiveEffectsMap().get(FeathersEffects.COLD.get()).getDuration() <= 201) {
+            if (!player.hasEffect(FeathersEffects.COLD.get())) {
 
-                if (player.hasEffect(FeathersEffects.HOT.get()))
+                if (player.hasEffect(FeathersEffects.HOT.get()) &&
+                        player.getActiveEffectsMap().get(FeathersEffects.HOT.get()).getDuration() <= 0){
                     player.removeEffect(FeathersEffects.HOT.get());
-
-                player.addEffect(new MobEffectInstance(FeathersEffects.COLD.get(), 1200, 0, false, true));
+                    player.addEffect(new MobEffectInstance(FeathersEffects.COLD.get(), -1, 0, false, true));
+                }
             }
 
         } else if (player.hasEffect(FeathersEffects.COLD.get()) &&
@@ -91,14 +92,12 @@ public class EffectHandler {
         ServerPlayer player = (ServerPlayer) event.player;
         if (PlayerSituationProvider.isInHotSituation(player)) {
 
-            if (!player.hasEffect(FeathersEffects.HOT.get()) ||
-                    player.getActiveEffectsMap().get(FeathersEffects.HOT.get()).getDuration() <= 201) {
+            if (!player.hasEffect(FeathersEffects.HOT.get())) {
 
                 if (player.hasEffect(FeathersEffects.COLD.get()))
                     player.removeEffect(FeathersEffects.COLD.get());
 
-                player.addEffect(new MobEffectInstance(FeathersEffects.HOT.get(),
-                        1200, 0, false, true));
+                player.addEffect(new MobEffectInstance(FeathersEffects.HOT.get(),-1, 0, false, true));
             }
         } else if (player.hasEffect(FeathersEffects.HOT.get())) {
             player.removeEffect(FeathersEffects.HOT.get());
