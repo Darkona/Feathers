@@ -13,9 +13,13 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class FeathersCommonConfig {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+
+
     public static final ForgeConfigSpec SPEC;
 
     public static final ForgeConfigSpec.ConfigValue<Integer> REGENERATION;
+
+    public static final ForgeConfigSpec.ConfigValue<Integer> MAX_STAMINA;
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_ARMOR_WEIGHTS;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ARMOR_WEIGHTS;
@@ -58,8 +62,11 @@ public class FeathersCommonConfig {
         BUILDER.push("Feathers' Config");
 
         REGENERATION = BUILDER
-                .comment("How many stamina regenerates per tick. 10 stamina = 1 feather.")
+                .comment("How many stamina regenerates per tick. 100 stamina = 1 feather.")
                           .define("Base Stamina Regeneration", 2);
+
+        MAX_STAMINA = BUILDER.comment("Maximum stamina the player can have. 1000 stamina = 1 feather.")
+                .define("Max Stamina", 20000);
 
         /*
          * Add all current armor types on config creation

@@ -152,7 +152,7 @@ public class FeathersCommands extends BaseCommand {
 
         if (entities.size() == 1) {
             Entity target = entities.iterator().next();
-            source.sendSuccess(() -> Component.translatable("Set the stamina of %d to %d", target.getName().getString(), amount), true);
+            source.sendSuccess(() -> Component.literal("Set the stamina of " + target.getName().getString() + " to " + amount), true);
         } else {
             source.sendSuccess(() -> Component.translatable("Whatever", entities.size(), amount), true);
         }

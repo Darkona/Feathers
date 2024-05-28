@@ -12,3 +12,15 @@ Hooks for:
 - Feather regeneration delay
 - Feather regeneration amount
 - Feather regeneration max amount
+. - Effects:
+
+    + Max Stamina = Endurance
+    - Max Stamina = Fatigue
+
+    + Regen = Energized
+    - Regen = Cold
+
+    + Usage= Burning
+    - Usage= Momentum
+
+

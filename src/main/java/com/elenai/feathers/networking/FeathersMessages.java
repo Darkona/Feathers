@@ -2,7 +2,6 @@ package com.elenai.feathers.networking;
 
 import com.elenai.feathers.Feathers;
 import com.elenai.feathers.networking.packet.*;
-
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -20,10 +19,11 @@ public class FeathersMessages {
     }
 
     public static void register() {
-        SimpleChannel network = NetworkRegistry.ChannelBuilder.named(new ResourceLocation(Feathers.MODID, "messages"))
-                                                              .networkProtocolVersion(() -> "1.0").clientAcceptedVersions(s -> true)
-                                                              .serverAcceptedVersions(s -> true)
-                                                              .simpleChannel();
+        SimpleChannel network =
+                NetworkRegistry.ChannelBuilder.named(new ResourceLocation(Feathers.MODID, "messages"))
+                                              .networkProtocolVersion(() -> "1.0").clientAcceptedVersions(s -> true)
+                                              .serverAcceptedVersions(s -> true)
+                                              .simpleChannel();
         INSTANCE = network;
 
         network.messageBuilder(FeatherSyncCTSPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
@@ -50,22 +50,10 @@ public class FeathersMessages {
                .consumerMainThread(FeatherSyncSTCPacket::handle)
                .add();
 
-        network.messageBuilder(ColdSyncSTCPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-               .decoder(ColdSyncSTCPacket::new)
-               .encoder(ColdSyncSTCPacket::toBytes)
-               .consumerMainThread(ColdSyncSTCPacket::handle)
-               .add();
-
-        network.messageBuilder(EnergizedSyncSTCPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-               .decoder(EnergizedSyncSTCPacket::new)
-               .encoder(EnergizedSyncSTCPacket::toBytes)
-               .consumerMainThread(EnergizedSyncSTCPacket::handle)
-               .add();
-
-        network.messageBuilder(HotSyncSTCPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-               .decoder(HotSyncSTCPacket::new)
-               .encoder(HotSyncSTCPacket::toBytes)
-               .consumerMainThread(HotSyncSTCPacket::handle)
+        network.messageBuilder(EffectChangeSTCPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+               .decoder(EffectChangeSTCPacket::new)
+               .encoder(EffectChangeSTCPacket::toBytes)
+               .consumerMainThread(EffectChangeSTCPacket::handle)
                .add();
 
     }

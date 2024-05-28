@@ -1,7 +1,8 @@
 package com.elenai.feathers.effect;
 
 import com.elenai.feathers.networking.FeathersMessages;
-import com.elenai.feathers.networking.packet.EnergizedSyncSTCPacket;
+import com.elenai.feathers.networking.packet.Effect;
+import com.elenai.feathers.networking.packet.EffectChangeSTCPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -17,7 +18,7 @@ public class EnergizedEffect extends MobEffect {
     @Override
     public void addAttributeModifiers(LivingEntity target, AttributeMap map, int strength) {
         if (target instanceof ServerPlayer player) {
-            FeathersMessages.sendToPlayer(new EnergizedSyncSTCPacket(true), player);
+            FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.ENERGIZED,true), player);
         }
         super.addAttributeModifiers(target, map, strength);
     }
@@ -25,7 +26,7 @@ public class EnergizedEffect extends MobEffect {
     @Override
     public void removeAttributeModifiers(LivingEntity target, AttributeMap map, int strength) {
         if (target instanceof ServerPlayer player) {
-            FeathersMessages.sendToPlayer(new EnergizedSyncSTCPacket(false), player);
+            FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.ENERGIZED,false), player);
         }
         super.removeAttributeModifiers(target, map, strength);
     }

@@ -1,6 +1,7 @@
 package com.elenai.feathers.client.gui;
 
 import com.elenai.feathers.Feathers;
+import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.client.ClientFeathersData;
 import com.elenai.feathers.config.FeathersClientConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -51,7 +52,7 @@ public class FeathersHudOverlay {
     public static int k = 0;
     static float alpha = 1.0f;
 
-    public static final double STAMINA_PER_FEATHER = 20.0d;
+
     /**
      * Renders the Feathers to the hotbar
      */
@@ -96,7 +97,7 @@ public class FeathersHudOverlay {
              */
 
             for (int i = 0; i < 10; i++) {
-                if ((i + 1 <= Math.ceil((double) ClientFeathersData.maxFeathers / STAMINA_PER_FEATHER))) {
+                if ((i + 1 <= Math.ceil((double) ClientFeathersData.getMaxFeathers() / 2))) {
 
                     GuiIcon icon = ((ClientFeathersData.cold) ? COLD_BACKGROUND : NORMAL_BACKGROUND);
 
@@ -108,12 +109,12 @@ public class FeathersHudOverlay {
             /*
              * Only render the currently active feathers
              */
-            double halvedFeathers = Math.ceil((double) ClientFeathersData.stamina / STAMINA_PER_FEATHER);
+            double halvedFeathers = Math.ceil(ClientFeathersData.getFeathers() / 2.0d);
             for (int i = 0; i < 10; i++) {
-                if ((i + 1 <= halvedFeathers) && ClientFeathersData.stamina > 0) {
+                if ((i + 1 <= halvedFeathers) && ClientFeathersData.getFeathers() > 0) {
 
-                    GuiIcon icon = (i + 1 == Math.ceil((double) ClientFeathersData.stamina / STAMINA_PER_FEATHER)
-                            && (ClientFeathersData.stamina % 20 != 0)) ? getIconHalf() : getIconFull();
+                    GuiIcon icon = (i + 1 == Math.ceil((double) ClientFeathersData.getFeathers() / 2)
+                            && (ClientFeathersData.getFeathers() % 2 != 0)) ? getIconHalf() : getIconFull();
 
                     int height = getHeight(i);
                     draw(guiGraphics, getXPos(x, i, xOffset), getYPos(y, rightOffset, height, yOffset), icon);
@@ -126,10 +127,10 @@ public class FeathersHudOverlay {
              * Only render the currently worn armor
              */
             for (int i = 0; i < 10; i++) {
-                if ((i + 1 <= Math.ceil((double) ClientFeathersData.weight / STAMINA_PER_FEATHER)) && (i + 1 <= halvedFeathers)) {
+                if ((i + 1 <= Math.ceil((double) ClientFeathersData.weight / FeathersConstants.STAMINA_PER_FEATHER)) && (i + 1 <= halvedFeathers)) {
 
-                    GuiIcon icon = (i + 1 == Math.ceil((double) ClientFeathersData.weight / STAMINA_PER_FEATHER)
-                            && (ClientFeathersData.weight % 2 != 0)) ? ARMORED_HALF_FEATHER : ARMORED_FULL_FEATHER;
+                    GuiIcon icon = (i + 1 == Math.ceil((double) ClientFeathersData.weight / FeathersConstants.STAMINA_PER_FEATHER)
+                            && (ClientFeathersData.weight % FeathersConstants.STAMINA_PER_FEATHER != 0)) ? ARMORED_HALF_FEATHER : ARMORED_FULL_FEATHER;
 
                     int height = getHeight(i);
                     draw(guiGraphics, getXPos(x, i, xOffset), getYPos(y, rightOffset, height, yOffset), icon);
@@ -144,10 +145,10 @@ public class FeathersHudOverlay {
              */
             if (ClientFeathersData.overflowing) {
                 for (int i = 0; i < 10; i++) {
-                    if (i + 1 <= Math.ceil((double) (ClientFeathersData.stamina - 20) / STAMINA_PER_FEATHER)) {
+                    if (i + 1 <= Math.ceil((double) (ClientFeathersData.getFeathers() - ClientFeathersData.getMaxFeathers()) / FeathersConstants.STAMINA_PER_FEATHER)) {
 
-                        GuiIcon icon = (i + 1 == Math.ceil((double) (ClientFeathersData.stamina - ClientFeathersData.maxStamina) / STAMINA_PER_FEATHER)
-                                && ClientFeathersData.stamina % 2 != 0) ? OVERFLOW_HALF_FEATHER : OVERFLOW_FULL_FEATHER;
+                        GuiIcon icon = (i + 1 == Math.ceil((double) (ClientFeathersData.stamina - ClientFeathersData.maxStamina) / FeathersConstants.STAMINA_PER_FEATHER)
+                                && ClientFeathersData.stamina % FeathersConstants.STAMINA_PER_FEATHER != 0) ? OVERFLOW_HALF_FEATHER : OVERFLOW_FULL_FEATHER;
 
                         int height = getHeight(i);
 
@@ -164,7 +165,7 @@ public class FeathersHudOverlay {
              */
             for (int i = 0; i < 10; i++) {
                 if (ClientFeathersData.animationCooldown >= 18 || ClientFeathersData.animationCooldown == 10) {
-                    if ((i + 1 <= Math.ceil((double) ClientFeathersData.maxStamina / STAMINA_PER_FEATHER))) {
+                    if ((i + 1 <= Math.ceil((double) ClientFeathersData.maxStamina / FeathersConstants.STAMINA_PER_FEATHER))) {
                         int height = getHeight(i);
                         GuiIcon icon = REGEN_BACKGROUND;
                         draw(guiGraphics, getXPos(x, i, xOffset), y - rightOffset + yOffset, icon);
@@ -191,13 +192,13 @@ public class FeathersHudOverlay {
             /*
              * Only render the currently active endurance feathers by line
              */
-            for (int i = 0; i < Math.ceil((double) ClientFeathersData.enduranceFeathers / STAMINA_PER_FEATHER); i++) { //TODO: fix half feathers
+            for (int i = 0; i < Math.ceil((double) ClientFeathersData.enduranceFeathers / FeathersConstants.STAMINA_PER_FEATHER); i++) { //TODO: fix half feathers
                 lines += 10;
                 for (int j = 0; j < 10; j++) {
-                    if ((((i) * 10.0d) + (j + 1) <= Math.ceil((double) ClientFeathersData.enduranceFeathers / STAMINA_PER_FEATHER))
+                    if ((((i) * 10.0d) + (j + 1) <= Math.ceil((double) ClientFeathersData.enduranceFeathers / FeathersConstants.STAMINA_PER_FEATHER))
                             && ClientFeathersData.enduranceFeathers > 0) {
 
-                        GuiIcon icon = (((j + 1) + (10 * i) == Math.ceil((double) ClientFeathersData.enduranceFeathers / STAMINA_PER_FEATHER)
+                        GuiIcon icon = (((j + 1) + (10 * i) == Math.ceil((double) ClientFeathersData.enduranceFeathers / FeathersConstants.STAMINA_PER_FEATHER)
                                 && (ClientFeathersData.enduranceFeathers % 2 != 0)) ? ENDURANCE_HALF_FEATHER : ENDURANCE_FULL_FEATHER);
 
                         draw(guiGraphics, getXPos(x, j, xOffset), y - rightOffset + yOffset - ((i) * 10), icon);

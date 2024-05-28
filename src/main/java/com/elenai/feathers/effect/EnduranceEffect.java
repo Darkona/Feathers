@@ -1,6 +1,6 @@
 package com.elenai.feathers.effect;
 
-import com.elenai.feathers.api.FeathersHelper;
+import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
@@ -20,7 +20,7 @@ public class EnduranceEffect extends MobEffect {
     public void addAttributeModifiers(LivingEntity target, AttributeMap map, int strength) {
         if (target instanceof ServerPlayer player) {
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
-                f.setEnduranceStamina((strength + 1) * 8);
+                f.setEnduranceStamina((strength + 1) * (8 * FeathersConstants.STAMINA_PER_FEATHER));
                 FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
             });
         }

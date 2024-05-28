@@ -40,10 +40,10 @@ public class FeatherSyncSTCPacket {
         buf.writeInt(maxStamina);
         buf.writeInt(enduranceStamina);
         buf.writeInt(staminaDelta);
+
         buf.writeBoolean(cold);
         buf.writeBoolean(hot);
     }
-
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();

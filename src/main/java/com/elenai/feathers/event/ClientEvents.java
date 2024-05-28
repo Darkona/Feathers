@@ -1,9 +1,11 @@
 package com.elenai.feathers.event;
 
 import com.elenai.feathers.Feathers;
+import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.client.ClientFeathersData;
 import com.elenai.feathers.client.gui.FeathersHudOverlay;
 import com.elenai.feathers.config.FeathersClientConfig;
+import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.enchantment.FeathersEnchantments;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.RequestWeightCTSPacket;
@@ -45,25 +47,28 @@ public class ClientEvents {
 
         @SubscribeEvent
         public static void clientTickEvents(ClientTickEvent event) {
+
+
             if (event.phase == TickEvent.Phase.START) {
                 if (Minecraft.getInstance().level != null) {
-                    ClientFeathersData.overflowing = ClientFeathersData.feathers > 20;
+                    ClientFeathersData.overflowing = ClientFeathersData.getFeathers() > FeathersCommonConfig.MAX_STAMINA.get() / FeathersConstants.STAMINA_PER_FEATHER;
+
 
                     if (ClientFeathersData.animationCooldown > 0) {// TODO: improve this animation
                         ClientFeathersData.animationCooldown = ClientFeathersData.animationCooldown - 1;
                     }
 
-                    if (ClientFeathersData.feathers != ClientFeathersData.previousFeathers) {
-                        if (ClientFeathersData.feathers > ClientFeathersData.previousFeathers
+                    if (ClientFeathersData.getFeathers() != ClientFeathersData.previousFeathers) {
+                        if (ClientFeathersData.getFeathers() > ClientFeathersData.previousFeathers
                                 && FeathersClientConfig.REGEN_EFFECT.get()) {
                             ClientFeathersData.animationCooldown = 18;
                         }
-                        ClientFeathersData.previousFeathers = ClientFeathersData.feathers;
+                        ClientFeathersData.previousFeathers = ClientFeathersData.getFeathers();
                     }
 
                     if (FeathersClientConfig.FADE_WHEN_FULL.get()) {
                         int cooldown = ClientFeathersData.fadeCooldown;
-                        if (ClientFeathersData.feathers == ClientFeathersData.maxFeathers
+                        if (ClientFeathersData.getFeathers() == ClientFeathersData.getMaxFeathers()
                                 || ClientFeathersData.enduranceFeathers > 0) {
                             if (cooldown < FeathersClientConfig.FADE_COOLDOWN.get()) {
                                 ClientFeathersData.fadeCooldown = ClientFeathersData.fadeCooldown + 1;

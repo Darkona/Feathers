@@ -2,7 +2,6 @@ package com.elenai.feathers.networking.packet;
 
 import java.util.function.Supplier;
 
-import com.elenai.feathers.api.FeathersHelper;
 import com.elenai.feathers.networking.FeathersMessages;
 
 import net.minecraft.network.FriendlyByteBuf;
@@ -35,9 +34,9 @@ public class RequestWeightCTSPacket {
 
 		public boolean handle(Supplier<NetworkEvent.Context> supplier) {
 			NetworkEvent.Context context = supplier.get();
-			context.enqueueWork(() -> {
+			/*context.enqueueWork(() -> {
 				FeathersMessages.sendToPlayer(new ReplyWithWeightSTCPacket(FeathersHelper.getArmorWeight(Item.byId(itemId), lightweightLevel, heavyLevel)), context.getSender());
-			});
+			});*/
 			return true;
 		}
 }

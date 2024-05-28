@@ -10,14 +10,12 @@ import net.minecraft.world.entity.player.Player;
 
 public class PlayerSituationProvider {
 
-
-
     public static boolean isInColdSituation(Player player){
 
         boolean isInSnow = player.isInPowderSnow || player.wasInPowderSnow;
 
         if(Feathers.COLD_SWEAT_LOADED && FeathersCommonConfig.COLD_SWEAT_COMPATIBILITY.get()){
-            return Temperature.get(player, Temperature.Trait.BODY) <= -100 || isInSnow;
+            return Temperature.get(player, Temperature.Trait.BODY) <= -55;
         }
 
         boolean isInColdBiome = player.level().getBiome(player.blockPosition()).get().coldEnoughToSnow(player.blockPosition());
@@ -31,7 +29,7 @@ public class PlayerSituationProvider {
         boolean isBurning = player.wasOnFire || player.isOnFire() || player.isInLava();
 
         if(Feathers.COLD_SWEAT_LOADED && FeathersCommonConfig.COLD_SWEAT_COMPATIBILITY.get()){
-            return Temperature.get(player, Temperature.Trait.BODY) >= 100 || isBurning;
+            return Temperature.get(player, Temperature.Trait.BODY) >= 55;
         }
 
         boolean isInHotBiome = player.level().getBiome(player.blockPosition()).get().getModifiedClimateSettings().temperature() > 0.45f;

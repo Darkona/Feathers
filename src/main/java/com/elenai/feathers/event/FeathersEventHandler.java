@@ -1,12 +1,9 @@
 package com.elenai.feathers.event;
 
 import com.elenai.feathers.Feathers;
-import com.elenai.feathers.api.FeathersHelper;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
-import com.elenai.feathers.effect.FeathersEffects;
 import com.elenai.feathers.networking.FeathersMessages;
-import com.elenai.feathers.networking.packet.EnergizedSyncSTCPacket;
 import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,7 +23,7 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = Feathers.MODID)
-public class CommonEvents {
+public class FeathersEventHandler {
 
     @SubscribeEvent
     public static void onPlayerJoinWorld(EntityJoinLevelEvent event) {
@@ -35,6 +32,7 @@ public class CommonEvents {
 
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
                 f.setShouldRecalculate(true);
+                f.recalculateStaminaDelta();
                 FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
             });
         }
@@ -43,8 +41,7 @@ public class CommonEvents {
 
     @SubscribeEvent
     public static void playerTickEvent(PlayerTickEvent event) {
-        if (event.side == LogicalSide.SERVER && event.phase == TickEvent.Phase.START) {
-            
+        if (event.player instanceof ServerPlayer) {
             StaminaDeltaTickHandler.applyStaminaChanges(event);
 
             EffectHandler.handleEffects(event);
@@ -53,13 +50,12 @@ public class CommonEvents {
     }
 
 
-
     @SubscribeEvent
     public static void onPlayerChangeArmor(LivingEquipmentChangeEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && event.getSlot().getType() == EquipmentSlot.Type.ARMOR) {
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
-                FeathersMessages.sendToPlayer(
-                        new FeatherSyncSTCPacket(f), player);
+
+                FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
             });
         }
     }

@@ -18,21 +18,21 @@ import java.util.function.Function;
 
 public class FeathersAPI {
 
-    private static final int STAMINA_PER_FEATHER = 20;
+
     public static int getFeathers(Player player){
-        var feathers = (double) (getStamina(player) / STAMINA_PER_FEATHER);
+        var feathers = (double) (getStamina(player) / FeathersConstants.STAMINA_PER_FEATHER);
         return  (int)feathers;
     }
 
     public static int getMaxFeathers(Player player){
-        var feathers = (double) (getMaxStamina(player) / STAMINA_PER_FEATHER);
+        var feathers = (double) (getMaxStamina(player) / FeathersConstants.STAMINA_PER_FEATHER);
         return  (int)feathers;
     }
 
     public static void setFeathers(Player player, int amount){
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
               .ifPresent(f -> {
-                  f.setStamina(amount * STAMINA_PER_FEATHER);
+                  f.setStamina(amount * FeathersConstants.STAMINA_PER_FEATHER);
                   FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
               });
     }
@@ -40,7 +40,7 @@ public class FeathersAPI {
     public static void setMaxFeathers(Player player, int amount){
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
               .ifPresent(f -> {
-                  f.setMaxStamina(amount * STAMINA_PER_FEATHER);
+                  f.setMaxStamina(amount * FeathersConstants.STAMINA_PER_FEATHER);
                   FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
               });
     }
@@ -48,7 +48,7 @@ public class FeathersAPI {
     public static void addFeathers(Player player, int amount){
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
               .ifPresent(f -> {
-                  f.setStamina(f.getStamina() + (amount * STAMINA_PER_FEATHER));
+                  f.setStamina(f.getStamina() + (amount * FeathersConstants.STAMINA_PER_FEATHER));
                   FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
               });
     }
@@ -56,7 +56,7 @@ public class FeathersAPI {
     public static void removeFeathers(Player player, int amount){
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
               .ifPresent(f -> {
-                  f.setStamina(f.getStamina() - (amount * STAMINA_PER_FEATHER));
+                  f.setStamina(f.getStamina() - (amount * FeathersConstants.STAMINA_PER_FEATHER));
                   FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
               });
     }
@@ -84,6 +84,7 @@ public class FeathersAPI {
                   FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
               });
     }
+
 
     public static void addMaxStamina(Player player, int amount){
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)

@@ -2,7 +2,8 @@ package com.elenai.feathers.effect;
 
 import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.networking.FeathersMessages;
-import com.elenai.feathers.networking.packet.ColdSyncSTCPacket;
+import com.elenai.feathers.networking.packet.Effect;
+import com.elenai.feathers.networking.packet.EffectChangeSTCPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -22,7 +23,7 @@ public class ColdEffect extends MobEffect {
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
                 if (!f.isCold()) {
                     f.setCold(true);
-                    FeathersMessages.sendToPlayer(new ColdSyncSTCPacket(f.isCold()), player);
+                    FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.COLD, f.isCold()), player);
                 }
             });
         }
@@ -35,7 +36,7 @@ public class ColdEffect extends MobEffect {
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
                 if (f.isCold()) {
                     f.setCold(false);
-                    FeathersMessages.sendToPlayer(new ColdSyncSTCPacket(f.isCold()), player);
+                    FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.COLD, f.isCold()), player);
                 }
             });
         }

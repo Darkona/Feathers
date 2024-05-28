@@ -1,15 +1,13 @@
 package com.elenai.feathers.event;
 
 import com.elenai.feathers.Feathers;
-import com.elenai.feathers.api.FeathersHelper;
-import com.elenai.feathers.attributes.FeathersAttributes;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.effect.FeathersEffects;
 import com.elenai.feathers.effect.PlayerSituationProvider;
 import com.elenai.feathers.networking.FeathersMessages;
-import com.elenai.feathers.networking.packet.ColdSyncSTCPacket;
-import com.elenai.feathers.networking.packet.HotSyncSTCPacket;
+import com.elenai.feathers.networking.packet.Effect;
+import com.elenai.feathers.networking.packet.EffectChangeSTCPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraftforge.event.TickEvent;
@@ -36,46 +34,17 @@ public class EffectHandler {
 
     @SubscribeEvent
     public static void onEffectApplied(MobEffectEvent.Added event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            if (FeathersCommonConfig.ENABLE_HOT_EFFECTS.get() &&
-                    event.getEffectInstance().getEffect() == FeathersEffects.HOT.get()) {
-                player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
-                    FeathersHelper.setHot(player, true);
-                    int maxFeathers = FeathersHelper.getMaxFeathers(player);
-                    if (maxFeathers >= (int) Math.round(FeathersAttributes.MAX_FEATHERS.get().getDefaultValue())) {
-                        FeathersHelper.setMaxFeathers(player, maxFeathers - FeathersCommonConfig.HOT_FEATHER_REDUCTION.get());
-                    }
 
-                });
-            }
-
-            if (FeathersCommonConfig.ENABLE_COLD_EFFECTS.get() &&
-                    event.getEffectInstance().getEffect() == FeathersEffects.COLD.get()) {
-                FeathersHelper.setCold(player, true);
-
-            }
-        }
 
     }
 
     @SubscribeEvent
     public static void onEffectRemoved(MobEffectEvent.Remove event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            if (event.getEffectInstance().getEffect() == FeathersEffects.HOT.get()) {
 
-                FeathersHelper.setHot(player, false);
-                FeathersHelper.setMaxFeathers(player, (int) Math.round(FeathersAttributes.MAX_FEATHERS.get().getDefaultValue()));
-            }
-            if (event.getEffectInstance().getEffect() == FeathersEffects.COLD.get()) {
-                player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
-                    FeathersHelper.setCold(player, false);
-                });
-            }
-        }
     }
 
     public static void handleEffects(TickEvent.PlayerTickEvent event) {
-        handleColdEffect(event);
+        applyColdEffect(event);
         handleHotEffect(event);
         handleEnduranceEffect(event);
     }
@@ -83,7 +52,7 @@ public class EffectHandler {
     /**
      * Handle the beta cold mechanic here
      */
-    public static void handleColdEffect(TickEvent.PlayerTickEvent event) {
+    public static void applyColdEffect(TickEvent.PlayerTickEvent event) {
         if (!FeathersCommonConfig.ENABLE_COLD_EFFECTS.get()) return;
         ServerPlayer player = (ServerPlayer) event.player;
         if (PlayerSituationProvider.isInColdSituation(player)) {
@@ -108,7 +77,7 @@ public class EffectHandler {
             player.removeEffect(FeathersEffects.COLD.get());
         }
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
-            FeathersMessages.sendToPlayer(new ColdSyncSTCPacket(f.isCold()), player);
+            FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.COLD, f.isCold()), player);
         });
     }
 
@@ -118,7 +87,7 @@ public class EffectHandler {
      * @param event
      */
     static void handleHotEffect(TickEvent.PlayerTickEvent event) {
-        if(!FeathersCommonConfig.ENABLE_HOT_EFFECTS.get()) return;
+        if (!FeathersCommonConfig.ENABLE_HOT_EFFECTS.get()) return;
         ServerPlayer player = (ServerPlayer) event.player;
         if (PlayerSituationProvider.isInHotSituation(player)) {
 
@@ -139,7 +108,7 @@ public class EffectHandler {
             player.removeEffect(FeathersEffects.HOT.get());
         }
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
-            FeathersMessages.sendToPlayer(new ColdSyncSTCPacket(f.isHot()), player);
+            FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.HOT, f.isHot()), player);
         });
 
     }
@@ -148,11 +117,11 @@ public class EffectHandler {
      * Handle the Endurance mechanic here, where the potion leaves if the player has no endurance feathers left
      */
     static void handleEnduranceEffect(TickEvent.PlayerTickEvent event) {
-        if (FeathersCommonConfig.ENABLE_ENDURANCE.get()) {
+        /*if (FeathersCommonConfig.ENABLE_ENDURANCE.get()) {
             if (event.player.hasEffect(FeathersEffects.ENDURANCE.get()) &&
                     FeathersHelper.getEndurance((ServerPlayer) event.player) == 0) {
                 event.player.removeEffect(FeathersEffects.ENDURANCE.get());
             }
-        }
+        }*/
     }
 }
