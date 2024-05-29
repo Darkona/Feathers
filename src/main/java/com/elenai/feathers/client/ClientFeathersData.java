@@ -20,9 +20,9 @@ public class ClientFeathersData {
 	public static boolean hot = false;
     public static boolean energized = false;
 	public static boolean overflowing = false;
-    public static boolean fatigue = false;
     public static boolean momentum = false;
     public static boolean endurance = false;
+    public static boolean fatigued  = false;
 
     public static int getFeathers(){
         return stamina / FeathersConstants.STAMINA_PER_FEATHER;

@@ -3,13 +3,11 @@ package com.elenai.feathers.capability;
 import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.config.FeathersCommonConfig;
 
-import com.elenai.feathers.event.FeatherChangeEvent;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -18,6 +16,7 @@ import java.util.function.Function;
 @Setter
 public class PlayerFeathers  {
 
+	private int previousStamina = FeathersCommonConfig.MAX_STAMINA.get();
 	private int stamina = FeathersCommonConfig.MAX_STAMINA.get();
 	private int maxStamina = FeathersCommonConfig.MAX_STAMINA.get();
 
@@ -28,26 +27,28 @@ public class PlayerFeathers  {
 
 	private int enduranceStamina = 0;
 	private int strainStamina = 0;
-	private int maxStrain = 4000;
+	private int maxStrain = 4 * FeathersConstants.STAMINA_PER_FEATHER;
 
+	//Recalculation
 	private int staminaDelta = 0;
+	private boolean shouldRecalculate = false;
 
-
-
+	//Effects
 	private boolean cold = false;
 	private boolean hot = false;
 	private boolean energized = false;
+	private int energizedStrength = 0;
+	private boolean fatigued = false;
+	private boolean momentum = false;
 
 
-	private boolean shouldRecalculate = false;
 
 	private Map<String, Function<Integer,Integer>> staminaDeltaModifiers = new HashMap<>();
 	private Map<String, Function<Integer,Integer>> staminaUsageModifiers = new HashMap<>();
 
-
-
+	//Modifiers
 	private static final Function <Integer, Integer> regeneration = (i) -> i + FeathersCommonConfig.REGENERATION.get();
-	private static final Function <Integer, Integer> energy = (i) -> FeathersCommonConfig.REGENERATION.get() * 2;
+	private static final Function <Integer, Integer> energy = (i) -> FeathersCommonConfig.REGENERATION.get() * (i+1);
 	private static final Function <Integer, Integer> no_regen = (i) -> 0;
 
 
@@ -84,7 +85,6 @@ public class PlayerFeathers  {
 			if(modifier != null)
 				staminaDelta = modifier.apply(staminaDelta);
 		});
-		if(energized) staminaDelta = energy.apply(staminaDelta);
 		shouldRecalculate = false;
 	}
 

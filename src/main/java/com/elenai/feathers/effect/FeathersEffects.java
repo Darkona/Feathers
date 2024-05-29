@@ -1,6 +1,11 @@
 package com.elenai.feathers.effect;
 
 import com.elenai.feathers.Feathers;
+import com.elenai.feathers.capability.PlayerFeathers;
+import com.elenai.feathers.networking.FeathersMessages;
+import com.elenai.feathers.networking.packet.Effect;
+import com.elenai.feathers.networking.packet.EffectChangeSTCPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -22,8 +27,12 @@ public class FeathersEffects {
     public static final RegistryObject<MobEffect> HOT = EFFECTS
             .register("hot", () -> new HotEffect(MobEffectCategory.HARMFUL, 0x7e5d48));
 
+    public static final RegistryObject<MobEffect> FATIGUE = EFFECTS
+            .register("fatigued", () -> new FatiguedEffect(MobEffectCategory.HARMFUL, 0x7e0048));
+
     public static void register(IEventBus eventBus) {
 
         EFFECTS.register(eventBus);
     }
+
 }

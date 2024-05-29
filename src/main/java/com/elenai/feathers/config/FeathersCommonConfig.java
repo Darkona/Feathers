@@ -25,10 +25,10 @@ public class FeathersCommonConfig {
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ARMOR_WEIGHTS;
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_COLD_EFFECTS;
-    public static final ForgeConfigSpec.ConfigValue<Integer> COLD_EFFECT_COOLDOWN_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<Integer> COLD_EFFECT_STRENGTH;
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_HOT_EFFECTS;
-    public static final ForgeConfigSpec.ConfigValue<Integer> HOT_FEATHER_REDUCTION;
+    public static final ForgeConfigSpec.ConfigValue<Double> HOT_EFFECT_STRENGTH;
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> SLEEPING_ALWAYS_RESTORES_FEATHERS;
 
@@ -37,9 +37,6 @@ public class FeathersCommonConfig {
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENDURANCE_ENCHANTMENT_REGEN;
 
     public static final ForgeConfigSpec.ConfigValue<Integer> COLD_LINGER;
-
-
-
 
 
     //Configs for Cold Sweat
@@ -62,11 +59,12 @@ public class FeathersCommonConfig {
         BUILDER.push("Feathers' Config");
 
         REGENERATION = BUILDER
-                .comment("How many stamina regenerates per tick. 100 stamina = 1 feather.")
-                          .define("Base Stamina Regeneration", 2);
+                .comment("How many stamina regenerates per tick. 1000 stamina = 1 feather. " +
+                        "Default value of 20 results in one feather every 500 ticks, or 25 seconds.")
+                .define("Base Stamina Regeneration", 20);
 
         MAX_STAMINA = BUILDER.comment("Maximum stamina the player can have. 1000 stamina = 1 feather.")
-                .define("Max Stamina", 20000);
+                             .define("Max Stamina", 20000);
 
         /*
          * Add all current armor types on config creation
@@ -85,25 +83,26 @@ public class FeathersCommonConfig {
         ENABLE_ARMOR_WEIGHTS = BUILDER
                 .comment("If enabled, armor types have weight, this reduces the amount of feathers you can use based on how heavy your armor is")
                 .define("Enable Armor Weights", false);
-        
+
         ENABLE_COLD_EFFECTS = BUILDER
                 .comment("Whether the Cold Effect is enabled. When the effect is active, feathers regenerate slower.")
                 .define("Enable Cold Effect", false);
 
-        COLD_EFFECT_COOLDOWN_MULTIPLIER = BUILDER
-                .comment("How muc does the cooldown multiply by when Cold Effect is applied. Values can range from 1 (which would have no effect) up to 20. " +
-                        "Set to 1 to have no effect, set to 20 to have the feathers regenerate 20 times slower. Set to 21 to have feathers not regenerate at all.")
-                .defineInRange("Cold Multiplier", 21, 1, 21);
+        COLD_EFFECT_STRENGTH = BUILDER
+                .comment("How many stamina is substracted from regenerating every tick. " +
+                        "The higher the value, the more stamina is substracted, the slower the regeneration. " +
+                        "A value of 0 means no stamina is substracted. " +
+                        "A value equal to the REGENERATION value means all stamina is substracted.")
+                .defineInRange("Cold Effect Strength", 21, 1, 21);
 
         ENABLE_HOT_EFFECTS = BUILDER
                 .comment("Whether the Hot Effect is enabled. When the effect is active, feathers are reduced. Fatigue is applied when the player is hot or burning")
                 .define("Enable Hot Effect", false);
 
-        HOT_FEATHER_REDUCTION = BUILDER.
-                comment("Multiplier for the feather reduction when affected by heat. Values can range from 0 to 20." +
-                        "The higher the value, the more feathers are reduced. The lower the value, the less feathers are reduced." +
-                        "A value of 0 means no feathers are reduced. A value of 20 means all feathers are reduced.")
-                .defineInRange("Fatigue Feather Reduction Multiplier", 6, 0, 20);
+        HOT_EFFECT_STRENGTH = BUILDER.
+                comment("Multiplier for the feather consumption when affected by heat. Values can range from 1 to 5." +
+                        "This value is multiplied by however many feathers are consumed to determine the final amount.")
+                .defineInRange("Fatigue Feather Reduction Multiplier", 1.5D, 0D, 5D);
 
         ENABLE_LIGHTWEIGHT_ENCHANTMENT = BUILDER
                 .comment("Whether the Lightweight enchantment can be applied in an enchantment table, or if it is treasure only.")
@@ -127,17 +126,16 @@ public class FeathersCommonConfig {
                 .define("Sleeping Always Restores Feathers", true);
 
 
-
         BUILDER.pop();
 
-        if(Feathers.COLD_SWEAT_LOADED){
+        if (Feathers.COLD_SWEAT_LOADED) {
             BUILDER.push("Cold Sweat compatibility settings");
             COLD_SWEAT_COMPATIBILITY = BUILDER
                     .comment("Enable compatibility with mod \"Cold Sweat\". " +
                             "If enabled, Cold Sweat will determine if the player gets the Hot or the Cold effect depending on body temperature.")
                     .define("Cold Sweat Compatibility", true);
             BUILDER.pop();
-        }else{
+        } else {
             COLD_SWEAT_COMPATIBILITY = BUILDER.define("Cold Sweat Compatibility", false);
         }
 
@@ -149,12 +147,12 @@ public class FeathersCommonConfig {
 
         THIRST_REGEN_REDUCTION_MULTIPLIER = BUILDER
                 .comment("How many ticks of half-feather regeneration be increased by level missing of Thirst. " +
-                        "Maximum Thirst is 20 and minimum is 0." )
+                        "Maximum Thirst is 20 and minimum is 0.")
                 .define("Thirst Reduces Regen", 5);
 
         QUENCH_REGEN_BONUS_MULTIPLIER = BUILDER
                 .comment("How many ticks of half-feather regeneration be decreased by level of Quench. " +
-                        "Maximum Quench is whatever your current Thirst is and minimum is 0." )
+                        "Maximum Quench is whatever your current Thirst is and minimum is 0.")
                 .define("Thirst Increases Regen", 2);
 
         BUILDER.pop();

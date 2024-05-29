@@ -15,21 +15,25 @@ public class EffectChangeSTCPacket {
 
     private Effect name;
 
+    private int strength;
     private boolean state;
 
-    public EffectChangeSTCPacket(Effect name, boolean state) {
+    public EffectChangeSTCPacket(Effect name, boolean state, int strength) {
         this.name = name;
         this.state = state;
+        this.strength = strength;
     }
 
     public EffectChangeSTCPacket(FriendlyByteBuf buf) {
         this.name = buf.readEnum(Effect.class);
         this.state = buf.readBoolean();
+        this.strength = buf.readInt();
     }
 
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeEnum(name);
         buf.writeBoolean(state);
+        buf.writeInt(strength);
     }
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
@@ -54,12 +58,13 @@ public class EffectChangeSTCPacket {
                     break;
                 case ENDURANCE:
                     ClientFeathersData.endurance = state;
+                    ClientFeathersData.enduranceFeathers = strength;
                     break;
                 case ENERGIZED:
                     ClientFeathersData.energized = state;
                     break;
                 case FATIGUE:
-                    ClientFeathersData.fatigue = state;
+                    ClientFeathersData.fatigued = state;
                     break;
                 case MOMENTUM:
                     ClientFeathersData.momentum = state;

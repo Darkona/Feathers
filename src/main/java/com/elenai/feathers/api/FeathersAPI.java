@@ -5,7 +5,7 @@ import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.enchantment.FeathersEnchantments;
-import com.elenai.feathers.event.FeatherChangeEvent;
+import com.elenai.feathers.event.StaminaChangeEvent;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
 import com.elenai.feathers.util.ArmorHandler;
@@ -57,12 +57,12 @@ public class FeathersAPI {
     public static void addFeathers(Player player, int amount) {
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
               .ifPresent(f -> {
-                  var gainEvent = new FeatherChangeEvent.Gain.Pre(player, amount);
+                  var gainEvent = new StaminaChangeEvent.Gain.Pre(player, amount);
                   MinecraftForge.EVENT_BUS.post(gainEvent);
                   if (!gainEvent.isCanceled()) {
                       var prev = f.getFeathers();
                       var post = f.gainFeathers(gainEvent.amount);
-                      MinecraftForge.EVENT_BUS.post(new FeatherChangeEvent.Use.Post(player, prev, post));
+                      MinecraftForge.EVENT_BUS.post(new StaminaChangeEvent.Use.Post(player, prev, post));
                       FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
                   }
                   f.setStamina(f.getStamina() + (amount * FeathersConstants.STAMINA_PER_FEATHER));
@@ -73,12 +73,12 @@ public class FeathersAPI {
     public static void useFeathers(Player player, int amount) {
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
               .ifPresent(f -> {
-                  var useEvent = new FeatherChangeEvent.Use.Pre(player, amount);
+                  var useEvent = new StaminaChangeEvent.Use.Pre(player, amount);
                   MinecraftForge.EVENT_BUS.post(useEvent);
                   if (!useEvent.isCanceled()) {
                       var prev = f.getFeathers();
                       var post = f.useFeathers(useEvent.amount);
-                      MinecraftForge.EVENT_BUS.post(new FeatherChangeEvent.Use.Post(player, prev, post));
+                      MinecraftForge.EVENT_BUS.post(new StaminaChangeEvent.Use.Post(player, prev, post));
                       if(player instanceof ServerPlayer p) FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), p);
                   }
               });

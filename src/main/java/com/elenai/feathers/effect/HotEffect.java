@@ -20,7 +20,7 @@ public class HotEffect extends MobEffect {
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
                 if (!f.isHot()) {
                     f.setHot(true);
-                    FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.HOT, f.isHot()), player);
+                    FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.HOT, true, strength), player);
                 }
             });
         }
@@ -33,7 +33,7 @@ public class HotEffect extends MobEffect {
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
                 if (f.isHot()) {
                     f.setHot(false);
-                    FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.HOT, f.isHot()), player);
+                    FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.HOT, false, strength), player);
                 }
             });
         }
