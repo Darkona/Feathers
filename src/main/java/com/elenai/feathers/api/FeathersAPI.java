@@ -2,14 +2,12 @@ package com.elenai.feathers.api;
 
 import com.elenai.feathers.Feathers;
 import com.elenai.feathers.attributes.FeathersAttributes;
-import com.elenai.feathers.capability.Modifiers;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.config.FeathersCommonConfig;
+import com.elenai.feathers.effect.FeathersEffects;
 import com.elenai.feathers.enchantment.FeathersEnchantments;
-import com.elenai.feathers.event.FeatherAmountEvent;
 import com.elenai.feathers.event.FeatherEvent;
-import com.elenai.feathers.event.StaminaChangeEvent;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
 import com.elenai.feathers.util.ArmorHandler;
@@ -148,5 +146,37 @@ public class FeathersAPI {
         return 0;
     }
 
+    public static void setCooldown(ServerPlayer player, int cooldownTicks) {
+        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
+              .ifPresent(f -> f.setCooldown(cooldownTicks));
+    }
 
+    public static int getCooldown(ServerPlayer player) {
+        return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
+                     .map(PlayerFeathers::getCooldown).orElse(0);
+    }
+
+    public static boolean isCold(ServerPlayer player){
+        return player.hasEffect(FeathersEffects.COLD.get());
+    }
+
+    public static boolean isHot(ServerPlayer player){
+        return player.hasEffect(FeathersEffects.HOT.get());
+    }
+
+    public static boolean isEnergized(ServerPlayer player){
+        return player.hasEffect(FeathersEffects.ENERGIZED.get());
+    }
+
+    public static boolean isStrained(ServerPlayer player){
+        return player.hasEffect(FeathersEffects.STRAINED.get());
+    }
+
+    public static boolean isEnduring(ServerPlayer player){
+        return player.hasEffect(FeathersEffects.ENDURANCE.get());
+    }
+
+    public static boolean isFatigued(ServerPlayer player){
+        return player.hasEffect(FeathersEffects.FATIGUE.get());
+    }
 }

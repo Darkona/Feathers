@@ -34,7 +34,7 @@ public class FeatherSyncSTCPacket {
         staminaDelta = feathers.getStaminaDelta();
         cold = feathers.isCold();
         hot = feathers.isHot();
-        momentum = feathers.isMomentum();
+        momentum = feathers.hasMomentum();
     }
 
     public FeatherSyncSTCPacket(FriendlyByteBuf buf) {

@@ -5,14 +5,12 @@ import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.config.FeathersCommonConfig;
-import com.elenai.feathers.compatibility.thirst.FeathersThirstConfig;
 import com.elenai.feathers.effect.FeathersEffects;
 import com.elenai.feathers.event.FeatherAmountEvent;
 import com.elenai.feathers.event.StaminaChangeEvent;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
 import com.momosoftworks.coldsweat.api.util.Temperature;
-import dev.ghen.thirst.foundation.common.capability.ModCapabilities;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
@@ -23,8 +21,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Mod.EventBusSubscriber(modid = Feathers.MODID)
 public class StaminaDeltaTickHandler {
@@ -44,7 +40,7 @@ public class StaminaDeltaTickHandler {
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
 
                     //If there is cooldown to start regenerating, it will go down before attempting to regenerate again.
-                    if(f.getCooldown() > 0){
+                    if (f.getCooldown() > 0) {
                         f.setCooldown(f.getCooldown() - 1);
                         return;
                     }
@@ -60,8 +56,8 @@ public class StaminaDeltaTickHandler {
                     var preChangeEvent = new StaminaChangeEvent.Pre(player, f.getStaminaDelta(), f.getStamina());
                     var cancelled = MinecraftForge.EVENT_BUS.post(preChangeEvent);
 
-                    if  (cancelled) return;
-                    if(preChangeEvent.getResult() == Event.Result.DENY) return;
+                    if (cancelled) return;
+                    if (preChangeEvent.getResult() == Event.Result.DENY) return;
 
                     f.setStaminaDelta(preChangeEvent.prevStaminaDelta);
                     f.setStamina(preChangeEvent.prevStamina);
@@ -94,12 +90,11 @@ public class StaminaDeltaTickHandler {
                             FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
 
                         } else if (f.getStamina() % FeathersConstants.STAMINA_PER_FEATHER == 0) {
-
                             FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
                         }
-                        if(f.getStamina() < 0){
-                            player.addEffect(new MobEffectInstance(FeathersEffects.STRAIN.get(),-1, 0, false, true));
 
+                        if (f.getStamina() < 0) {
+                            player.addEffect(new MobEffectInstance(FeathersEffects.STRAINED.get(), -1, 0, false, true));
                         }
                     }
 
@@ -112,9 +107,9 @@ public class StaminaDeltaTickHandler {
         event.getEntity().getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
             if (FeathersCommonConfig.ENABLE_STRAIN.get()) {
                 if (event.prevStamina > 0) {
-                    //event.getEntity().addEffect(FeathersEffects.STRAIN);
+                    event.getEntity().addEffect(new MobEffectInstance(FeathersEffects.STRAINED.get()));
                 } else {
-                    //event.getEntity().removeEffect(StrainEffect.INSTANCE.get());
+                    event.getEntity().removeEffect(FeathersEffects.STRAINED.get());
                 }
             }
         });
@@ -130,21 +125,6 @@ public class StaminaDeltaTickHandler {
             log.info(Temperature.get(player, Temperature.Trait.BURNING_POINT));
             log.info(Temperature.get(player, Temperature.Trait.FREEZING_POINT));
         }
-    }
-
-    private static int applyThirstModifiers(Player player, int maxCooldown) {
-        if (Feathers.THIRST_LOADED && FeathersThirstConfig.THIRST_COMPATIBILITY.get()) {
-            AtomicInteger thirstReduction = new AtomicInteger(0);
-            AtomicInteger quenchBonus = new AtomicInteger(0);
-
-            player.getCapability(ModCapabilities.PLAYER_THIRST).ifPresent(iThirst -> {
-
-                quenchBonus.set(iThirst.getQuenched() * FeathersThirstConfig.QUENCH_REGEN_BONUS_MULTIPLIER.get());
-            });
-            maxCooldown += thirstReduction.get() - quenchBonus.get();
-
-        }
-        return maxCooldown;
     }
 
 }

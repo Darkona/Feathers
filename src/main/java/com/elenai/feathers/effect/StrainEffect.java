@@ -1,7 +1,6 @@
 package com.elenai.feathers.effect;
 
 import com.elenai.feathers.api.IModifier;
-import com.elenai.feathers.capability.Modifiers;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.config.FeathersCommonConfig;
@@ -31,7 +30,7 @@ public class StrainEffect extends MobEffect {
         public int apply(Player player, PlayerFeathers playerFeathers, int feathers) {
             if(playerFeathers.getFeathers() == 0){
                 int strain = playerFeathers.getStrainFeathers();
-                if(strain + feathers <= playerFeathers.getMaxStrain()) {
+                if(strain + feathers <= playerFeathers.getMaxStrained()) {
                     playerFeathers.setStrainFeathers(strain + feathers);
                 }
             }
@@ -70,10 +69,11 @@ public class StrainEffect extends MobEffect {
     };
     @Override
     public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
+        if(!FeathersCommonConfig.ENABLE_STRAIN.get()) return;
         if (target instanceof ServerPlayer player) {
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
-                if (!f.isStrain()) {
-                    f.setStrain(true);
+                if (!f.isStrained()) {
+                    f.setStrained(true);
                     f.addUsageModifier(STRAIN_USAGE);
                     f.removeDeltaModifier(PlayerFeathers.REGENERATION);
                     f.addDeltaModifier(STRAIN_RECOVERY);
@@ -86,10 +86,11 @@ public class StrainEffect extends MobEffect {
 
     @Override
     public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
+        if(!FeathersCommonConfig.ENABLE_STRAIN.get()) return;
         if (target instanceof ServerPlayer player) {
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
-                if (f.isStrain()) {
-                    f.setStrain(false);
+                if (f.isStrained()) {
+                    f.setStrained(false);
                     f.removeUsageModifier(STRAIN_USAGE);
                     f.removeDeltaModifier(STRAIN_RECOVERY);
                     f.addDeltaModifier(PlayerFeathers.REGENERATION);

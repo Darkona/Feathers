@@ -45,9 +45,6 @@ public class PlayerFeathersProvider implements ICapabilityProvider, INBTSerializ
             return deltaModifiers;
         } else if (attachInitialModifiersEvent.getResult() == Event.Result.DEFAULT) {
             attachInitialModifiersEvent.modifiers.add(PlayerFeathers.REGENERATION);
-            if(FeathersCommonConfig.ENABLE_STRAIN.get()){
-                attachInitialModifiersEvent.modifiers.add(StrainEffect.STRAIN_RECOVERY);
-            }
         }
 
         return attachInitialModifiersEvent.modifiers;
@@ -60,9 +57,7 @@ public class PlayerFeathersProvider implements ICapabilityProvider, INBTSerializ
         if(MinecraftForge.EVENT_BUS.post(attachInitialModifiersEvent)) {
             return usageModifiers;
         }else if(attachInitialModifiersEvent.getResult() == Event.Result.DEFAULT){
-            if(FeathersCommonConfig.ENABLE_STRAIN.get()) {
-                attachInitialModifiersEvent.modifiers.add(StrainEffect.STRAIN_USAGE);
-            }
+            usageModifiers.add(PlayerFeathers.DEFAULT_USAGE);
         }
 
         return attachInitialModifiersEvent.modifiers;

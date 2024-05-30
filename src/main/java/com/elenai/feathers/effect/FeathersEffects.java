@@ -1,11 +1,6 @@
 package com.elenai.feathers.effect;
 
 import com.elenai.feathers.Feathers;
-import com.elenai.feathers.capability.PlayerFeathers;
-import com.elenai.feathers.networking.FeathersMessages;
-import com.elenai.feathers.networking.packet.Effect;
-import com.elenai.feathers.networking.packet.EffectChangeSTCPacket;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -33,7 +28,7 @@ public class FeathersEffects {
     public static final RegistryObject<MobEffect> MOMENTUM = EFFECTS
             .register("momentum", () -> new MomentumEffect(MobEffectCategory.BENEFICIAL, 0x7e0048));
 
-    public static final RegistryObject<MobEffect> STRAIN = EFFECTS
+    public static final RegistryObject<MobEffect> STRAINED = EFFECTS
             .register("strain", () -> new StrainEffect(MobEffectCategory.HARMFUL, 0x7e0048));
     public static void register(IEventBus eventBus) {
 

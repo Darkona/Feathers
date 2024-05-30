@@ -1,73 +1,45 @@
 package com.elenai.feathers.capability;
 
 import com.elenai.feathers.api.FeathersConstants;
+import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.config.FeathersCommonConfig;
 
-import com.elenai.feathers.effect.ColdEffect;
-import com.elenai.feathers.effect.FeathersEffects;
-import com.elenai.feathers.effect.HotEffect;
-import com.elenai.feathers.event.FeatherAmountEvent;
-import com.elenai.feathers.event.StaminaChangeEvent;
-import com.elenai.feathers.networking.FeathersMessages;
-import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Event;
 
 import java.util.*;
 
 @Getter
 @Setter
-public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
+public class PlayerFeathers implements IFeathers {
 
-    private static final int ZERO = 0;
+    public static final IModifier DEFAULT_USAGE = new IModifier() {
+        @Override
+        public int apply(Player player, PlayerFeathers playerFeathers, int usingFeathers) {
+            return usingFeathers;
+        }
 
-    private int stamina = FeathersCommonConfig.MAX_STAMINA.get();
-    private int maxStamina = FeathersCommonConfig.MAX_STAMINA.get();
+        @Override
+        public int getOrdinal() {
+            return 0;
+        }
 
-    private int feathers = ZERO;
-    private int maxFeathers = FeathersCommonConfig.MAX_STAMINA.get() / FeathersConstants.STAMINA_PER_FEATHER;
-
-    private int cooldown = ZERO;
-
-    private int enduranceFeathers = ZERO;
-    private int strainFeathers = ZERO;
-
-    private int maxStrain = FeathersCommonConfig.MAX_STRAIN.get();
-
-    //Recalculation
-    private int staminaDelta = ZERO;
-    private boolean shouldRecalculate = false;
-
-    //Effects
-    private boolean cold = false;
-    private boolean hot = false;
-    private boolean energized = false;
-    private int energizedStrength = ZERO;
-    private boolean fatigued = false;
-    private boolean momentum = false;
-
-
-    private Map<String, IModifier> staminaDeltaModifiers = new HashMap<>();
-    private List<IModifier> staminaDeltaModifierList = new ArrayList<>();
-
-    private Map<String, IModifier> staminaUsageModifiers = new HashMap<>();
-    private List<IModifier> staminaUsageModifiersList = new ArrayList<>();
-    private boolean strain;
-
+        @Override
+        public String getName() {
+            return "default";
+        }
+    };
     /**
      * Basic modifier that applies the regeneration effect.
      * This modifier is used to regenerate the player's stamina.
      * The regeneration value is defined in the config.
      * This modifier is applied once per tick.
      */
-    public static final IModifier REGENERATION = new IModifier() {
+    public static final class RegenerationModifier implements IModifier{
         @Override
         public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
             return FeathersCommonConfig.REGENERATION.get();
@@ -83,8 +55,7 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
             return "regeneration";
         }
     };
-
-
+    public static final IModifier REGENERATION = new RegenerationModifier();
     /**
      * This modifier is used to inverse the regeneration effect.
      * Available for modders as an example, but not used in this mod.
@@ -137,25 +108,77 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
         }
     };
 
+
+    private static final int ZERO = 0;
+
+    private int stamina = FeathersCommonConfig.MAX_STAMINA.get();
+    private int maxStamina = FeathersCommonConfig.MAX_STAMINA.get();
+
+    private int feathers = ZERO;
+    private int maxFeathers = FeathersCommonConfig.MAX_STAMINA.get() / FeathersConstants.STAMINA_PER_FEATHER;
+
+    private int cooldown = ZERO;
+
+    private int enduranceFeathers = ZERO;
+    private int strainFeathers = ZERO;
+
+    private int maxStrained = FeathersCommonConfig.MAX_STRAIN.get();
+
+    //Recalculation
+    private int staminaDelta = ZERO;
+
+    @Getter(AccessLevel.NONE)
+    private boolean shouldRecalculate;
+
+    //Effects
+    private boolean cold = false;
+    private boolean hot = false;
+    private boolean energized = false;
+    private int energizedStrength = ZERO;
+    private boolean fatigued = false;
+    @Getter(AccessLevel.NONE)
+    private boolean momentum = false;
+    private boolean strained;
+
+    //Modifiers
+    private Map<String, IModifier> staminaDeltaModifiers = new HashMap<>();
+    private List<IModifier> staminaDeltaModifierList = new ArrayList<>();
+
+    private Map<String, IModifier> staminaUsageModifiers = new HashMap<>();
+    private List<IModifier> staminaUsageModifiersList = new ArrayList<>();
+
+    public boolean hasMomentum() {
+        return momentum;
+    }
+
+    public boolean shouldRecalculate(){
+        return shouldRecalculate;
+    }
     public PlayerFeathers(List<IModifier> deltaModifiers, List<IModifier> usageModifiers) {
         deltaModifiers.forEach(modifier -> staminaDeltaModifiers.put(modifier.getName(), modifier));
         usageModifiers.forEach(modifier -> staminaUsageModifiers.put(modifier.getName(), modifier));
         shouldRecalculate = true;
     }
 
+    @Override
+    public int getFeathers() {
+        return stamina / FeathersConstants.STAMINA_PER_FEATHER;
+    }
+
+    @Override
+    public void setFeathers(int feathers) {
+        this.stamina = feathers * FeathersConstants.STAMINA_PER_FEATHER;
+    }
+
+
+    @Override
     public void setStamina(int stamina) {
         this.stamina = Math.min(Math.max(stamina, ZERO), maxStamina);
         synchronizeFeathers();
     }
 
-    public int getFeathers() {
-        return stamina / FeathersConstants.STAMINA_PER_FEATHER;
-    }
 
-    public void setFeathers(int feathers) {
-        this.stamina = feathers * FeathersConstants.STAMINA_PER_FEATHER;
-    }
-
+    @Override
     public void addDeltaModifier(IModifier modifier) {
 
         var prev = staminaDeltaModifiers.put(modifier.getName(), modifier);
@@ -164,6 +187,7 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
         }
     }
 
+    @Override
     public void removeDeltaModifier(IModifier modifier) {
         if (staminaDeltaModifiers.remove(modifier.getName()) != null) {
             shouldRecalculate = true;
@@ -175,12 +199,13 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
         staminaDeltaModifierList.sort(Comparator.comparingInt(IModifier::getOrdinal));
     }
 
+    @Override
     public void recalculateStaminaDelta(Player player) {
         if (!shouldRecalculate) return;
         staminaDelta = 0;
         sortDeltaModifiers();
         for (IModifier modifier : staminaDeltaModifierList) {
-            staminaDelta = modifier.apply(player, this, staminaDelta);
+            staminaDelta += modifier.apply(player, this, staminaDelta);
         }
         shouldRecalculate = false;
     }
@@ -193,7 +218,7 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
             int prevStrain = strainFeathers;
             strainFeathers -= staminaDelta;
             if(strainFeathers <= 0){
-                strain = false;
+                strained = false;
                 staminaDelta = prevDelta - prevStrain;
                 return staminaDelta;
             }
@@ -209,6 +234,7 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
         synchronizeFeathers();
     }
 
+    @Override
     public void addUsageModifier(IModifier modifier) {
         var prev = staminaUsageModifiers.put(modifier.getName(), modifier);
         if (prev != modifier) {
@@ -217,6 +243,7 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
         }
     }
 
+    @Override
     public void removeUsageModifier(IModifier modifier) {
         if (staminaUsageModifiers.remove(modifier.getName()) != null) {
             sortUsageModifiers();
@@ -233,16 +260,19 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
         feathers = stamina / FeathersConstants.STAMINA_PER_FEATHER;
     }
 
+    @Override
     public void setMaxStamina(int maxStamina) {
         this.maxStamina = Math.min(maxStamina, FeathersConstants.STAMINA_CAP);
     }
 
+    @Override
     public int gainFeathers(int feathers) {
 
         addStamina(feathers * FeathersConstants.STAMINA_PER_FEATHER);
         return feathers;
     }
 
+    @Override
     public int useFeathers(Player player, int feathers) {
 
         var staminaToRemove = feathers * FeathersConstants.STAMINA_PER_FEATHER;
@@ -290,7 +320,7 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
         nbt.putBoolean("cold", this.cold);
         nbt.putBoolean("hot", this.hot);
         nbt.putBoolean("energized", this.energized);
-        nbt.putBoolean("strain", this.strain);
+        nbt.putBoolean("strained", this.strained);
 
     }
 
@@ -304,8 +334,11 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
         this.cold = nbt.getBoolean("cold");
         this.hot = nbt.getBoolean("hot");
         this.energized = nbt.getBoolean("energized");
-        this.strain = nbt.getBoolean("strain");
+        this.strained = nbt.getBoolean("strained");
         synchronizeFeathers();
     }
+
+
+
 
 }

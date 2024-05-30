@@ -20,33 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ThirstManager {
 
 
-    public static final IModifier THIRSTY = new IModifier() {
-        @Override
-        public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
-            AtomicInteger result = new AtomicInteger(staminaDelta);
-            player.getCapability(ModCapabilities.PLAYER_THIRST).ifPresent(iThirst -> {
-                var calculation = new ThirstCalculation(player, playerFeathers, ModCapabilities.PLAYER_THIRST);
-                var cancelled = MinecraftForge.EVENT_BUS.post(new ThirstCalculation(player, playerFeathers, ModCapabilities.PLAYER_THIRST));
-                if(cancelled) {
-                    return;
-                }else if (calculation.getResult() == Event.Result.DEFAULT) {
-                    calculation.calculationResult = (iThirst.getThirst() - 20) * FeathersThirstConfig.THIRST_SLOWS_FEATHER_REGEN.get();
-                }
-                result.set(calculation.calculationResult);
-            });
-            return result.get();
-        }
-
-        @Override
-        public int getOrdinal() {
-            return 2;
-        }
-
-        @Override
-        public String getName() {
-            return "thirsty";
-        }
-    };
+    public static final IModifier THIRSTY = new ThirstDeltaModifier();
 
     public static final IModifier QUENCHED = new IModifier() {
         @Override
