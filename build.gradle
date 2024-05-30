@@ -112,6 +112,7 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
+    implementation fg.deobf("curse.maven:configured-457570:${configured_file_id}")
     implementation fg.deobf("curse.maven:serene-seasons-291874:${serene_seasons_file_id}")
 
     implementation fg.deobf("curse.maven:cold-sweat-506194:${cold_sweat_file_id}-sources-5011470")
