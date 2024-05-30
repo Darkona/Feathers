@@ -1,4 +1,4 @@
-package com.elenai.feathers.config;
+package com.elenai.feathers.compatibility.coldsweat;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 

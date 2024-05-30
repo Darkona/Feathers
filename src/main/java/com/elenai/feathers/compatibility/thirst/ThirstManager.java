@@ -3,7 +3,6 @@ package com.elenai.feathers.compatibility.thirst;
 import com.elenai.feathers.Feathers;
 import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.capability.PlayerFeathers;
-import com.elenai.feathers.config.FeathersThirstConfig;
 import com.elenai.feathers.event.FeatherEvent;
 import dev.ghen.thirst.foundation.common.capability.IThirst;
 import dev.ghen.thirst.foundation.common.capability.ModCapabilities;

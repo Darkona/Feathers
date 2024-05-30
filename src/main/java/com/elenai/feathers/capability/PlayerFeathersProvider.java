@@ -1,10 +1,8 @@
 package com.elenai.feathers.capability;
 
-import com.elenai.feathers.Feathers;
 import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.compatibility.thirst.ThirstManager;
 import com.elenai.feathers.config.FeathersCommonConfig;
-import com.elenai.feathers.config.FeathersThirstConfig;
 import com.elenai.feathers.effect.StrainEffect;
 import com.elenai.feathers.event.FeatherEvent;
 import net.minecraft.core.Direction;
@@ -46,7 +44,7 @@ public class PlayerFeathersProvider implements ICapabilityProvider, INBTSerializ
         if(MinecraftForge.EVENT_BUS.post(attachInitialModifiersEvent)){
             return deltaModifiers;
         } else if (attachInitialModifiersEvent.getResult() == Event.Result.DEFAULT) {
-            attachInitialModifiersEvent.modifiers.add(ThirstManager.THIRSTY);
+            attachInitialModifiersEvent.modifiers.add(PlayerFeathers.REGENERATION);
             if(FeathersCommonConfig.ENABLE_STRAIN.get()){
                 attachInitialModifiersEvent.modifiers.add(StrainEffect.STRAIN_RECOVERY);
             }

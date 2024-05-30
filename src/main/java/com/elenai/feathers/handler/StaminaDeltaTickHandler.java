@@ -5,7 +5,7 @@ import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.config.FeathersCommonConfig;
-import com.elenai.feathers.config.FeathersThirstConfig;
+import com.elenai.feathers.compatibility.thirst.FeathersThirstConfig;
 import com.elenai.feathers.effect.FeathersEffects;
 import com.elenai.feathers.event.FeatherAmountEvent;
 import com.elenai.feathers.event.StaminaChangeEvent;

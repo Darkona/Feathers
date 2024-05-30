@@ -61,6 +61,82 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
     private List<IModifier> staminaUsageModifiersList = new ArrayList<>();
     private boolean strain;
 
+    /**
+     * Basic modifier that applies the regeneration effect.
+     * This modifier is used to regenerate the player's stamina.
+     * The regeneration value is defined in the config.
+     * This modifier is applied once per tick.
+     */
+    public static final IModifier REGENERATION = new IModifier() {
+        @Override
+        public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
+            return FeathersCommonConfig.REGENERATION.get();
+        }
+
+        @Override
+        public int getOrdinal() {
+            return 0;
+        }
+
+        @Override
+        public String getName() {
+            return "regeneration";
+        }
+    };
+
+
+    /**
+     * This modifier is used to inverse the regeneration effect.
+     * Available for modders as an example, but not used in this mod.
+     */
+    public static final IModifier INVERSE_REGENERATION = new IModifier() {
+
+        @Override
+        public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
+            return -FeathersCommonConfig.REGENERATION.get();
+        }
+
+        @Override
+        public int getOrdinal() {
+            return 0;
+        }
+
+        @Override
+        public String getName() {
+            return "inverse_regeneration";
+        }
+    };
+
+    /**
+     * This modifier is used to make the regeneration effect non-linear.
+     * Regeneration is faster at the start and slower at the end.
+     * Available for modders as an example, but not used in this mod.
+     */
+    public static final IModifier NON_LINEAR_REGENERATION = new IModifier() {
+
+        private final Map<Integer, Integer> regenValues = Map.of(
+                0, FeathersCommonConfig.REGENERATION.get() * 3,
+                6, FeathersCommonConfig.REGENERATION.get() * 2,
+                10, FeathersCommonConfig.REGENERATION.get(),
+                14, (int) (FeathersCommonConfig.REGENERATION.get() * 0.6)
+        );
+
+        @Override
+        public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
+            return regenValues.get(playerFeathers.getFeathers());
+        }
+
+        @Override
+        public int getOrdinal() {
+            return 0;
+        }
+
+        @Override
+        public String getName() {
+            return "non_linear_regeneration";
+        }
+    };
+
     public PlayerFeathers(List<IModifier> deltaModifiers, List<IModifier> usageModifiers) {
         deltaModifiers.forEach(modifier -> staminaDeltaModifiers.put(modifier.getName(), modifier));
         usageModifiers.forEach(modifier -> staminaUsageModifiers.put(modifier.getName(), modifier));

@@ -125,9 +125,6 @@ public class FeathersAPI {
         return result.get();
     }
 
-
-
-
     public static int getPlayerWeight(ServerPlayer player) {
         if (!FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
             return 0;

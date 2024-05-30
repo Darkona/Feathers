@@ -1,7 +1,7 @@
 package com.elenai.feathers.effect;
 
 import com.elenai.feathers.Feathers;
-import com.elenai.feathers.config.FeathersColdSweatConfig;
+import com.elenai.feathers.compatibility.coldsweat.FeathersColdSweatConfig;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.momosoftworks.coldsweat.api.util.Temperature;
 import com.momosoftworks.coldsweat.util.registries.ModEffects;
