@@ -1,17 +1,20 @@
 package com.elenai.feathers.capability;
 
+import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.api.IModifier;
-import com.elenai.feathers.config.FeathersCommonConfig;
+import com.elenai.feathers.attributes.FeathersAttributes;
 import net.minecraft.world.entity.player.Player;
-
-import java.util.Map;
 
 public class Modifiers {
 
     public static final IModifier REGENERATION = new IModifier() {
         @Override
         public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
-            return FeathersCommonConfig.REGENERATION.get();
+            var fps = player.getAttribute(FeathersAttributes.BASE_FEATHERS_PER_SECOND.get());
+            if (fps == null) {
+                return 0;
+            }
+            return (int) (fps.getValue() * FeathersConstants.STAMINA_PER_FEATHER / 20);
         }
 
         @Override
@@ -34,7 +37,11 @@ public class Modifiers {
 
         @Override
         public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
-            return -FeathersCommonConfig.REGENERATION.get();
+            var fps = player.getAttribute(FeathersAttributes.BASE_FEATHERS_PER_SECOND.get());
+            if (fps == null) {
+                return 0;
+            }
+            return (int) (fps.getValue() * FeathersConstants.STAMINA_PER_FEATHER / -20);
         }
 
         @Override
@@ -54,17 +61,14 @@ public class Modifiers {
      * Available for modders as an example, but not used in this mod.
      */
     public static final IModifier NON_LINEAR_REGENERATION = new IModifier() {
-
-        private final Map<Integer, Integer> regenValues = Map.of(
-                0, FeathersCommonConfig.REGENERATION.get() * 3,
-                6, FeathersCommonConfig.REGENERATION.get() * 2,
-                10, FeathersCommonConfig.REGENERATION.get(),
-                14, (int) (FeathersCommonConfig.REGENERATION.get() * 0.6)
-        );
-
         @Override
         public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
-            return regenValues.get(playerFeathers.getFeathers());
+            var fps = player.getAttribute(FeathersAttributes.BASE_FEATHERS_PER_SECOND.get());
+            if (fps == null) {
+                return 0;
+            }
+            int sps = (int) (fps.getValue() * FeathersConstants.STAMINA_PER_FEATHER / 20);
+            return Math.max((int) (1 / Math.log(fps.getValue() / 40 + 1.4) - 3.5) * sps, 1);
         }
 
         @Override
