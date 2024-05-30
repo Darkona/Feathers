@@ -4,6 +4,7 @@ import com.elenai.feathers.Feathers;
 import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
+import com.elenai.feathers.compatibility.coldsweat.FeathersColdSweatConfig;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.effect.FeathersEffects;
 import com.elenai.feathers.event.FeatherAmountEvent;
@@ -11,9 +12,12 @@ import com.elenai.feathers.event.StaminaChangeEvent;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
 import com.momosoftworks.coldsweat.api.util.Temperature;
+import com.momosoftworks.coldsweat.util.registries.ModEffects;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -22,17 +26,29 @@ import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+
 @Mod.EventBusSubscriber(modid = Feathers.MODID)
-public class StaminaDeltaTickHandler {
+public class TickEventHandler {
 
     static Logger log = LogManager.getLogger(Feathers.MODID);
+
+    @SubscribeEvent
+    public static void playerTickEvent(TickEvent.PlayerTickEvent event) {
+        if (event.player instanceof ServerPlayer player) {
+
+            handleStaminaDelta(event);
+
+            handleEffects(event);
+
+        }
+    }
 
     /**
      * Apply stamina delta to the player's stamina value. Handles regeneration, effects, etc.
      *
      * @param event Player Tick Event
      */
-    public static void applyStaminaChanges(TickEvent.PlayerTickEvent event) {
+    public static void handleStaminaDelta(TickEvent.PlayerTickEvent event) {
 
         Player player = event.player;
         if (!player.isAlive() || player.isCreative() || player.isSpectator()) return;
@@ -100,19 +116,16 @@ public class StaminaDeltaTickHandler {
 
                 }
         );
+
     }
 
-    @SubscribeEvent
-    public static void applyStrain(FeatherAmountEvent.Empty event) {
-        event.getEntity().getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
-            if (FeathersCommonConfig.ENABLE_STRAIN.get()) {
-                if (event.prevStamina > 0) {
-                    event.getEntity().addEffect(new MobEffectInstance(FeathersEffects.STRAINED.get()));
-                } else {
-                    event.getEntity().removeEffect(FeathersEffects.STRAINED.get());
-                }
-            }
-        });
+
+    public static void handleEffects(TickEvent.PlayerTickEvent event) {
+
+        autoApplyColdEffect(event);
+
+        autoApplyHotEffect(event);
+
     }
 
     private static void logStuff(Player player, PlayerFeathers f) {
@@ -125,6 +138,107 @@ public class StaminaDeltaTickHandler {
             log.info(Temperature.get(player, Temperature.Trait.BURNING_POINT));
             log.info(Temperature.get(player, Temperature.Trait.FREEZING_POINT));
         }
+    }
+
+    /**
+     * Handle the cold mechanic here.
+     */
+    public static void autoApplyColdEffect(TickEvent.PlayerTickEvent event) {
+        if (!FeathersCommonConfig.ENABLE_COLD_EFFECTS.get()) return;
+
+        if (event.player instanceof ServerPlayer player && !player.isCreative()) {
+
+            boolean hasCold = player.hasEffect(FeathersEffects.COLD.get());
+            boolean hasHot = player.hasEffect(FeathersEffects.HOT.get());
+            int coldDuration = hasCold ? player.getActiveEffectsMap().get(FeathersEffects.COLD.get()).getDuration() : 0;
+            int hotDuration = hasHot ? player.getActiveEffectsMap().get(FeathersEffects.HOT.get()).getDuration() : 0;
+
+            if (isInColdSituation(player)) {
+
+                if (hotDuration < 0) {
+                    player.removeEffect(FeathersEffects.HOT.get());
+                } else if (!hasCold) {
+                    player.addEffect(new MobEffectInstance(
+                            FeathersEffects.COLD.get(), -1, 0, false, true));
+                }
+
+            } else if (hasCold && coldDuration > FeathersCommonConfig.COLD_LINGER.get()) {
+
+                player.removeEffect(FeathersEffects.COLD.get());
+                player.addEffect(new MobEffectInstance(FeathersEffects.COLD.get(),
+                        FeathersCommonConfig.COLD_LINGER.get(), 0, false, true));
+            }
+
+            if (player.isCreative() && player.hasEffect(FeathersEffects.COLD.get())) {
+                player.removeEffect(FeathersEffects.COLD.get());
+            }
+
+        }
+    }
+
+    /**
+     * Handles the hot mechanic here.
+     */
+    public static void autoApplyHotEffect(TickEvent.PlayerTickEvent event) {
+        if (!FeathersCommonConfig.ENABLE_HOT_EFFECTS.get()) return;
+
+        if (event.player instanceof ServerPlayer player && !player.isCreative()) {
+
+            boolean hasCold = player.hasEffect(FeathersEffects.COLD.get());
+            boolean hasHot = player.hasEffect(FeathersEffects.HOT.get());
+            int hotDuration = hasHot ? player.getActiveEffectsMap().get(FeathersEffects.HOT.get()).getDuration() : 0;
+            int coldDuration = hasCold ? player.getActiveEffectsMap().get(FeathersEffects.COLD.get()).getDuration() : 0;
+
+            if (isInHotSituation(player)) {
+
+                if (hasCold && coldDuration < 0) {
+                    player.removeEffect(FeathersEffects.COLD.get());
+                } else if (!hasHot) {
+                    player.addEffect(new MobEffectInstance(
+                            FeathersEffects.HOT.get(), -1, 0, false, true));
+                }
+
+            } else if (hotDuration < 0) {
+                player.removeEffect(FeathersEffects.HOT.get());
+                player.addEffect(new MobEffectInstance(FeathersEffects.HOT.get(),
+                        FeathersCommonConfig.COLD_LINGER.get(), 0, false, true));
+            }
+
+            if (player.isCreative() && player.hasEffect(FeathersEffects.HOT.get())) {
+                player.removeEffect(FeathersEffects.HOT.get());
+            }
+        }
+    }
+
+
+    public static boolean isInColdSituation(ServerPlayer player) {
+
+        boolean isRaining = player.level().isRaining() && player.level().isRainingAt(player.blockPosition());
+
+        if (Feathers.COLD_SWEAT_LOADED &&
+                FeathersColdSweatConfig.COLD_SWEAT_COMPATIBILITY.get() &&
+                FeathersColdSweatConfig.BEING_COLD_ADDS_COLD_EFFECT.get()) {
+            return Temperature.get(player, Temperature.Trait.BODY) <= -50;
+        }
+
+        boolean isInColdBiome = player.level().getBiome(player.blockPosition()).get().coldEnoughToSnow(player.blockPosition());
+
+        return (isInColdBiome && isRaining && player.level().canSeeSky(player.blockPosition())) || player.isFreezing();
+    }
+
+    public static boolean isInHotSituation(ServerPlayer player) {
+
+        boolean isBurning = player.wasOnFire || player.isOnFire() || player.isInLava();
+
+        if (Feathers.COLD_SWEAT_LOADED &&
+                FeathersColdSweatConfig.COLD_SWEAT_COMPATIBILITY.get() &&
+                FeathersColdSweatConfig.BEING_HOT_ADDS_HOT_EFFECT.get()) {
+            return Temperature.get(player, Temperature.Trait.BODY) >= 50;
+        }
+
+        boolean isInHotBiome = player.level().getBiome(player.blockPosition()).get().getModifiedClimateSettings().temperature() > 0.45f;
+        isInHotBiome |= player.level().dimension().equals(Level.NETHER);
+        return isBurning || isInHotBiome;
     }
 
 }

@@ -98,7 +98,7 @@ public class FeathersHudOverlay {
             for (int i = 0; i < 10; i++) {
                 if ((i + 1 <= halvedFeathers) && ClientFeathersData.getFeathers() > 0) {
 
-                    GuiIcon icon = (i + 1 == Math.ceil((double) ClientFeathersData.getFeathers() / 2)
+                    GuiIcon icon = (i + 1 == halvedFeathers
                             && (ClientFeathersData.getFeathers() % 2 != 0)) ? getIconHalf() : getIconFull();
 
                     int height = getHeight(i);
