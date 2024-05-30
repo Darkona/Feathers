@@ -1,7 +1,11 @@
 package com.elenai.feathers.capability;
 
+import com.elenai.feathers.Feathers;
 import com.elenai.feathers.api.IModifier;
+import com.elenai.feathers.compatibility.thirst.ThirstManager;
 import com.elenai.feathers.config.FeathersCommonConfig;
+import com.elenai.feathers.config.FeathersThirstConfig;
+import com.elenai.feathers.effect.StrainEffect;
 import com.elenai.feathers.event.FeatherEvent;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -28,24 +32,44 @@ public class PlayerFeathersProvider implements ICapabilityProvider, INBTSerializ
 
     private PlayerFeathers createPlayerFeathers() {
 
-
-
         if (this.feathers == null) {
-            List<IModifier> deltaModifiers = new ArrayList<>();
-            List<IModifier> usageModifiers = new ArrayList<>();
-            deltaModifiers.add(Modifiers.REGENERATION);
-
-            var attachInitialModifiersEvent = new FeatherEvent.InitializeModifiers(deltaModifiers);
-            var isCancelled = MinecraftForge.EVENT_BUS.post(attachInitialModifiersEvent);
-            if(!isCancelled && attachInitialModifiersEvent.getResult() == Event.Result.DEFAULT){
-                this.feathers = new PlayerFeathers(deltaModifiers, usageModifiers);
-            }
-
-
+            this.feathers = new PlayerFeathers(attachDeltaModifiers(), attachUsageModifiers());
         }
 
         return this.feathers;
     }
+
+    private List<IModifier> attachDeltaModifiers(){
+        List<IModifier> deltaModifiers = new ArrayList<>();
+
+        var attachInitialModifiersEvent = new FeatherEvent.AttachDeltaModifiers(deltaModifiers);
+        if(MinecraftForge.EVENT_BUS.post(attachInitialModifiersEvent)){
+            return deltaModifiers;
+        } else if (attachInitialModifiersEvent.getResult() == Event.Result.DEFAULT) {
+            attachInitialModifiersEvent.modifiers.add(ThirstManager.THIRSTY);
+            if(FeathersCommonConfig.ENABLE_STRAIN.get()){
+                attachInitialModifiersEvent.modifiers.add(StrainEffect.STRAIN_RECOVERY);
+            }
+        }
+
+        return attachInitialModifiersEvent.modifiers;
+    }
+
+    private List<IModifier> attachUsageModifiers(){
+        List<IModifier> usageModifiers = new ArrayList<>();
+
+        var attachInitialModifiersEvent = new FeatherEvent.AttachUsageModifiers(usageModifiers);
+        if(MinecraftForge.EVENT_BUS.post(attachInitialModifiersEvent)) {
+            return usageModifiers;
+        }else if(attachInitialModifiersEvent.getResult() == Event.Result.DEFAULT){
+            if(FeathersCommonConfig.ENABLE_STRAIN.get()) {
+                attachInitialModifiersEvent.modifiers.add(StrainEffect.STRAIN_USAGE);
+            }
+        }
+
+        return attachInitialModifiersEvent.modifiers;
+    }
+
 
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if (cap == PLAYER_FEATHERS) {

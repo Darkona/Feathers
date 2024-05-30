@@ -5,17 +5,26 @@ import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.config.FeathersCommonConfig;
 
 import com.elenai.feathers.effect.ColdEffect;
+import com.elenai.feathers.effect.FeathersEffects;
 import com.elenai.feathers.effect.HotEffect;
+import com.elenai.feathers.event.FeatherAmountEvent;
+import com.elenai.feathers.event.StaminaChangeEvent;
+import com.elenai.feathers.networking.FeathersMessages;
+import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.Event;
 
 import java.util.*;
 
 @Getter
 @Setter
-public class PlayerFeathers {
+public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
 
     private static final int ZERO = 0;
 
@@ -25,7 +34,7 @@ public class PlayerFeathers {
     private int feathers = ZERO;
     private int maxFeathers = FeathersCommonConfig.MAX_STAMINA.get() / FeathersConstants.STAMINA_PER_FEATHER;
 
-
+    private int cooldown = ZERO;
 
     private int enduranceFeathers = ZERO;
     private int strainFeathers = ZERO;
@@ -75,14 +84,12 @@ public class PlayerFeathers {
 
         var prev = staminaDeltaModifiers.put(modifier.getName(), modifier);
         if (prev != modifier) {
-            sortDeltaModifiers();
             shouldRecalculate = true;
         }
     }
 
     public void removeDeltaModifier(IModifier modifier) {
         if (staminaDeltaModifiers.remove(modifier.getName()) != null) {
-            sortDeltaModifiers();
             shouldRecalculate = true;
         }
     }
@@ -95,28 +102,34 @@ public class PlayerFeathers {
     public void recalculateStaminaDelta(Player player) {
         if (!shouldRecalculate) return;
         staminaDelta = 0;
-
+        sortDeltaModifiers();
         for (IModifier modifier : staminaDeltaModifierList) {
             staminaDelta = modifier.apply(player, this, staminaDelta);
         }
         shouldRecalculate = false;
     }
 
-    public void applyStaminaDelta() {
-        if (staminaDelta == ZERO) return;
+    private int applyDeltaToStrain(){
 
-        if (strainFeathers > ZERO) {
 
-            strainFeathers = Math.max(strainFeathers - staminaDelta, ZERO);
-
-        } else {
-            stamina = stamina + staminaDelta;
-
-            if (stamina > maxStamina) stamina = maxStamina;
-
-            if (stamina < ZERO) stamina = ZERO;
+        if(strainFeathers > 0){
+            int prevDelta = staminaDelta;
+            int prevStrain = strainFeathers;
+            strainFeathers -= staminaDelta;
+            if(strainFeathers <= 0){
+                strain = false;
+                staminaDelta = prevDelta - prevStrain;
+                return staminaDelta;
+            }
         }
+        return staminaDelta;
+    }
+    public void applyStaminaDelta() {
+        if(stamina <= ZERO) staminaDelta = applyDeltaToStrain();
 
+        stamina += staminaDelta;
+        if (stamina > maxStamina) stamina = maxStamina;
+        if (stamina < ZERO) stamina = ZERO;
         synchronizeFeathers();
     }
 
@@ -218,6 +231,5 @@ public class PlayerFeathers {
         this.strain = nbt.getBoolean("strain");
         synchronizeFeathers();
     }
-
 
 }

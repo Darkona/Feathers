@@ -3,7 +3,9 @@ package com.elenai.feathers;
 import com.elenai.feathers.attributes.FeathersAttributes;
 import com.elenai.feathers.commands.CommandInit;
 import com.elenai.feathers.config.FeathersClientConfig;
+import com.elenai.feathers.config.FeathersColdSweatConfig;
 import com.elenai.feathers.config.FeathersCommonConfig;
+import com.elenai.feathers.config.FeathersThirstConfig;
 import com.elenai.feathers.effect.FeathersEffects;
 import com.elenai.feathers.enchantment.FeathersEnchantments;
 import com.elenai.feathers.networking.FeathersMessages;
@@ -34,9 +36,15 @@ public class Feathers {
 		IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 		modEventBus.addListener(this::commonSetup);
 
-		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, FeathersClientConfig.SPEC, "Feathers-Client.toml");
-		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, FeathersCommonConfig.SPEC, "Feathers-Common.toml");
+		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, FeathersClientConfig.SPEC, "feathers//Feathers-Client.toml");
+		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, FeathersCommonConfig.SPEC, "feathers//Feathers-Common.toml");
 
+		if(THIRST_LOADED){
+			ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, FeathersThirstConfig.SPEC, "feathers//Feathers-Thirst.toml");
+		}
+		if(COLD_SWEAT_LOADED){
+			ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, FeathersColdSweatConfig.SPEC, "feathers//Feathers-ColdSweat.toml");
+		}
 		FeathersAttributes.register(modEventBus);
 		FeathersEffects.register(modEventBus);
 		FeathersPotions.register(modEventBus);

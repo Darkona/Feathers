@@ -99,7 +99,7 @@ public class FeathersAPI {
      * @return the amount of feathers spent
      * @throws UnsupportedOperationException if the amount is negative
      */
-    public static int spendFeathers(ServerPlayer player, int amount) throws UnsupportedOperationException {
+    public static int spendFeathers(ServerPlayer player, int amount, int cooldownTicks) throws UnsupportedOperationException {
         if (amount < 0) {
             throw new UnsupportedOperationException("Cannot spend negative feathers");
         }
@@ -116,6 +116,7 @@ public class FeathersAPI {
                           result.set(post - prev);
                           if (prev != f.getFeathers())
                               FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
+                          if(cooldownTicks > 0) f.setCooldown(cooldownTicks);
                       } else {
                           result.set(useFeatherEvent.amount);
                       }

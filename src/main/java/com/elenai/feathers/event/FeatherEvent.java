@@ -16,10 +16,23 @@ public abstract class FeatherEvent extends PlayerEvent {
     }
 
     @Cancelable
-    public static class InitializeModifiers extends Event {
+    public static class AttachDeltaModifiers extends Event {
 
         public final List<IModifier> modifiers;
-        public InitializeModifiers(List<IModifier> modifiers) {
+        public AttachDeltaModifiers(List<IModifier> modifiers) {
+            this.modifiers = modifiers;
+        }
+
+        public boolean hasResult() {
+            return true;
+        }
+
+    }
+
+    public static class AttachUsageModifiers extends Event {
+
+        public final List<IModifier> modifiers;
+        public AttachUsageModifiers(List<IModifier> modifiers) {
             this.modifiers = modifiers;
         }
 

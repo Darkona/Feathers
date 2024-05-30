@@ -159,7 +159,7 @@ public class FeathersHelper {
      * @side server
      */
     public static boolean spendFeathers(ServerPlayer player, int feathers) {
-        return FeathersAPI.spendFeathers(player, feathers) >= 0;
+        return FeathersAPI.spendFeathers(player, feathers, 20) >= 0;
     }
 
     /**

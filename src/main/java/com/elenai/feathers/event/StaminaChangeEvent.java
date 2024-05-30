@@ -13,12 +13,12 @@ public abstract class StaminaChangeEvent extends PlayerEvent {
 
     @Cancelable
     public static class Pre extends StaminaChangeEvent {
-        public int staminaDelta;
-        public int stamina;
-        public Pre(Player player, int staminaDelta, int stamina) {
+        public int prevStaminaDelta;
+        public int prevStamina;
+        public Pre(Player player, int prevStaminaDelta, int prevStamina) {
             super(player);
-            this.staminaDelta = staminaDelta;
-            this.stamina = stamina;
+            this.prevStaminaDelta = prevStaminaDelta;
+            this.prevStamina = prevStamina;
         }
     }
 

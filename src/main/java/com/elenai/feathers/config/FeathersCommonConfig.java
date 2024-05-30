@@ -40,16 +40,6 @@ public class FeathersCommonConfig {
     public static final ForgeConfigSpec.ConfigValue<Integer> MAX_STRAIN;
 
 
-    //Configs for Cold Sweat
-
-    public static final ForgeConfigSpec.ConfigValue<Boolean> COLD_SWEAT_COMPATIBILITY;
-
-
-    //Configs for Thirst Was Taken
-    public static final ForgeConfigSpec.ConfigValue<Boolean> THIRST_COMPATIBILITY;
-    public static final ForgeConfigSpec.ConfigValue<Integer> THIRST_REGEN_REDUCTION_MULTIPLIER;
-    public static final ForgeConfigSpec.ConfigValue<Integer> QUENCH_REGEN_BONUS_MULTIPLIER;
-
 
 
     public static List<String> armorWeightBuilder = new ArrayList<>();
@@ -60,7 +50,7 @@ public class FeathersCommonConfig {
 
         REGENERATION = BUILDER
                 .comment("How many stamina regenerates per tick. 1000 stamina = 1 feather. " +
-                        "Default value of 20 results in one feather every 500 ticks, or 25 seconds.")
+                        "Default value of 20 means 1 feather every 50 ticks, or 2.5 seconds. ")
                 .define("Base Stamina Regeneration", 20);
 
         MAX_STAMINA = BUILDER.comment("Maximum stamina the player can have. 1000 stamina = 1 feather.")
@@ -138,36 +128,6 @@ public class FeathersCommonConfig {
                 .define("Max Strain", 6);
 
         BUILDER.pop();
-
-        if (Feathers.COLD_SWEAT_LOADED) {
-            BUILDER.push("Cold Sweat compatibility settings");
-            COLD_SWEAT_COMPATIBILITY = BUILDER
-                    .comment("Enable compatibility with mod \"Cold Sweat\". " +
-                            "If enabled, Cold Sweat will determine if the player gets the Hot or the Cold effect depending on body temperature.")
-                    .define("Cold Sweat Compatibility", true);
-            BUILDER.pop();
-        } else {
-            COLD_SWEAT_COMPATIBILITY = BUILDER.define("Cold Sweat Compatibility", false);
-        }
-
-        BUILDER.push("Thirst Was Taken compatibility settings");
-
-        THIRST_COMPATIBILITY = BUILDER
-                .comment("Enable compatibility with mod \"Thirst Was Taken\".")
-                .define("Determine Cold With Thirst", true);
-
-        THIRST_REGEN_REDUCTION_MULTIPLIER = BUILDER
-                .comment("How many ticks of half-feather regeneration be increased by level missing of Thirst. " +
-                        "Maximum Thirst is 20 and minimum is 0.")
-                .define("Thirst Reduces Regen", 5);
-
-        QUENCH_REGEN_BONUS_MULTIPLIER = BUILDER
-                .comment("How many ticks of half-feather regeneration be decreased by level of Quench. " +
-                        "Maximum Quench is whatever your current Thirst is and minimum is 0.")
-                .define("Thirst Increases Regen", 2);
-
-        BUILDER.pop();
-
 
         SPEC = BUILDER.build();
     }

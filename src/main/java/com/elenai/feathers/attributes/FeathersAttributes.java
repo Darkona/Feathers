@@ -26,8 +26,6 @@ public class FeathersAttributes {
 
     public static final RegistryObject<Attribute> MAX_STAMINA = registerAttribute("feathers.max_stamina",
             (id) -> new RangedAttribute(id, 200.0D, 0.0D, 20000D).setSyncable(true), "d74ded8f-c5b6-4222-80e2-dbea7ccf8d02");
-    public static final RegistryObject<Attribute> STAMINA_DELTA = registerAttribute("feathers.stamina_delta",
-            (id) -> new RangedAttribute(id, 2.0D, 0.0D, 2000D).setSyncable(true), "d74ded8f-c5b6-4222-80e2-dbea7ccf8d02");
 
     public static RegistryObject<Attribute> registerAttribute(String name, Function<String, Attribute> attribute, String uuid) {
         return registerAttribute(name, attribute, UUID.fromString(uuid));

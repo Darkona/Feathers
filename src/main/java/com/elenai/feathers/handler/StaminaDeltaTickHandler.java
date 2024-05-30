@@ -2,12 +2,11 @@ package com.elenai.feathers.handler;
 
 import com.elenai.feathers.Feathers;
 import com.elenai.feathers.api.FeathersConstants;
-import com.elenai.feathers.capability.Modifiers;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.config.FeathersCommonConfig;
+import com.elenai.feathers.config.FeathersThirstConfig;
 import com.elenai.feathers.effect.FeathersEffects;
-import com.elenai.feathers.effect.StrainEffect;
 import com.elenai.feathers.event.FeatherAmountEvent;
 import com.elenai.feathers.event.StaminaChangeEvent;
 import com.elenai.feathers.networking.FeathersMessages;
@@ -15,6 +14,7 @@ import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
 import com.momosoftworks.coldsweat.api.util.Temperature;
 import dev.ghen.thirst.foundation.common.capability.ModCapabilities;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -43,25 +43,30 @@ public class StaminaDeltaTickHandler {
 
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
 
+                    //If there is cooldown to start regenerating, it will go down before attempting to regenerate again.
+                    if(f.getCooldown() > 0){
+                        f.setCooldown(f.getCooldown() - 1);
+                        return;
+                    }
 
                     //If there was any change in the delta modifiers, recalculate.
                     //Internal logic will only run if the flag is set to true
                     f.recalculateStaminaDelta(player);
 
                     //Event to see if something modifies the stamina delta before applying it and after existing modifiers have been applied.
-                    int prevStaminaDelta = f.getStaminaDelta();
+
                     int prevStamina = f.getStamina();
+
                     var preChangeEvent = new StaminaChangeEvent.Pre(player, f.getStaminaDelta(), f.getStamina());
-                    MinecraftForge.EVENT_BUS.post(preChangeEvent);
+                    var cancelled = MinecraftForge.EVENT_BUS.post(preChangeEvent);
 
-                    if (preChangeEvent.hasResult() && preChangeEvent.getResult() == Event.Result.DENY) return;
-                    if (preChangeEvent.isCancelable()) return;
+                    if  (cancelled) return;
+                    if(preChangeEvent.getResult() == Event.Result.DENY) return;
 
-                    f.setStaminaDelta(preChangeEvent.staminaDelta);
-                    f.setStamina(preChangeEvent.stamina);
+                    f.setStaminaDelta(preChangeEvent.prevStaminaDelta);
+                    f.setStamina(preChangeEvent.prevStamina);
 
-                    //Mark dirty for next tick
-                    f.setShouldRecalculate(prevStaminaDelta != f.getStaminaDelta());
+                    f.applyStaminaDelta();
 
                     //If the stamina delta is not zero, then the player's stamina will change
                     if (f.getStaminaDelta() != 0) {
@@ -71,14 +76,14 @@ public class StaminaDeltaTickHandler {
                             if (f.getStamina() < f.getMaxStamina()) f.applyStaminaDelta();
                         } else {
                             //If the stamina delta is negative, only apply if we are not at zero stamina. Avoid pointless operations.
-                            if(f.getStamina() > 0) f.applyStaminaDelta();
+                            if (f.getStamina() > 0) f.applyStaminaDelta();
                         }
                     }
 
                     //If there was any change in stamina
                     if (prevStamina != f.getStamina()) {
                         MinecraftForge.EVENT_BUS.post(new StaminaChangeEvent.Post(player, prevStamina, f.getStamina()));
-                        if (f.getStamina() == 0) {
+                        if (f.getStamina() <= 0) {
 
                             MinecraftForge.EVENT_BUS.post(new FeatherAmountEvent.Empty(player, prevStamina));
                             FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
@@ -92,6 +97,10 @@ public class StaminaDeltaTickHandler {
 
                             FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
                         }
+                        if(f.getStamina() < 0){
+                            player.addEffect(new MobEffectInstance(FeathersEffects.STRAIN.get(),-1, 0, false, true));
+
+                        }
                     }
 
                 }
@@ -99,17 +108,18 @@ public class StaminaDeltaTickHandler {
     }
 
     @SubscribeEvent
-    public static void applyStrain(FeatherAmountEvent.Empty event){
+    public static void applyStrain(FeatherAmountEvent.Empty event) {
         event.getEntity().getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
-            if(FeathersCommonConfig.ENABLE_STRAIN.get()){
-                if(event.prevStamina > 0) {
+            if (FeathersCommonConfig.ENABLE_STRAIN.get()) {
+                if (event.prevStamina > 0) {
                     //event.getEntity().addEffect(FeathersEffects.STRAIN);
-                }else {
+                } else {
                     //event.getEntity().removeEffect(StrainEffect.INSTANCE.get());
                 }
             }
         });
     }
+
     private static void logStuff(Player player, PlayerFeathers f) {
         log.info("Stamina: " + f.getStamina() + " Max Stamina: " + f.getMaxStamina() + " Delta: " + f.getStaminaDelta());
         if (player.isAlive()) {
@@ -123,13 +133,13 @@ public class StaminaDeltaTickHandler {
     }
 
     private static int applyThirstModifiers(Player player, int maxCooldown) {
-        if (Feathers.THIRST_LOADED && FeathersCommonConfig.THIRST_COMPATIBILITY.get()) {
+        if (Feathers.THIRST_LOADED && FeathersThirstConfig.THIRST_COMPATIBILITY.get()) {
             AtomicInteger thirstReduction = new AtomicInteger(0);
             AtomicInteger quenchBonus = new AtomicInteger(0);
 
             player.getCapability(ModCapabilities.PLAYER_THIRST).ifPresent(iThirst -> {
-                thirstReduction.set((20 - iThirst.getThirst()) * FeathersCommonConfig.THIRST_REGEN_REDUCTION_MULTIPLIER.get());
-                quenchBonus.set(iThirst.getQuenched() * FeathersCommonConfig.QUENCH_REGEN_BONUS_MULTIPLIER.get());
+
+                quenchBonus.set(iThirst.getQuenched() * FeathersThirstConfig.QUENCH_REGEN_BONUS_MULTIPLIER.get());
             });
             maxCooldown += thirstReduction.get() - quenchBonus.get();
 
