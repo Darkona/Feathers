@@ -75,7 +75,7 @@ public class StrainEffect extends MobEffect {
                 if (!f.isStrain()) {
                     f.setStrain(true);
                     f.addUsageModifier(STRAIN_USAGE);
-                    f.removeDeltaModifier(Modifiers.REGENERATION);
+                    f.removeDeltaModifier(PlayerFeathers.REGENERATION);
                     f.addDeltaModifier(STRAIN_RECOVERY);
                     FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.STRAIN, true, strength), player);
                 }
@@ -92,7 +92,7 @@ public class StrainEffect extends MobEffect {
                     f.setStrain(false);
                     f.removeUsageModifier(STRAIN_USAGE);
                     f.removeDeltaModifier(STRAIN_RECOVERY);
-                    f.addDeltaModifier(Modifiers.REGENERATION);
+                    f.addDeltaModifier(PlayerFeathers.REGENERATION);
                     FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.STRAIN, false, strength), player);
                 }
             });
