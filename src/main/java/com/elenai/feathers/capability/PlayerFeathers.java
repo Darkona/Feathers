@@ -101,7 +101,7 @@ public class PlayerFeathers implements IFeathers {
                 return 0;
             }
             int sps = (int) (fps.getValue() * FeathersConstants.STAMINA_PER_FEATHER / 20);
-            return Math.max((int) (1 / Math.log(fps.getValue() / 40 + 1.4) - 3.5) * sps, 1);
+            return Math.max((int) (1 / Math.log(playerFeathers.getFeathers() / 40d + 1.4) - 3.5) * sps, 1);
         }
 
         @Override
