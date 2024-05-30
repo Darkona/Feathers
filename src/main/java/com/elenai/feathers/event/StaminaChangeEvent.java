@@ -15,6 +15,7 @@ public abstract class StaminaChangeEvent extends PlayerEvent {
     public static class Pre extends StaminaChangeEvent {
         public int prevStaminaDelta;
         public int prevStamina;
+
         public Pre(Player player, int prevStaminaDelta, int prevStamina) {
             super(player);
             this.prevStaminaDelta = prevStaminaDelta;
@@ -25,6 +26,7 @@ public abstract class StaminaChangeEvent extends PlayerEvent {
     public static class Post extends StaminaChangeEvent {
         public int stamina;
         public int prevStamina;
+
         public Post(Player player, int prevStamina, int stamina) {
             super(player);
             this.stamina = stamina;

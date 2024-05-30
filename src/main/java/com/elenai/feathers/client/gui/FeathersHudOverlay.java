@@ -15,44 +15,29 @@ import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 public class FeathersHudOverlay {
 
     public final static ResourceLocation ICONS = new ResourceLocation(Feathers.MODID, "textures/gui/icons.png");
-    private static GuiIcon NORMAL_BACKGROUND = new GuiIcon(16, 0, 9, 9);
-    private static GuiIcon NORMAL_HALF_FEATHER = new GuiIcon(25, 0, 9, 9);
-    private static GuiIcon NORMAL_FULL_FEATHER = new GuiIcon(34, 0, 9, 9);
-
-    private static GuiIcon ENDURANCE_HALF_FEATHER = new GuiIcon(25, 9, 9, 9);
-    private static GuiIcon ENDURANCE_FULL_FEATHER = new GuiIcon(34, 9, 9, 9);
-
-    private static GuiIcon HALF_RED_FEATHER = new GuiIcon(61, 9, 9, 9);
-    private static GuiIcon FULL_RED_FEATHER = new GuiIcon(70, 9, 9, 9);
-
-
-    private static GuiIcon ARMORED_HALF_FEATHER = new GuiIcon(43, 0, 9, 9);
-    private static GuiIcon ARMORED_FULL_FEATHER = new GuiIcon(52, 0, 9, 9);
-
-
-    private static GuiIcon REGEN_BACKGROUND = new GuiIcon(16, 9, 9, 9);
-    private static GuiIcon ENERGIZED_HALF_FEATHER = new GuiIcon(43, 27, 9, 9);
-    private static GuiIcon ENERGIZED_FULL_FEATHER = new GuiIcon(52, 27, 9, 9);
-
-
-    private static GuiIcon COLD_BACKGROUND = new GuiIcon(16, 18, 9, 9);
-    private static GuiIcon COLD_HALF_FEATHER = new GuiIcon(25, 18, 9, 9);
-    private static GuiIcon COLD_FULL_FEATHER = new GuiIcon(34, 18, 9, 9);
-
-    private static GuiIcon ALTER_FULL_FEATHER = new GuiIcon(34, 27, 9, 9);
-    private static GuiIcon ALTER_HALF_FEATHER = new GuiIcon(25, 27, 9, 9);
-
-    private static GuiIcon HOT_HALF_FEATHER = new GuiIcon(61, 0, 9, 9);
-    private static GuiIcon HOT_FULL_FEATHER = new GuiIcon(70, 0, 9, 9);
-
-
-    private static GuiIcon OVERFLOW_HALF_FEATHER = new GuiIcon(61, 18, 9, 9);
-    private static GuiIcon OVERFLOW_FULL_FEATHER = new GuiIcon(70, 18, 9, 9);
-
     public static int k = 0;
     static float alpha = 1.0f;
-
-
+    private static final GuiIcon NORMAL_BACKGROUND = new GuiIcon(16, 0, 9, 9);
+    private static final GuiIcon NORMAL_HALF_FEATHER = new GuiIcon(25, 0, 9, 9);
+    private static final GuiIcon NORMAL_FULL_FEATHER = new GuiIcon(34, 0, 9, 9);
+    private static final GuiIcon ENDURANCE_HALF_FEATHER = new GuiIcon(25, 9, 9, 9);
+    private static final GuiIcon ENDURANCE_FULL_FEATHER = new GuiIcon(34, 9, 9, 9);
+    private static final GuiIcon HALF_RED_FEATHER = new GuiIcon(61, 9, 9, 9);
+    private static final GuiIcon FULL_RED_FEATHER = new GuiIcon(70, 9, 9, 9);
+    private static final GuiIcon ARMORED_HALF_FEATHER = new GuiIcon(43, 0, 9, 9);
+    private static final GuiIcon ARMORED_FULL_FEATHER = new GuiIcon(52, 0, 9, 9);
+    private static final GuiIcon REGEN_BACKGROUND = new GuiIcon(16, 9, 9, 9);
+    private static final GuiIcon ENERGIZED_HALF_FEATHER = new GuiIcon(43, 27, 9, 9);
+    private static final GuiIcon ENERGIZED_FULL_FEATHER = new GuiIcon(52, 27, 9, 9);
+    private static final GuiIcon COLD_BACKGROUND = new GuiIcon(16, 18, 9, 9);
+    private static final GuiIcon COLD_HALF_FEATHER = new GuiIcon(25, 18, 9, 9);
+    private static final GuiIcon COLD_FULL_FEATHER = new GuiIcon(34, 18, 9, 9);
+    private static final GuiIcon ALTER_FULL_FEATHER = new GuiIcon(34, 27, 9, 9);
+    private static final GuiIcon ALTER_HALF_FEATHER = new GuiIcon(25, 27, 9, 9);
+    private static final GuiIcon HOT_HALF_FEATHER = new GuiIcon(61, 0, 9, 9);
+    private static final GuiIcon HOT_FULL_FEATHER = new GuiIcon(70, 0, 9, 9);
+    private static final GuiIcon OVERFLOW_HALF_FEATHER = new GuiIcon(61, 18, 9, 9);
+    private static final GuiIcon OVERFLOW_FULL_FEATHER = new GuiIcon(70, 18, 9, 9);
     /**
      * Renders the Feathers to the hotbar
      */

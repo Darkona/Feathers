@@ -29,9 +29,9 @@ public class ThirstManager {
             player.getCapability(ModCapabilities.PLAYER_THIRST).ifPresent(iThirst -> {
                 var calculation = new ThirstCalculation(player, playerFeathers, ModCapabilities.PLAYER_THIRST);
                 var cancelled = MinecraftForge.EVENT_BUS.post(new ThirstCalculation(player, playerFeathers, ModCapabilities.PLAYER_THIRST));
-                if(cancelled) {
+                if (cancelled) {
                     return;
-                }else if (calculation.getResult() == Event.Result.DEFAULT) {
+                } else if (calculation.getResult() == Event.Result.DEFAULT) {
                     calculation.calculationResult = iThirst.getQuenched() * FeathersThirstConfig.THIRST_SLOWS_FEATHER_REGEN.get();
                 }
                 result.set(calculation.calculationResult);
@@ -50,6 +50,16 @@ public class ThirstManager {
         }
     };
 
+    @SubscribeEvent
+    public static void attachThirstDeltaModifiers(FeatherEvent.AttachDeltaModifiers event) {
+        if (Feathers.THIRST_LOADED && FeathersThirstConfig.THIRST_COMPATIBILITY.get()) {
+
+            if (FeathersThirstConfig.THIRST_SLOWS_FEATHER_REGEN.get() > 0)
+                event.modifiers.add(THIRSTY);
+
+        }
+    }
+
     public static class ThirstCalculation extends PlayerEvent {
 
         public int calculationResult;
@@ -63,15 +73,5 @@ public class ThirstManager {
             this.thirst = thirst;
         }
 
-    }
-
-    @SubscribeEvent
-    public static void attachThirstDeltaModifiers(FeatherEvent.AttachDeltaModifiers event) {
-        if (Feathers.THIRST_LOADED && FeathersThirstConfig.THIRST_COMPATIBILITY.get()) {
-
-            if (FeathersThirstConfig.THIRST_SLOWS_FEATHER_REGEN.get() > 0)
-                event.modifiers.add(THIRSTY);
-
-        }
     }
 }

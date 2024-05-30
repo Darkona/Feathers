@@ -4,7 +4,6 @@ import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.config.FeathersCommonConfig;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,29 +32,8 @@ public class PlayerFeathers implements IFeathers {
             return "default";
         }
     };
-    /**
-     * Basic modifier that applies the regeneration effect.
-     * This modifier is used to regenerate the player's stamina.
-     * The regeneration value is defined in the config.
-     * This modifier is applied once per tick.
-     */
-    public static final class RegenerationModifier implements IModifier{
-        @Override
-        public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
-            return FeathersCommonConfig.REGENERATION.get();
-        }
-
-        @Override
-        public int getOrdinal() {
-            return 0;
-        }
-
-        @Override
-        public String getName() {
-            return "regeneration";
-        }
-    };
     public static final IModifier REGENERATION = new RegenerationModifier();
+
     /**
      * This modifier is used to inverse the regeneration effect.
      * Available for modders as an example, but not used in this mod.
@@ -77,7 +55,6 @@ public class PlayerFeathers implements IFeathers {
             return "inverse_regeneration";
         }
     };
-
     /**
      * This modifier is used to make the regeneration effect non-linear.
      * Regeneration is faster at the start and slower at the end.
@@ -107,29 +84,19 @@ public class PlayerFeathers implements IFeathers {
             return "non_linear_regeneration";
         }
     };
-
-
     private static final int ZERO = 0;
-
     private int stamina = FeathersCommonConfig.MAX_STAMINA.get();
     private int maxStamina = FeathersCommonConfig.MAX_STAMINA.get();
-
     private int feathers = ZERO;
     private int maxFeathers = FeathersCommonConfig.MAX_STAMINA.get() / FeathersConstants.STAMINA_PER_FEATHER;
-
     private int cooldown = ZERO;
-
     private int enduranceFeathers = ZERO;
     private int strainFeathers = ZERO;
-
     private int maxStrained = FeathersCommonConfig.MAX_STRAIN.get();
-
     //Recalculation
     private int staminaDelta = ZERO;
-
     @Getter(AccessLevel.NONE)
     private boolean shouldRecalculate;
-
     //Effects
     private boolean cold = false;
     private boolean hot = false;
@@ -139,25 +106,23 @@ public class PlayerFeathers implements IFeathers {
     @Getter(AccessLevel.NONE)
     private boolean momentum = false;
     private boolean strained;
-
     //Modifiers
     private Map<String, IModifier> staminaDeltaModifiers = new HashMap<>();
     private List<IModifier> staminaDeltaModifierList = new ArrayList<>();
-
     private Map<String, IModifier> staminaUsageModifiers = new HashMap<>();
     private List<IModifier> staminaUsageModifiersList = new ArrayList<>();
+    public PlayerFeathers(List<IModifier> deltaModifiers, List<IModifier> usageModifiers) {
+        deltaModifiers.forEach(modifier -> staminaDeltaModifiers.put(modifier.getName(), modifier));
+        usageModifiers.forEach(modifier -> staminaUsageModifiers.put(modifier.getName(), modifier));
+        shouldRecalculate = true;
+    }
 
     public boolean hasMomentum() {
         return momentum;
     }
 
-    public boolean shouldRecalculate(){
+    public boolean shouldRecalculate() {
         return shouldRecalculate;
-    }
-    public PlayerFeathers(List<IModifier> deltaModifiers, List<IModifier> usageModifiers) {
-        deltaModifiers.forEach(modifier -> staminaDeltaModifiers.put(modifier.getName(), modifier));
-        usageModifiers.forEach(modifier -> staminaUsageModifiers.put(modifier.getName(), modifier));
-        shouldRecalculate = true;
     }
 
     @Override
@@ -170,13 +135,11 @@ public class PlayerFeathers implements IFeathers {
         this.stamina = feathers * FeathersConstants.STAMINA_PER_FEATHER;
     }
 
-
     @Override
     public void setStamina(int stamina) {
         this.stamina = Math.min(Math.max(stamina, ZERO), maxStamina);
         synchronizeFeathers();
     }
-
 
     @Override
     public void addDeltaModifier(IModifier modifier) {
@@ -210,14 +173,14 @@ public class PlayerFeathers implements IFeathers {
         shouldRecalculate = false;
     }
 
-    private int applyDeltaToStrain(){
+    private int applyDeltaToStrain() {
 
 
-        if(strainFeathers > 0){
+        if (strainFeathers > 0) {
             int prevDelta = staminaDelta;
             int prevStrain = strainFeathers;
             strainFeathers -= staminaDelta;
-            if(strainFeathers <= 0){
+            if (strainFeathers <= 0) {
                 strained = false;
                 staminaDelta = prevDelta - prevStrain;
                 return staminaDelta;
@@ -225,8 +188,9 @@ public class PlayerFeathers implements IFeathers {
         }
         return staminaDelta;
     }
+
     public void applyStaminaDelta() {
-        if(stamina <= ZERO) staminaDelta = applyDeltaToStrain();
+        if (stamina <= ZERO) staminaDelta = applyDeltaToStrain();
 
         stamina += staminaDelta;
         if (stamina > maxStamina) stamina = maxStamina;
@@ -338,7 +302,28 @@ public class PlayerFeathers implements IFeathers {
         synchronizeFeathers();
     }
 
+    /**
+     * Basic modifier that applies the regeneration effect.
+     * This modifier is used to regenerate the player's stamina.
+     * The regeneration value is defined in the config.
+     * This modifier is applied once per tick.
+     */
+    public static final class RegenerationModifier implements IModifier {
+        @Override
+        public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
+            return FeathersCommonConfig.REGENERATION.get();
+        }
 
+        @Override
+        public int getOrdinal() {
+            return 0;
+        }
+
+        @Override
+        public String getName() {
+            return "regeneration";
+        }
+    }
 
 
 }

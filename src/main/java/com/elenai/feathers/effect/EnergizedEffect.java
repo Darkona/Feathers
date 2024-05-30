@@ -1,7 +1,6 @@
 package com.elenai.feathers.effect;
 
 import com.elenai.feathers.api.IModifier;
-import com.elenai.feathers.capability.Modifiers;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.config.FeathersCommonConfig;
@@ -20,11 +19,6 @@ import java.util.function.Function;
 
 public class EnergizedEffect extends MobEffect {
 
-    public EnergizedEffect(MobEffectCategory mobEffectCategory, int color) {
-        super(mobEffectCategory, color);
-    }
-
-    private static final Function<Integer, Integer> energize_one = (i) -> i * 2;
     public static final IModifier ENERGIZED = new IModifier() {
 
         @Override
@@ -47,6 +41,11 @@ public class EnergizedEffect extends MobEffect {
             return "hot";
         }
     };
+    private static final Function<Integer, Integer> energize_one = (i) -> i * 2;
+    public EnergizedEffect(MobEffectCategory mobEffectCategory, int color) {
+        super(mobEffectCategory, color);
+    }
+
     @Override
     public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
         if (target instanceof ServerPlayer player) {

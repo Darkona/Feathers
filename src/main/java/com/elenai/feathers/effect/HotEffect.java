@@ -1,7 +1,6 @@
 package com.elenai.feathers.effect;
 
 import com.elenai.feathers.api.IModifier;
-import com.elenai.feathers.capability.Modifiers;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.networking.FeathersMessages;
@@ -16,9 +15,6 @@ import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class HotEffect extends MobEffect {
-    public HotEffect(MobEffectCategory mobEffectCategory, int color) {super(mobEffectCategory, color);}
-
-
     /**
      * Doubles the amount of feathers used.
      */
@@ -39,6 +35,10 @@ public class HotEffect extends MobEffect {
             return "hot";
         }
     };
+
+
+    public HotEffect(MobEffectCategory mobEffectCategory, int color) {super(mobEffectCategory, color);}
+
     @Override
     public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
         if (target instanceof ServerPlayer player) {

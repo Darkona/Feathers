@@ -1,6 +1,5 @@
 package com.elenai.feathers.config;
 
-import com.elenai.feathers.Feathers;
 import com.google.common.collect.Lists;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -38,8 +37,6 @@ public class FeathersCommonConfig {
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_STRAIN;
     public static final ForgeConfigSpec.ConfigValue<Integer> MAX_STRAIN;
-
-
 
 
     public static List<String> armorWeightBuilder = new ArrayList<>();

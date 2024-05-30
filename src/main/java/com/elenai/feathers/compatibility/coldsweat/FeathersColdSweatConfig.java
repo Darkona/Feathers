@@ -9,7 +9,6 @@ public class FeathersColdSweatConfig {
     public static final ForgeConfigSpec SPEC;
 
 
-
     //Configs for Cold Sweat
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> COLD_SWEAT_COMPATIBILITY;

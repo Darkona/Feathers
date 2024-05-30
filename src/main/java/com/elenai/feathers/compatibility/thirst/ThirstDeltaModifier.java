@@ -16,9 +16,9 @@ public class ThirstDeltaModifier implements IModifier {
         player.getCapability(ModCapabilities.PLAYER_THIRST).ifPresent(iThirst -> {
             var calculation = new ThirstManager.ThirstCalculation(player, playerFeathers, ModCapabilities.PLAYER_THIRST);
             var cancelled = MinecraftForge.EVENT_BUS.post(new ThirstManager.ThirstCalculation(player, playerFeathers, ModCapabilities.PLAYER_THIRST));
-            if(cancelled) {
+            if (cancelled) {
                 return;
-            }else if (calculation.getResult() == Event.Result.DEFAULT) {
+            } else if (calculation.getResult() == Event.Result.DEFAULT) {
                 calculation.calculationResult = (iThirst.getThirst() - 20) * FeathersThirstConfig.THIRST_SLOWS_FEATHER_REGEN.get();
             }
             result.set(calculation.calculationResult);

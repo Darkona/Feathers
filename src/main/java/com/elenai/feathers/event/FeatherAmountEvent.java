@@ -5,7 +5,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 
 
-public class FeatherAmountEvent  extends PlayerEvent{
+public class FeatherAmountEvent extends PlayerEvent {
 
 
     public FeatherAmountEvent(Player player) {
@@ -21,6 +21,7 @@ public class FeatherAmountEvent  extends PlayerEvent{
     public static class Empty extends FeatherAmountEvent {
 
         public int prevStamina;
+
         public Empty(Player player, int prevStamina) {
             super(player);
             this.prevStamina = prevStamina;
@@ -29,6 +30,7 @@ public class FeatherAmountEvent  extends PlayerEvent{
 
     public static class Discrete extends FeatherAmountEvent {
         int feathers;
+
         public Discrete(Player player, int feathers) {
             super(player);
             this.feathers = feathers;

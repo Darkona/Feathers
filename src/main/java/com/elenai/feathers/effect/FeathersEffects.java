@@ -30,6 +30,7 @@ public class FeathersEffects {
 
     public static final RegistryObject<MobEffect> STRAINED = EFFECTS
             .register("strain", () -> new StrainEffect(MobEffectCategory.HARMFUL, 0x7e0048));
+
     public static void register(IEventBus eventBus) {
 
         EFFECTS.register(eventBus);

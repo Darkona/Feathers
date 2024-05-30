@@ -9,12 +9,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 
 import java.util.ArrayList;
 
 @Mod.EventBusSubscriber
 public class CommandInit {
+    public static final DeferredRegister<ArgumentTypeInfo<?, ?>> ARGUMENTS = DeferredRegister.create(ForgeRegistries.COMMAND_ARGUMENT_TYPES, Feathers.MODID);
     private static final ArrayList<BaseCommand> COMMANDS = new ArrayList<>();
 
     @SubscribeEvent
@@ -30,7 +30,5 @@ public class CommandInit {
             }
         });
     }
-
-    public static final DeferredRegister<ArgumentTypeInfo<?, ?>> ARGUMENTS = DeferredRegister.create(ForgeRegistries.COMMAND_ARGUMENT_TYPES, Feathers.MODID);
 
 }

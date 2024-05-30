@@ -17,10 +17,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class EnduranceEffect extends MobEffect {
 
-    public EnduranceEffect(MobEffectCategory mobEffectCategory, int color) {
-        super(mobEffectCategory, color);
-    }
-
     /**
      * Uses Endurance Feathers before using regular feathers.
      * If the player has no Endurance Feathers, the player will use regular feathers.
@@ -28,12 +24,12 @@ public class EnduranceEffect extends MobEffect {
     public static final IModifier ENDURANCE = new IModifier() {
         @Override
         public int apply(Player player, PlayerFeathers playerFeathers, int staminaToUse) {
-            if(!player.hasEffect(FeathersEffects.ENDURANCE.get())) return 0;
+            if (!player.hasEffect(FeathersEffects.ENDURANCE.get())) return 0;
 
             int feathersToUse = staminaToUse / FeathersConstants.STAMINA_PER_FEATHER;
-            if(playerFeathers.getEnduranceFeathers() > 0){
+            if (playerFeathers.getEnduranceFeathers() > 0) {
                 int enduranceFeathers = playerFeathers.getEnduranceFeathers();
-                if(enduranceFeathers >= feathersToUse){
+                if (enduranceFeathers >= feathersToUse) {
                     playerFeathers.setEnduranceFeathers(enduranceFeathers - feathersToUse);
                     return 0;
                 } else {
@@ -55,6 +51,10 @@ public class EnduranceEffect extends MobEffect {
             return "endurance";
         }
     };
+
+    public EnduranceEffect(MobEffectCategory mobEffectCategory, int color) {
+        super(mobEffectCategory, color);
+    }
 
     @Override
     public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {

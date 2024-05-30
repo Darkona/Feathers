@@ -1,7 +1,6 @@
 package com.elenai.feathers.handler;
 
 import com.elenai.feathers.Feathers;
-import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.config.FeathersCommonConfig;
@@ -51,7 +50,7 @@ public class FeathersEventHandler {
 
     @SubscribeEvent
     public static void onPlayerSleep(PlayerSleepInBedEvent event) {
-        if(!FeathersCommonConfig.SLEEPING_ALWAYS_RESTORES_FEATHERS.get()) return;
+        if (!FeathersCommonConfig.SLEEPING_ALWAYS_RESTORES_FEATHERS.get()) return;
         if (event.getEntity() instanceof ServerPlayer player) {
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
                 f.setStamina(f.getMaxStamina());
@@ -61,6 +60,7 @@ public class FeathersEventHandler {
         }
 
     }
+
     @SubscribeEvent
     public static void onPlayerChangeArmor(LivingEquipmentChangeEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && event.getSlot().getType() == EquipmentSlot.Type.ARMOR) {

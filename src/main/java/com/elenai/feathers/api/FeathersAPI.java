@@ -68,6 +68,7 @@ public class FeathersAPI {
     /**
      * Give feathers to the player. Returns the amount of feathers gained.
      * For tick-based operations, use staminaUsageModifiers.
+     *
      * @param player the player
      * @param amount the amount of feathers to gain
      * @return the amount of feathers gained
@@ -114,7 +115,7 @@ public class FeathersAPI {
                           result.set(post - prev);
                           if (prev != f.getFeathers())
                               FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
-                          if(cooldownTicks > 0) f.setCooldown(cooldownTicks);
+                          if (cooldownTicks > 0) f.setCooldown(cooldownTicks);
                       } else {
                           result.set(useFeatherEvent.amount);
                       }
@@ -156,27 +157,27 @@ public class FeathersAPI {
                      .map(PlayerFeathers::getCooldown).orElse(0);
     }
 
-    public static boolean isCold(ServerPlayer player){
+    public static boolean isCold(ServerPlayer player) {
         return player.hasEffect(FeathersEffects.COLD.get());
     }
 
-    public static boolean isHot(ServerPlayer player){
+    public static boolean isHot(ServerPlayer player) {
         return player.hasEffect(FeathersEffects.HOT.get());
     }
 
-    public static boolean isEnergized(ServerPlayer player){
+    public static boolean isEnergized(ServerPlayer player) {
         return player.hasEffect(FeathersEffects.ENERGIZED.get());
     }
 
-    public static boolean isStrained(ServerPlayer player){
+    public static boolean isStrained(ServerPlayer player) {
         return player.hasEffect(FeathersEffects.STRAINED.get());
     }
 
-    public static boolean isEnduring(ServerPlayer player){
+    public static boolean isEnduring(ServerPlayer player) {
         return player.hasEffect(FeathersEffects.ENDURANCE.get());
     }
 
-    public static boolean isFatigued(ServerPlayer player){
+    public static boolean isFatigued(ServerPlayer player) {
         return player.hasEffect(FeathersEffects.FATIGUE.get());
     }
 }

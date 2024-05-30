@@ -19,6 +19,7 @@ public abstract class FeatherEvent extends PlayerEvent {
     public static class AttachDeltaModifiers extends Event {
 
         public final List<IModifier> modifiers;
+
         public AttachDeltaModifiers(List<IModifier> modifiers) {
             this.modifiers = modifiers;
         }
@@ -32,6 +33,7 @@ public abstract class FeatherEvent extends PlayerEvent {
     public static class AttachUsageModifiers extends Event {
 
         public final List<IModifier> modifiers;
+
         public AttachUsageModifiers(List<IModifier> modifiers) {
             this.modifiers = modifiers;
         }
@@ -46,6 +48,7 @@ public abstract class FeatherEvent extends PlayerEvent {
 
         public int prev;
         public int post;
+
         public Changed(Player player, int prev, int post) {
             super(player);
             this.prev = prev;
@@ -57,6 +60,7 @@ public abstract class FeatherEvent extends PlayerEvent {
     public static class Use extends FeatherEvent {
 
         public int amount;
+
         public Use(Player player, int amount) {
             super(player);
             this.amount = amount;
@@ -68,13 +72,12 @@ public abstract class FeatherEvent extends PlayerEvent {
     public static class Gain extends FeatherEvent {
 
         public int amount;
+
         public Gain(Player player, int amount) {
             super(player);
             this.amount = amount;
         }
     }
-
-
 
 
 }

@@ -5,6 +5,7 @@ import net.minecraft.world.entity.player.Player;
 public interface IFeathers {
 
     int getStamina();
+
     void setStamina(int stamina);
 
     int getFeathers();
@@ -21,27 +22,34 @@ public interface IFeathers {
 
     void removeUsageModifier(IModifier modifier);
 
-    void setMaxStamina(int maxStamina);
     int getMaxStamina();
 
+    void setMaxStamina(int maxStamina);
 
     int gainFeathers(int feathers);
 
     int useFeathers(Player player, int feathers);
 
 
-
-
-
     int getMaxFeathers();
+
+    void setMaxFeathers(int maxFeathers);
 
     int getCooldown();
 
+    void setCooldown(int cooldown);
+
     int getEnduranceFeathers();
+
+    void setEnduranceFeathers(int enduranceFeathers);
 
     int getStrainFeathers();
 
+    void setStrainFeathers(int strainFeathers);
+
     int getMaxStrained();
+
+    void setMaxStrained(int maxStrained);
 
     int getStaminaDelta();
 
@@ -49,46 +57,35 @@ public interface IFeathers {
 
     boolean isCold();
 
+    void setCold(boolean cold);
+
     boolean isHot();
+
+    void setHot(boolean hot);
 
     boolean isEnergized();
 
+    void setEnergized(boolean energized);
+
     int getEnergizedStrength();
+
+    void setEnergizedStrength(int energizedStrength);
 
     boolean isFatigued();
 
+    void setFatigued(boolean fatigued);
+
     boolean isStrained();
+
+    void setStrained(boolean strain);
+
     boolean hasMomentum();
 
     java.util.Map<String, IModifier> getStaminaDeltaModifiers();
 
     java.util.Map<String, IModifier> getStaminaUsageModifiers();
 
-
-
-    void setMaxFeathers(int maxFeathers);
-
-    void setCooldown(int cooldown);
-
-    void setEnduranceFeathers(int enduranceFeathers);
-
-    void setStrainFeathers(int strainFeathers);
-
-    void setMaxStrained(int maxStrained);
-
     void setShouldRecalculate(boolean shouldRecalculate);
 
-    void setCold(boolean cold);
-
-    void setHot(boolean hot);
-
-    void setEnergized(boolean energized);
-
-    void setEnergizedStrength(int energizedStrength);
-
-    void setFatigued(boolean fatigued);
-
     void setMomentum(boolean momentum);
-
-    void setStrained(boolean strain);
 }

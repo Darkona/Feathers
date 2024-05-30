@@ -180,7 +180,7 @@ public class FeathersHelper {
 
         Player player = Minecraft.getInstance().player;
         assert player != null;
-        if (player.isCreative() || player.isSpectator()) { return true; }
+        if (player.isCreative() || player.isSpectator()) {return true;}
 
         if (ClientFeathersData.getFeathers() >= amount) {
             ClientFeathersData.setFeathers(ClientFeathersData.getFeathers() - amount);

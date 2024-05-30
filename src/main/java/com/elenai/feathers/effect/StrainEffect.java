@@ -16,10 +16,6 @@ import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class StrainEffect extends MobEffect {
-    protected StrainEffect(MobEffectCategory p_19451_, int p_19452_) {
-        super(p_19451_, p_19452_);
-    }
-
     /**
      * This modifier is used to over-spend feathers when no more feathers are available.
      * While strained, the player will enter a negative stamina state.
@@ -28,9 +24,9 @@ public class StrainEffect extends MobEffect {
     public static final IModifier STRAIN_USAGE = new IModifier() {
         @Override
         public int apply(Player player, PlayerFeathers playerFeathers, int feathers) {
-            if(playerFeathers.getFeathers() == 0){
+            if (playerFeathers.getFeathers() == 0) {
                 int strain = playerFeathers.getStrainFeathers();
-                if(strain + feathers <= playerFeathers.getMaxStrained()) {
+                if (strain + feathers <= playerFeathers.getMaxStrained()) {
                     playerFeathers.setStrainFeathers(strain + feathers);
                 }
             }
@@ -47,11 +43,10 @@ public class StrainEffect extends MobEffect {
             return "strain";
         }
     };
-
     public static final IModifier STRAIN_RECOVERY = new IModifier() {
         @Override
         public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
-            if(playerFeathers.getStrainFeathers() > 0) {
+            if (playerFeathers.getStrainFeathers() > 0) {
                 staminaDelta = (int) (FeathersCommonConfig.REGENERATION.get() * 0.4);
             }
             return staminaDelta;
@@ -67,9 +62,14 @@ public class StrainEffect extends MobEffect {
             return "strain_recovery";
         }
     };
+
+    protected StrainEffect(MobEffectCategory p_19451_, int p_19452_) {
+        super(p_19451_, p_19452_);
+    }
+
     @Override
     public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        if(!FeathersCommonConfig.ENABLE_STRAIN.get()) return;
+        if (!FeathersCommonConfig.ENABLE_STRAIN.get()) return;
         if (target instanceof ServerPlayer player) {
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
                 if (!f.isStrained()) {
@@ -86,7 +86,7 @@ public class StrainEffect extends MobEffect {
 
     @Override
     public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        if(!FeathersCommonConfig.ENABLE_STRAIN.get()) return;
+        if (!FeathersCommonConfig.ENABLE_STRAIN.get()) return;
         if (target instanceof ServerPlayer player) {
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
                 if (f.isStrained()) {

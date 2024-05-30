@@ -13,10 +13,10 @@ import java.util.function.Supplier;
 
 public class EffectChangeSTCPacket {
 
-    private Effect name;
+    private final Effect name;
 
-    private int strength;
-    private boolean state;
+    private final int strength;
+    private final boolean state;
 
     public EffectChangeSTCPacket(Effect name, boolean state, int strength) {
         this.name = name;
@@ -43,7 +43,7 @@ public class EffectChangeSTCPacket {
             switch (name) {
                 case COLD:
                     ClientFeathersData.cold = state;
-                    if(ClientFeathersData.cold && FeathersClientConfig.FROST_SOUND.get()) {
+                    if (ClientFeathersData.cold && FeathersClientConfig.FROST_SOUND.get()) {
 
                         Minecraft instance = Minecraft.getInstance();
                         assert instance.level != null;

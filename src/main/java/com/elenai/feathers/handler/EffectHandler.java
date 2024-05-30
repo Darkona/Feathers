@@ -1,7 +1,6 @@
 package com.elenai.feathers.handler;
 
 import com.elenai.feathers.Feathers;
-import com.elenai.feathers.api.FeathersHelper;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.effect.FeathersEffects;
 import com.elenai.feathers.effect.PlayerSituationProvider;

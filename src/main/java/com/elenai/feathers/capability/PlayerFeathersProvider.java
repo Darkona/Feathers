@@ -1,9 +1,6 @@
 package com.elenai.feathers.capability;
 
 import com.elenai.feathers.api.IModifier;
-import com.elenai.feathers.compatibility.thirst.ThirstManager;
-import com.elenai.feathers.config.FeathersCommonConfig;
-import com.elenai.feathers.effect.StrainEffect;
 import com.elenai.feathers.event.FeatherEvent;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -37,11 +34,11 @@ public class PlayerFeathersProvider implements ICapabilityProvider, INBTSerializ
         return this.feathers;
     }
 
-    private List<IModifier> attachDeltaModifiers(){
+    private List<IModifier> attachDeltaModifiers() {
         List<IModifier> deltaModifiers = new ArrayList<>();
 
         var attachInitialModifiersEvent = new FeatherEvent.AttachDeltaModifiers(deltaModifiers);
-        if(MinecraftForge.EVENT_BUS.post(attachInitialModifiersEvent)){
+        if (MinecraftForge.EVENT_BUS.post(attachInitialModifiersEvent)) {
             return deltaModifiers;
         } else if (attachInitialModifiersEvent.getResult() == Event.Result.DEFAULT) {
             attachInitialModifiersEvent.modifiers.add(PlayerFeathers.REGENERATION);
@@ -50,13 +47,13 @@ public class PlayerFeathersProvider implements ICapabilityProvider, INBTSerializ
         return attachInitialModifiersEvent.modifiers;
     }
 
-    private List<IModifier> attachUsageModifiers(){
+    private List<IModifier> attachUsageModifiers() {
         List<IModifier> usageModifiers = new ArrayList<>();
 
         var attachInitialModifiersEvent = new FeatherEvent.AttachUsageModifiers(usageModifiers);
-        if(MinecraftForge.EVENT_BUS.post(attachInitialModifiersEvent)) {
+        if (MinecraftForge.EVENT_BUS.post(attachInitialModifiersEvent)) {
             return usageModifiers;
-        }else if(attachInitialModifiersEvent.getResult() == Event.Result.DEFAULT){
+        } else if (attachInitialModifiersEvent.getResult() == Event.Result.DEFAULT) {
             usageModifiers.add(PlayerFeathers.DEFAULT_USAGE);
         }
 

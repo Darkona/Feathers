@@ -66,7 +66,8 @@ public class StaminaAPI {
                   FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
               });
     }
-    public static void addStaminaUsageModifier(Player player, IModifier modifier){
+
+    public static void addStaminaUsageModifier(Player player, IModifier modifier) {
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.addUsageModifier(modifier);
@@ -74,7 +75,7 @@ public class StaminaAPI {
               });
     }
 
-    public static void removeStaminaUsageModifier(Player player, IModifier modifier){
+    public static void removeStaminaUsageModifier(Player player, IModifier modifier) {
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.removeUsageModifier(modifier);

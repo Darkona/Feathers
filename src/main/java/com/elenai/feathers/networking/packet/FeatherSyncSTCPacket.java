@@ -23,7 +23,6 @@ public class FeatherSyncSTCPacket {
     private final boolean momentum;
 
 
-
     public FeatherSyncSTCPacket(PlayerFeathers feathers) {
         stamina = feathers.getStamina();
         maxStamina = feathers.getMaxStamina();
