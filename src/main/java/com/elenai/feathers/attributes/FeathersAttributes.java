@@ -1,20 +1,23 @@
 package com.elenai.feathers.attributes;
 
 import com.elenai.feathers.Feathers;
-import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.util.Calculations;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -24,8 +27,8 @@ import java.util.function.Function;
 public class FeathersAttributes {
 
     public static final HashMap<RegistryObject<Attribute>, UUID> UUIDS = new HashMap<>();
-    public static final DeferredRegister<Attribute> ATTRIBUTES = DeferredRegister.create(
-        ForgeRegistries.ATTRIBUTES,
+    public static final DeferredRegister<Attribute> ATTRIBUTES =
+        DeferredRegister.create(ForgeRegistries.ATTRIBUTES,
         Feathers.MODID
     );
 
@@ -35,13 +38,17 @@ public class FeathersAttributes {
         "d74ded8f-c5b6-4222-80e2-dbea7ccf8d02"
     );
 
-    private static final double baseFeathersPerSecond = Calculations.calculateFeathersPerSecond(FeathersCommonConfig.REGENERATION.get());
+    private static final double baseFeathersPerSecond =
+        Calculations.calculateFeathersPerSecond(FeathersCommonConfig.REGENERATION.getDefault());
     private static final double minimumFeathersPerSecond = baseFeathersPerSecond * -20;
     private static final double maximumFeathersPerSecond = baseFeathersPerSecond * 20;
 
     public static final RegistryObject<Attribute> BASE_FEATHERS_PER_SECOND = registerAttribute(
         "feathers.feathers_per_second",
-        (id) -> new RangedAttribute(id,baseFeathersPerSecond,minimumFeathersPerSecond,maximumFeathersPerSecond
+        (id) -> new RangedAttribute(id,
+            baseFeathersPerSecond,
+            minimumFeathersPerSecond,
+            maximumFeathersPerSecond
         ).setSyncable(true),
         "d74ded8f-c5b6-4222-80e2-dbea7ccf8d02"
     );
@@ -55,8 +62,7 @@ public class FeathersAttributes {
     public static RegistryObject<Attribute> registerAttribute(
         String name, Function<String, Attribute> attribute, UUID uuid
     ) {
-        RegistryObject<Attribute> registryObject = ATTRIBUTES.register(
-            name,
+        RegistryObject<Attribute> registryObject = ATTRIBUTES.register(name,
             () -> attribute.apply(name)
         );
         UUIDS.put(registryObject, uuid);
@@ -78,4 +84,24 @@ public class FeathersAttributes {
         }
     }
 
+    @SubscribeEvent
+    public static void onConfig(ModConfigEvent event) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) {
+            return;
+        }
+        server.getPlayerList().getPlayers().forEach(
+            p -> {
+                AttributeInstance attr = p.getAttribute(BASE_FEATHERS_PER_SECOND.get());
+                if (attr != null) {
+                    attr.setBaseValue(
+                        Calculations.calculateFeathersPerSecond(
+                            FeathersCommonConfig.REGENERATION.get()
+                        )
+                    );
+                }
+            }
+        );
+
+    }
 }
