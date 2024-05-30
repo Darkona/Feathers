@@ -14,7 +14,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.asm.mixin.injection.At;
 
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 public class EnergizedEffect extends MobEffect {
@@ -22,13 +25,13 @@ public class EnergizedEffect extends MobEffect {
     public static final IModifier ENERGIZED = new IModifier() {
 
         @Override
-        public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
-            if (player.getEffect(FeathersEffects.ENERGIZED.get()) != null) {
-                int strength = player.getEffect(FeathersEffects.ENERGIZED.get()).getAmplifier();
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
+            var effect = player.getEffect(FeathersEffects.ENERGIZED.get());
+            if (effect != null) {
+                int strength =  effect.getAmplifier();
                 float multiplier = 1 + ((strength + 1) * 0.2F);
-                return (int) (FeathersCommonConfig.REGENERATION.get() * multiplier);
+                staminaDelta.set((int) (FeathersCommonConfig.REGENERATION.get() * multiplier));
             }
-            return staminaDelta;
         }
 
         @Override
@@ -42,6 +45,7 @@ public class EnergizedEffect extends MobEffect {
         }
     };
     private static final Function<Integer, Integer> energize_one = (i) -> i * 2;
+
     public EnergizedEffect(MobEffectCategory mobEffectCategory, int color) {
         super(mobEffectCategory, color);
     }

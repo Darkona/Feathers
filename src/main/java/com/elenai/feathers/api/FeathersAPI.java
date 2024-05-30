@@ -106,15 +106,21 @@ public class FeathersAPI {
         if (player.isCreative() || player.isSpectator())
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
                   .ifPresent(f -> {
+
                       var useFeatherEvent = new FeatherEvent.Use(player, amount);
                       boolean cancelled = MinecraftForge.EVENT_BUS.post(useFeatherEvent);
+
                       if (!cancelled && useFeatherEvent.getResult() == DEFAULT) {
+
                           var prev = f.getFeathers();
                           var post = f.useFeathers(player, useFeatherEvent.amount);
+
                           MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, prev, post));
-                          result.set(post - prev);
-                          if (prev != f.getFeathers())
+                          result.set(prev -post);
+
+                          if (prev != post && post != 0)
                               FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
+
                           if (cooldownTicks > 0) f.setCooldown(cooldownTicks);
                       } else {
                           result.set(useFeatherEvent.amount);

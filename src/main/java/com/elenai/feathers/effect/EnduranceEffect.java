@@ -15,6 +15,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class EnduranceEffect extends MobEffect {
 
     /**
@@ -23,22 +25,28 @@ public class EnduranceEffect extends MobEffect {
      */
     public static final IModifier ENDURANCE = new IModifier() {
         @Override
-        public int apply(Player player, PlayerFeathers playerFeathers, int staminaToUse) {
-            if (!player.hasEffect(FeathersEffects.ENDURANCE.get())) return 0;
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaToUse) {
+            if (!player.hasEffect(FeathersEffects.ENDURANCE.get())) return;
 
-            int feathersToUse = staminaToUse / FeathersConstants.STAMINA_PER_FEATHER;
+            int feathersToUse = staminaToUse.get() / FeathersConstants.STAMINA_PER_FEATHER;
+
             if (playerFeathers.getEnduranceFeathers() > 0) {
+
                 int enduranceFeathers = playerFeathers.getEnduranceFeathers();
+
                 if (enduranceFeathers >= feathersToUse) {
+
                     playerFeathers.setEnduranceFeathers(enduranceFeathers - feathersToUse);
-                    return 0;
                 } else {
+
                     player.removeEffect(FeathersEffects.ENDURANCE.get());
-                    return (feathersToUse - enduranceFeathers) * FeathersConstants.STAMINA_PER_FEATHER;
+
+                    staminaToUse.set((feathersToUse - enduranceFeathers) * FeathersConstants.STAMINA_PER_FEATHER);
                 }
+
             }
 
-            return 0;
+
         }
 
         @Override

@@ -15,6 +15,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class StrainEffect extends MobEffect {
     /**
      * This modifier is used to over-spend feathers when no more feathers are available.
@@ -23,14 +25,13 @@ public class StrainEffect extends MobEffect {
      */
     public static final IModifier STRAIN_USAGE = new IModifier() {
         @Override
-        public int apply(Player player, PlayerFeathers playerFeathers, int feathers) {
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger feathers) {
             if (playerFeathers.getFeathers() == 0) {
                 int strain = playerFeathers.getStrainFeathers();
-                if (strain + feathers <= playerFeathers.getMaxStrained()) {
-                    playerFeathers.setStrainFeathers(strain + feathers);
+                if (strain + feathers.get() <= playerFeathers.getMaxStrained()) {
+                    playerFeathers.setStrainFeathers(strain + feathers.get());
                 }
             }
-            return 0;
         }
 
         @Override
@@ -45,11 +46,10 @@ public class StrainEffect extends MobEffect {
     };
     public static final IModifier STRAIN_RECOVERY = new IModifier() {
         @Override
-        public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
             if (playerFeathers.getStrainFeathers() > 0) {
-                staminaDelta = (int) (FeathersCommonConfig.REGENERATION.get() * 0.4);
+                staminaDelta.set(staminaDelta.get() + (int) (FeathersCommonConfig.REGENERATION.get() * 0.4));
             }
-            return staminaDelta;
         }
 
         @Override

@@ -13,6 +13,9 @@ import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
 import com.momosoftworks.coldsweat.api.util.Temperature;
 import com.momosoftworks.coldsweat.util.registries.ModEffects;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -57,6 +60,7 @@ public class TickEventHandler {
 
                     //If there is cooldown to start regenerating, it will go down before attempting to regenerate again.
                     if (f.getCooldown() > 0) {
+
                         f.setCooldown(f.getCooldown() - 1);
                         return;
                     }
@@ -68,6 +72,7 @@ public class TickEventHandler {
                     //Event to see if something modifies the stamina delta before applying it and after existing modifiers have been applied.
 
                     int prevStamina = f.getStamina();
+                    int prevFeather = f.getFeathers();
 
                     var preChangeEvent = new StaminaChangeEvent.Pre(player, f.getStaminaDelta(), f.getStamina());
                     var cancelled = MinecraftForge.EVENT_BUS.post(preChangeEvent);
@@ -81,7 +86,7 @@ public class TickEventHandler {
                     f.applyStaminaDelta();
 
                     //If the stamina delta is not zero, then the player's stamina will change
-                    if (f.getStaminaDelta() != 0) {
+                    if (f.getStaminaDelta() != 0 ) {
 
                         if (f.getStaminaDelta() > 0) {
                             //If the stamina delta is positive, only apply if we are not at max stamina. Avoid pointless operations.
@@ -100,16 +105,25 @@ public class TickEventHandler {
                             MinecraftForge.EVENT_BUS.post(new FeatherAmountEvent.Empty(player, prevStamina));
                             FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
 
+
+
                         } else if (f.getStamina() == f.getMaxStamina()) {
 
                             MinecraftForge.EVENT_BUS.post(new FeatherAmountEvent.Full(player));
                             FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
 
-                        } else if (f.getStamina() % FeathersConstants.STAMINA_PER_FEATHER == 0) {
+                        }
+
+                        if (prevFeather != f.getFeathers()) {
+                            player.sendSystemMessage(MutableComponent.create(new LiteralContents("Previous feathers : " + prevFeather + ", now: " + f.getFeathers())));
                             FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
                         }
 
                         if (f.getStamina() < 0) {
+
+                            player.sendSystemMessage(MutableComponent.create(new LiteralContents("You are out of stamina!")));
+
+
                             player.addEffect(new MobEffectInstance(FeathersEffects.STRAINED.get(), -1, 0, false, true));
                         }
                     }
@@ -192,20 +206,26 @@ public class TickEventHandler {
             if (isInHotSituation(player)) {
 
                 if (hasCold && coldDuration < 0) {
+
                     player.removeEffect(FeathersEffects.COLD.get());
+
                 } else if (!hasHot) {
+
                     player.addEffect(new MobEffectInstance(
                             FeathersEffects.HOT.get(), -1, 0, false, true));
                 }
 
             } else if (hotDuration < 0) {
+
                 player.removeEffect(FeathersEffects.HOT.get());
-                player.addEffect(new MobEffectInstance(FeathersEffects.HOT.get(),
-                        FeathersCommonConfig.COLD_LINGER.get(), 0, false, true));
+                player.addEffect(new MobEffectInstance(FeathersEffects.HOT.get(), FeathersCommonConfig.COLD_LINGER.get(), 0, false, true));
+
             }
 
             if (player.isCreative() && player.hasEffect(FeathersEffects.HOT.get())) {
+
                 player.removeEffect(FeathersEffects.HOT.get());
+
             }
         }
     }
@@ -218,6 +238,7 @@ public class TickEventHandler {
         if (Feathers.COLD_SWEAT_LOADED &&
                 FeathersColdSweatConfig.COLD_SWEAT_COMPATIBILITY.get() &&
                 FeathersColdSweatConfig.BEING_COLD_ADDS_COLD_EFFECT.get()) {
+
             return Temperature.get(player, Temperature.Trait.BODY) <= -50;
         }
 
@@ -230,14 +251,14 @@ public class TickEventHandler {
 
         boolean isBurning = player.wasOnFire || player.isOnFire() || player.isInLava();
 
-        if (Feathers.COLD_SWEAT_LOADED &&
-                FeathersColdSweatConfig.COLD_SWEAT_COMPATIBILITY.get() &&
-                FeathersColdSweatConfig.BEING_HOT_ADDS_HOT_EFFECT.get()) {
+        if (Feathers.COLD_SWEAT_LOADED && FeathersColdSweatConfig.COLD_SWEAT_COMPATIBILITY.get() && FeathersColdSweatConfig.BEING_HOT_ADDS_HOT_EFFECT.get()) {
+
             return Temperature.get(player, Temperature.Trait.BODY) >= 50;
         }
 
         boolean isInHotBiome = player.level().getBiome(player.blockPosition()).get().getModifiedClimateSettings().temperature() > 0.45f;
         isInHotBiome |= player.level().dimension().equals(Level.NETHER);
+
         return isBurning || isInHotBiome;
     }
 

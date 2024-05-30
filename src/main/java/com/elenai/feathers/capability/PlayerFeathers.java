@@ -12,6 +12,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
 @Setter
@@ -19,8 +20,8 @@ public class PlayerFeathers implements IFeathers {
 
     public static final IModifier DEFAULT_USAGE = new IModifier() {
         @Override
-        public int apply(Player player, PlayerFeathers playerFeathers, int usingFeathers) {
-            return usingFeathers;
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger usingFeathers) {
+            //Do nothing
         }
 
         @Override
@@ -42,13 +43,16 @@ public class PlayerFeathers implements IFeathers {
      */
     public static final IModifier REGENERATION = new IModifier() {
         @Override
-        public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
 
-            var fps = player.getAttribute(FeathersAttributes.BASE_FEATHERS_PER_SECOND.get());
-            if (fps == null) {
-                return 0;
-            }
-            return (int) (fps.getValue() * FeathersConstants.STAMINA_PER_FEATHER / 20);
+            //var fps = player.getAttribute(FeathersAttributes.BASE_FEATHERS_PER_SECOND.get());
+           /* if (fps == null) {
+                staminaDelta.set(FeathersCommonConfig.REGENERATION.get());
+            } else {*/
+                //var value = (int) (fps.getValue() * (FeathersConstants.STAMINA_PER_FEATHER / 20 / 20));
+            staminaDelta.set(staminaDelta.get() + FeathersCommonConfig.REGENERATION.get());
+           /* }
+            var a = 1;*/
         }
 
         @Override
@@ -70,12 +74,13 @@ public class PlayerFeathers implements IFeathers {
     public static final IModifier INVERSE_REGENERATION = new IModifier() {
 
         @Override
-        public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
-            var fps = player.getAttribute(FeathersAttributes.BASE_FEATHERS_PER_SECOND.get());
-            if (fps == null) {
-                return 0;
-            }
-            return (int) (fps.getValue() * FeathersConstants.STAMINA_PER_FEATHER / -20);
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
+            /*var fps = player.getAttribute(FeathersAttributes.BASE_FEATHERS_PER_SECOND.get());
+            if (fps == null) {*/
+            staminaDelta.set(FeathersCommonConfig.REGENERATION.get() * -1);
+            /*} else {
+                staminaDelta.set((int) (fps.getValue() * FeathersConstants.STAMINA_PER_FEATHER / -20));
+            }*/
         }
 
         @Override
@@ -96,13 +101,13 @@ public class PlayerFeathers implements IFeathers {
     public static final IModifier NON_LINEAR_REGENERATION = new IModifier() {
 
         @Override
-        public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
-            var fps = player.getAttribute(FeathersAttributes.BASE_FEATHERS_PER_SECOND.get());
-            if (fps == null) {
-                return 0;
-            }
-            int sps = (int) (fps.getValue() * FeathersConstants.STAMINA_PER_FEATHER / 20);
-            return Math.max((int) (1 / Math.log(playerFeathers.getFeathers() / 40d + 1.4) - 3.5) * sps, 1);
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
+           /* var fps = player.getAttribute(FeathersAttributes.BASE_FEATHERS_PER_SECOND.get());
+            int regenValue = (fps == null) ? FeathersCommonConfig.REGENERATION.get() : (int)fps.getValue() ;*/
+
+            int sps = FeathersCommonConfig.REGENERATION.get();
+            var something = Math.max((int) (1 / Math.log(playerFeathers.getFeathers() / 40d + 1.4) - 3.5) * sps, 1);
+            staminaDelta.set(something);
         }
 
         @Override
@@ -140,6 +145,7 @@ public class PlayerFeathers implements IFeathers {
     @Getter(AccessLevel.NONE)
     private boolean momentum = false;
     private boolean strained;
+
     //Modifiers
     private Map<String, IModifier> staminaDeltaModifiers = new HashMap<>();
     private List<IModifier> staminaDeltaModifierList = new ArrayList<>();
@@ -200,11 +206,12 @@ public class PlayerFeathers implements IFeathers {
     @Override
     public void recalculateStaminaDelta(Player player) {
         if (!shouldRecalculate) return;
-        staminaDelta = 0;
+        AtomicInteger delta = new AtomicInteger(ZERO);
         sortDeltaModifiers();
         for (IModifier modifier : staminaDeltaModifierList) {
-            staminaDelta += modifier.apply(player, this, staminaDelta);
+            modifier.apply(player, this, delta);
         }
+        staminaDelta = delta.get();
         shouldRecalculate = false;
     }
 
@@ -271,29 +278,31 @@ public class PlayerFeathers implements IFeathers {
         return feathers;
     }
 
+    /**
+     * Spend feathers from the player. Returns the amount of feathers spent.
+     * @param player
+     * @param feathers
+     * @return
+     */
     @Override
     public int useFeathers(Player player, int feathers) {
-
-        var staminaToRemove = feathers * FeathersConstants.STAMINA_PER_FEATHER;
+        var prev = this.feathers;
+        var staminaToRemove = new AtomicInteger(feathers * FeathersConstants.STAMINA_PER_FEATHER);
         for (IModifier modifier : staminaUsageModifiersList) {
-            staminaToRemove = modifier.apply(player, this, staminaToRemove);
+            modifier.apply(player, this, staminaToRemove);
         }
-
-        subtractStamina(staminaToRemove);
+        if(staminaToRemove.get() <= 0) return 0;
+        subtractStamina(staminaToRemove.get());
         synchronizeFeathers();
-        return this.getFeathers() - feathers;
+        return prev - feathers;
     }
 
     private void addStamina(int stamina) {
-
         this.stamina = Math.min(this.stamina + stamina, maxStamina);
-        synchronizeFeathers();
     }
 
     private void subtractStamina(int stamina) {
-
         this.stamina = Math.max(this.stamina - stamina, ZERO);
-        synchronizeFeathers();
     }
 
     public void copyFrom(PlayerFeathers source) {

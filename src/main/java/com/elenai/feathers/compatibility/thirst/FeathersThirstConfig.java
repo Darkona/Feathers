@@ -11,7 +11,7 @@ public class FeathersThirstConfig {
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> THIRST_COMPATIBILITY;
 
-    public static final ForgeConfigSpec.ConfigValue<Integer> THIRST_SLOWS_FEATHER_REGEN;
+    public static final ForgeConfigSpec.ConfigValue<Integer> THIRST_STAMINA_DRAIN;
 
     public static final ForgeConfigSpec.ConfigValue<Integer> QUENCH_REGEN_BONUS_MULTIPLIER;
 
@@ -24,7 +24,7 @@ public class FeathersThirstConfig {
                 .comment("Enable compatibility with Thirst Was Taken")
                 .define("thirst_compatibility", true);
 
-        THIRST_SLOWS_FEATHER_REGEN = BUILDER
+        THIRST_STAMINA_DRAIN = BUILDER
                 .comment("How much thirst reduces the regeneration bonus effect?" +
                         "This value is subtracted per thirst level (missing half-drop) from the stamina regeneration per tick."
                         + "The default value of 1 means that the stamina regeneration is reduced by 2 per missing drop, to a maximum of.")

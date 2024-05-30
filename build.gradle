@@ -123,6 +123,7 @@ dependencies {
     implementation fg.deobf("curse.maven:player-animator-658587:${player_animator_file_id}")
     implementation fg.deobf("curse.maven:elenai-dodge-442962:${elenai_dodge_file_id}")
     compileOnly 'org.projectlombok:lombok:1.18.20'
+
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }

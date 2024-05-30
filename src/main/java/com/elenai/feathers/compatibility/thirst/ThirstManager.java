@@ -20,23 +20,56 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ThirstManager {
 
 
-    public static final IModifier THIRSTY = new ThirstDeltaModifier();
+    public static final IModifier THIRSTY = new IModifier() {
+        @Override
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
+
+            player.getCapability(ModCapabilities.PLAYER_THIRST).ifPresent(iThirst -> {
+
+                var calculation = new ThirstManager.ThirstCalculation(player, playerFeathers, ModCapabilities.PLAYER_THIRST);
+                var cancelled = MinecraftForge.EVENT_BUS.post(new ThirstManager.ThirstCalculation(player, playerFeathers, ModCapabilities.PLAYER_THIRST));
+
+                if (cancelled) {
+
+                    return;
+                } else if (calculation.getResult() == Event.Result.DEFAULT) {
+
+                    calculation.calculationResult = (iThirst.getThirst() - 20) * FeathersThirstConfig.THIRST_STAMINA_DRAIN.get();
+                }
+
+                staminaDelta.set(staminaDelta.get() + calculation.calculationResult);
+            });
+        }
+
+        @Override
+        public int getOrdinal() {
+            return 2;
+        }
+
+        @Override
+        public String getName() {
+            return "thirsty";
+        }
+    };
 
     public static final IModifier QUENCHED = new IModifier() {
         @Override
-        public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
-            AtomicInteger result = new AtomicInteger(staminaDelta);
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
             player.getCapability(ModCapabilities.PLAYER_THIRST).ifPresent(iThirst -> {
+
                 var calculation = new ThirstCalculation(player, playerFeathers, ModCapabilities.PLAYER_THIRST);
                 var cancelled = MinecraftForge.EVENT_BUS.post(new ThirstCalculation(player, playerFeathers, ModCapabilities.PLAYER_THIRST));
+
                 if (cancelled) {
+
                     return;
                 } else if (calculation.getResult() == Event.Result.DEFAULT) {
-                    calculation.calculationResult = iThirst.getQuenched() * FeathersThirstConfig.THIRST_SLOWS_FEATHER_REGEN.get();
+
+                    calculation.calculationResult = iThirst.getQuenched() * FeathersThirstConfig.THIRST_STAMINA_DRAIN.get();
                 }
-                result.set(calculation.calculationResult);
+
+                staminaDelta.set(staminaDelta.get() + calculation.calculationResult);
             });
-            return result.get();
         }
 
         @Override
@@ -54,8 +87,11 @@ public class ThirstManager {
     public static void attachThirstDeltaModifiers(FeatherEvent.AttachDeltaModifiers event) {
         if (Feathers.THIRST_LOADED && FeathersThirstConfig.THIRST_COMPATIBILITY.get()) {
 
-            if (FeathersThirstConfig.THIRST_SLOWS_FEATHER_REGEN.get() > 0)
+            if (FeathersThirstConfig.THIRST_STAMINA_DRAIN.get() > 0)
                 event.modifiers.add(THIRSTY);
+
+            if(FeathersThirstConfig.QUENCH_REGEN_BONUS_MULTIPLIER.get() > 0)
+                event.modifiers.add(QUENCHED);
 
         }
     }

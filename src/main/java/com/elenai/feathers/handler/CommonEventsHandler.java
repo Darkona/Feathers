@@ -34,9 +34,11 @@ public class CommonEventsHandler {
 
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
                 var attr = player.getAttribute(FeathersAttributes.BASE_FEATHERS_PER_SECOND.get());
+
                 if (attr != null) {
                     attr.setBaseValue(FeathersCommonConfig.REGENERATION.get());
                 }
+
                 f.setShouldRecalculate(true);
                 f.recalculateStaminaDelta(player);
                 FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
@@ -51,6 +53,7 @@ public class CommonEventsHandler {
 
         if (event.getEntity() instanceof ServerPlayer player) {
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
+
                 f.setStamina(f.getMaxStamina());
                 f.setStrainFeathers(0);
                 FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
@@ -73,6 +76,7 @@ public class CommonEventsHandler {
     public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof Player) {
             if (!event.getObject().getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).isPresent()) {
+
                 event.addCapability(new ResourceLocation(Feathers.MODID, "properties"), new PlayerFeathersProvider());
             }
         }
@@ -84,6 +88,7 @@ public class CommonEventsHandler {
         if (!event.isWasDeath()) {
             event.getOriginal().getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(oldStore -> {
                 event.getOriginal().getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(newStore -> {
+
                     newStore.copyFrom(oldStore);
                 });
             });

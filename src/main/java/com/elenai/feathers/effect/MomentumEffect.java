@@ -7,6 +7,8 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class MomentumEffect extends MobEffect {
 
     /**
@@ -15,8 +17,8 @@ public class MomentumEffect extends MobEffect {
     public static final IModifier MOMENTUM = new IModifier() {
 
         @Override
-        public int apply(Player player, PlayerFeathers playerFeathers, int feathersToUse) {
-            return (feathersToUse * FeathersConstants.STAMINA_PER_FEATHER) / 2;
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger feathersToUse) {
+             feathersToUse.set((feathersToUse.get() * FeathersConstants.STAMINA_PER_FEATHER) / 2);
         }
 
         @Override

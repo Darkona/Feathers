@@ -17,27 +17,50 @@ public class FeathersHudOverlay {
     public final static ResourceLocation ICONS = new ResourceLocation(Feathers.MODID, "textures/gui/icons.png");
     public static int k = 0;
     static float alpha = 1.0f;
-    private static final GuiIcon NORMAL_BACKGROUND = new GuiIcon(16, 0, 9, 9);
-    private static final GuiIcon NORMAL_HALF_FEATHER = new GuiIcon(25, 0, 9, 9);
-    private static final GuiIcon NORMAL_FULL_FEATHER = new GuiIcon(34, 0, 9, 9);
-    private static final GuiIcon ENDURANCE_HALF_FEATHER = new GuiIcon(25, 9, 9, 9);
-    private static final GuiIcon ENDURANCE_FULL_FEATHER = new GuiIcon(34, 9, 9, 9);
-    private static final GuiIcon HALF_RED_FEATHER = new GuiIcon(61, 9, 9, 9);
-    private static final GuiIcon FULL_RED_FEATHER = new GuiIcon(70, 9, 9, 9);
-    private static final GuiIcon ARMORED_HALF_FEATHER = new GuiIcon(43, 0, 9, 9);
-    private static final GuiIcon ARMORED_FULL_FEATHER = new GuiIcon(52, 0, 9, 9);
-    private static final GuiIcon REGEN_BACKGROUND = new GuiIcon(16, 9, 9, 9);
-    private static final GuiIcon ENERGIZED_HALF_FEATHER = new GuiIcon(43, 27, 9, 9);
-    private static final GuiIcon ENERGIZED_FULL_FEATHER = new GuiIcon(52, 27, 9, 9);
-    private static final GuiIcon COLD_BACKGROUND = new GuiIcon(16, 18, 9, 9);
-    private static final GuiIcon COLD_HALF_FEATHER = new GuiIcon(25, 18, 9, 9);
-    private static final GuiIcon COLD_FULL_FEATHER = new GuiIcon(34, 18, 9, 9);
-    private static final GuiIcon ALTER_FULL_FEATHER = new GuiIcon(34, 27, 9, 9);
-    private static final GuiIcon ALTER_HALF_FEATHER = new GuiIcon(25, 27, 9, 9);
-    private static final GuiIcon HOT_HALF_FEATHER = new GuiIcon(61, 0, 9, 9);
-    private static final GuiIcon HOT_FULL_FEATHER = new GuiIcon(70, 0, 9, 9);
-    private static final GuiIcon OVERFLOW_HALF_FEATHER = new GuiIcon(61, 18, 9, 9);
-    private static final GuiIcon OVERFLOW_FULL_FEATHER = new GuiIcon(70, 18, 9, 9);
+
+
+    private static final GuiIcon BACK_NORMAL = GuiIcon.featherIcon(0,0);
+    private static final GuiIcon BACK_COLD = GuiIcon.featherIcon(1,0);
+    private static final GuiIcon BACK_HOT = GuiIcon.featherIcon(2,0);
+    private static final GuiIcon BACK_GREEN = GuiIcon.featherIcon(3,0);
+
+
+    private static final GuiIcon NORMAL_HALF = GuiIcon.featherIcon(0, 1);
+    private static final GuiIcon NORMAL_FULL = GuiIcon.featherIcon(0, 2);
+
+    private static final GuiIcon COLD_HALF = GuiIcon.featherIcon(1, 1);
+    private static final GuiIcon COLD_FULL = GuiIcon.featherIcon(1, 2);
+
+    private static final GuiIcon HOT_HALF = GuiIcon.featherIcon(2, 1);
+    private static final GuiIcon HOT_FULL = GuiIcon.featherIcon(2, 2);
+
+    private static final GuiIcon GREEN_HALF = GuiIcon.featherIcon(3, 1);
+    private static final GuiIcon GREEN_FULL = GuiIcon.featherIcon(3, 2);
+
+    private static final GuiIcon ENDUR_HALF = GuiIcon.featherIcon(10, 1);
+    private static final GuiIcon ENDUR_FULL = GuiIcon.featherIcon(10, 2);
+
+    private static final GuiIcon STRAIN_HALF = GuiIcon.featherIcon(9, 1);
+    private static final GuiIcon STRAIN_FULL = GuiIcon.featherIcon(9, 2);
+
+    private static final GuiIcon ARMOR_HALF = GuiIcon.featherIcon(3, 4);
+    private static final GuiIcon ARMOR_FULL = GuiIcon.featherIcon(3, 3);
+
+    private static final GuiIcon ENERGY_HALF = GuiIcon.featherIcon(5, 1);
+    private static final GuiIcon ENERGY_FULL = GuiIcon.featherIcon(5, 2);
+
+    private static final GuiIcon OVERFLOW_HALF = GuiIcon.featherIcon(4, 1);
+    private static final GuiIcon OVERFLOW_FULL = GuiIcon.featherIcon(4, 2);
+
+    private static final GuiIcon MOMENTUM_HALF = GuiIcon.featherIcon(6, 1);
+    private static final GuiIcon MOMENTUM_FULL = GuiIcon.featherIcon(6, 2);
+
+
+    private static final GuiIcon REGEN_OVERLAY = GuiIcon.featherIcon(0, 3);
+    private static final GuiIcon COLD_OVERLAY = GuiIcon.featherIcon(1, 3);
+    private static final GuiIcon HOT_OVERLAY = GuiIcon.featherIcon(2, 3);
+
+
     /**
      * Renders the Feathers to the hotbar
      */
@@ -84,7 +107,7 @@ public class FeathersHudOverlay {
             for (int i = 0; i < 10; i++) {
                 if ((i + 1 <= Math.ceil((double) ClientFeathersData.getMaxFeathers() / 2))) {
 
-                    GuiIcon icon = ((ClientFeathersData.cold) ? COLD_BACKGROUND : NORMAL_BACKGROUND);
+                    GuiIcon icon = ((ClientFeathersData.cold) ? BACK_COLD : BACK_NORMAL);
 
                     int height = getHeight(i);
                     draw(guiGraphics, getXPos(x, i, xOffset), getYPos(y, rightOffset, height, yOffset), icon);
@@ -99,7 +122,7 @@ public class FeathersHudOverlay {
                 if ((i + 1 <= halvedFeathers) && ClientFeathersData.getFeathers() > 0) {
 
                     GuiIcon icon = (i + 1 == halvedFeathers
-                            && (ClientFeathersData.getFeathers() % 2 != 0)) ? getIconHalf() : getIconFull();
+                            && (ClientFeathersData.getFeathers() % 2 != 0)) ?  getIconFull() : getIconHalf() ;
 
                     int height = getHeight(i);
                     draw(guiGraphics, getXPos(x, i, xOffset), getYPos(y, rightOffset, height, yOffset), icon);
@@ -115,7 +138,7 @@ public class FeathersHudOverlay {
                 if ((i + 1 <= Math.ceil((double) ClientFeathersData.weight / FeathersConstants.STAMINA_PER_FEATHER)) && (i + 1 <= halvedFeathers)) {
 
                     GuiIcon icon = (i + 1 == Math.ceil((double) ClientFeathersData.weight / FeathersConstants.STAMINA_PER_FEATHER)
-                            && (ClientFeathersData.weight % FeathersConstants.STAMINA_PER_FEATHER != 0)) ? ARMORED_HALF_FEATHER : ARMORED_FULL_FEATHER;
+                            && (ClientFeathersData.weight % FeathersConstants.STAMINA_PER_FEATHER != 0)) ? ARMOR_HALF : ARMOR_FULL;
 
                     int height = getHeight(i);
                     draw(guiGraphics, getXPos(x, i, xOffset), getYPos(y, rightOffset, height, yOffset), icon);
@@ -133,7 +156,7 @@ public class FeathersHudOverlay {
                     if (i + 1 <= Math.ceil((double) (ClientFeathersData.getFeathers() - ClientFeathersData.getMaxFeathers()) / FeathersConstants.STAMINA_PER_FEATHER)) {
 
                         GuiIcon icon = (i + 1 == Math.ceil((double) (ClientFeathersData.stamina - ClientFeathersData.maxStamina) / FeathersConstants.STAMINA_PER_FEATHER)
-                                && ClientFeathersData.stamina % FeathersConstants.STAMINA_PER_FEATHER != 0) ? OVERFLOW_HALF_FEATHER : OVERFLOW_FULL_FEATHER;
+                                && ClientFeathersData.stamina % FeathersConstants.STAMINA_PER_FEATHER != 0) ? OVERFLOW_HALF : OVERFLOW_FULL;
 
                         int height = getHeight(i);
 
@@ -152,7 +175,7 @@ public class FeathersHudOverlay {
                 if (ClientFeathersData.animationCooldown >= 18 || ClientFeathersData.animationCooldown == 10) {
                     if ((i + 1 <= Math.ceil((double) ClientFeathersData.maxStamina / FeathersConstants.STAMINA_PER_FEATHER))) {
                         int height = getHeight(i);
-                        GuiIcon icon = REGEN_BACKGROUND;
+                        GuiIcon icon = REGEN_OVERLAY;
                         draw(guiGraphics, getXPos(x, i, xOffset), y - rightOffset + yOffset, icon);
                     }
                 }
@@ -184,7 +207,7 @@ public class FeathersHudOverlay {
                             && ClientFeathersData.enduranceFeathers > 0) {
 
                         GuiIcon icon = (((j + 1) + (10 * i) == Math.ceil((double) ClientFeathersData.enduranceFeathers / FeathersConstants.STAMINA_PER_FEATHER)
-                                && (ClientFeathersData.enduranceFeathers % 2 != 0)) ? ENDURANCE_HALF_FEATHER : ENDURANCE_FULL_FEATHER);
+                                && (ClientFeathersData.enduranceFeathers % 2 != 0)) ? ENDUR_HALF : ENDUR_FULL);
 
                         draw(guiGraphics, getXPos(x, j, xOffset), y - rightOffset + yOffset - ((i) * 10), icon);
 
@@ -210,7 +233,7 @@ public class FeathersHudOverlay {
     };
 
     private static void draw(GuiGraphics guiGraphics, int xPos, int yPos, GuiIcon icon) {
-        guiGraphics.blit(ICONS, xPos, yPos, icon.x, icon.y, icon.width, icon.height, 256, 256);
+        guiGraphics.blit(ICONS, xPos, yPos, icon.x(), icon.y(), icon.width(), icon.height(), 256, 256);
     }
 
     private static int getYPos(int y, int rightOffset, int height, int yOffset) {
@@ -227,28 +250,28 @@ public class FeathersHudOverlay {
 
     private static GuiIcon getIconFull() {
         if (ClientFeathersData.cold) {
-            return COLD_FULL_FEATHER;
+            return COLD_FULL;
         }
         if (ClientFeathersData.hot) {
-            return HOT_FULL_FEATHER;
+            return HOT_FULL;
         }
         if (ClientFeathersData.energized) {
-            return ENERGIZED_FULL_FEATHER;
+            return ENERGY_FULL;
         }
-        return FeathersClientConfig.ALTERNATIVE_FEATHER_COLOR.get() ? ALTER_FULL_FEATHER : NORMAL_FULL_FEATHER;
+        return FeathersClientConfig.ALTERNATIVE_FEATHER_COLOR.get() ? GREEN_FULL : NORMAL_FULL;
     }
 
     private static GuiIcon getIconHalf() {
         if (ClientFeathersData.cold) {
-            return COLD_HALF_FEATHER;
+            return COLD_HALF;
         }
         if (ClientFeathersData.hot) {
-            return HOT_HALF_FEATHER;
+            return HOT_HALF;
         }
         if (ClientFeathersData.energized) {
-            return ENERGIZED_HALF_FEATHER;
+            return ENERGY_HALF;
         }
-        return FeathersClientConfig.ALTERNATIVE_FEATHER_COLOR.get() ? ALTER_HALF_FEATHER : NORMAL_HALF_FEATHER;
+        return FeathersClientConfig.ALTERNATIVE_FEATHER_COLOR.get() ? GREEN_HALF : NORMAL_HALF;
     }
 
 }

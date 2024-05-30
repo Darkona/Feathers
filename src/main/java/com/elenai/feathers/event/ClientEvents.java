@@ -53,7 +53,7 @@ public class ClientEvents {
                     ClientFeathersData.overflowing = ClientFeathersData.getFeathers() > FeathersCommonConfig.MAX_STAMINA.get() / FeathersConstants.STAMINA_PER_FEATHER;
 
 
-                    if (ClientFeathersData.animationCooldown > 0) {// TODO: improve this animation
+                    if (ClientFeathersData.animationCooldown > 0) {
                         ClientFeathersData.animationCooldown = ClientFeathersData.animationCooldown - 1;
                     }
 

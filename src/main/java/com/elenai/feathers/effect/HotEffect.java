@@ -14,6 +14,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class HotEffect extends MobEffect {
     /**
      * Doubles the amount of feathers used.
@@ -21,8 +23,8 @@ public class HotEffect extends MobEffect {
     public static final IModifier HOT = new IModifier() {
 
         @Override
-        public int apply(Player player, PlayerFeathers playerFeathers, int feathersToUse) {
-            return feathersToUse * 2;
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger feathersToUse) {
+            feathersToUse.set(feathersToUse.get() * 2);
         }
 
         @Override

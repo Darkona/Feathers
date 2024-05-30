@@ -15,12 +15,14 @@ import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class ColdEffect extends MobEffect {
 
     public static final IModifier COLD = new IModifier() {
         @Override
-        public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
-            return staminaDelta - FeathersCommonConfig.COLD_EFFECT_STRENGTH.get();
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
+            staminaDelta.set(staminaDelta.get() - FeathersCommonConfig.COLD_EFFECT_STRENGTH.get());
         }
 
         @Override

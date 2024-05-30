@@ -21,11 +21,14 @@ public class EffectHandler {
     @SubscribeEvent
     public static void canApplyEffect(MobEffectEvent.Applicable event) {
         if (event.getEntity() instanceof ServerPlayer player) {
+
             if (event.getEffectInstance().getEffect() == FeathersEffects.HOT.get()) {
+
                 event.setResult(canBeHot(player) ? Event.Result.ALLOW : Event.Result.DENY);
             }
 
             if (event.getEffectInstance().getEffect() == FeathersEffects.COLD.get()) {
+
                 event.setResult(canBeCold(player) ? Event.Result.ALLOW : Event.Result.DENY);
             }
         }
@@ -46,10 +49,14 @@ public class EffectHandler {
     @SubscribeEvent
     public static void applyStrain(FeatherAmountEvent.Empty event) {
         event.getEntity().getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
+
             if (FeathersCommonConfig.ENABLE_STRAIN.get()) {
+
                 if (event.prevStamina > 0) {
+
                     event.getEntity().addEffect(new MobEffectInstance(FeathersEffects.STRAINED.get()));
                 } else {
+
                     event.getEntity().removeEffect(FeathersEffects.STRAINED.get());
                 }
             }
@@ -58,12 +65,15 @@ public class EffectHandler {
 
 
     public static boolean canBeCold(ServerPlayer player) {
+
         if (!FeathersCommonConfig.ENABLE_COLD_EFFECTS.get() || player.getAbilities().invulnerable || player.isCreative()) return false;
 
         if (Feathers.COLD_SWEAT_LOADED &&
                 FeathersColdSweatConfig.COLD_SWEAT_COMPATIBILITY.get() &&
                 FeathersColdSweatConfig.BEING_COLD_ADDS_COLD_EFFECT.get()) {
+
             if (player.hasEffect(ModEffects.GRACE) || player.hasEffect(ModEffects.ICE_RESISTANCE)) {
+
                 return false;
             }
         }
@@ -72,11 +82,15 @@ public class EffectHandler {
     }
 
     public static boolean canBeHot(ServerPlayer player) {
+
         if (!FeathersCommonConfig.ENABLE_HOT_EFFECTS.get() || player.getAbilities().invulnerable || player.isCreative()) return false;
+
         boolean hasResistance = player.hasEffect(MobEffects.FIRE_RESISTANCE);
+
         if (Feathers.COLD_SWEAT_LOADED &&
                 FeathersColdSweatConfig.COLD_SWEAT_COMPATIBILITY.get() &&
                 FeathersColdSweatConfig.BEING_HOT_ADDS_HOT_EFFECT.get()) {
+
             return !player.hasEffect(ModEffects.GRACE) && !hasResistance;
         }
         return !hasResistance;
