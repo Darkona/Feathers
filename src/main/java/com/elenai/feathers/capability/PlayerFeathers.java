@@ -43,6 +43,7 @@ public class PlayerFeathers implements IFeathers {
     public static final IModifier REGENERATION = new IModifier() {
         @Override
         public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
+
             var fps = player.getAttribute(FeathersAttributes.BASE_FEATHERS_PER_SECOND.get());
             if (fps == null) {
                 return 0;
@@ -114,6 +115,8 @@ public class PlayerFeathers implements IFeathers {
             return "non_linear_regeneration";
         }
     };
+
+
     private static final int ZERO = 0;
     private int stamina = FeathersCommonConfig.MAX_STAMINA.get();
     private int maxStamina = FeathersCommonConfig.MAX_STAMINA.get();
@@ -123,6 +126,7 @@ public class PlayerFeathers implements IFeathers {
     private int enduranceFeathers = ZERO;
     private int strainFeathers = ZERO;
     private int maxStrained = FeathersCommonConfig.MAX_STRAIN.get();
+    private int effectCheckCooldown;
     //Recalculation
     private int staminaDelta = ZERO;
     @Getter(AccessLevel.NONE)

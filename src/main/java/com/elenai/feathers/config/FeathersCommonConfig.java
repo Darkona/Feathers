@@ -14,6 +14,7 @@ public class FeathersCommonConfig {
 
     public static final ForgeConfigSpec SPEC;
 
+    public static final int baseRegen = 20;
     public static final ForgeConfigSpec.ConfigValue<Integer> REGENERATION;
     public static final ForgeConfigSpec.ConfigValue<Integer> MAX_STAMINA;
 
@@ -39,6 +40,8 @@ public class FeathersCommonConfig {
     public static final ForgeConfigSpec.ConfigValue<Integer> MAX_STRAIN;
 
 
+
+
     public static List<String> armorWeightBuilder = new ArrayList<>();
 
     static {
@@ -48,7 +51,7 @@ public class FeathersCommonConfig {
         REGENERATION = BUILDER
                 .comment("How many stamina regenerates per tick. 1000 stamina = 1 feather. " +
                         "Default value of 20 means 1 feather every 50 ticks, or 2.5 seconds. ")
-                .define("Base Stamina Regeneration", 20);
+                .define("Base Stamina Regeneration", baseRegen);
 
         MAX_STAMINA = BUILDER.comment("Maximum stamina the player can have. 1000 stamina = 1 feather.")
                              .define("Max Stamina", 20000);

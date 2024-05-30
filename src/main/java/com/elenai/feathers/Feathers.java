@@ -15,11 +15,16 @@ import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.IConfigEvent;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,22 +50,29 @@ public class Feathers {
         if (COLD_SWEAT_LOADED) {
             ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, FeathersColdSweatConfig.SPEC, "feathers//Feathers-ColdSweat.toml");
         }
+
         FeathersAttributes.register(modEventBus);
         FeathersEffects.register(modEventBus);
         FeathersPotions.register(modEventBus);
         FeathersEnchantments.register(modEventBus);
         CommandInit.ARGUMENTS.register(modEventBus);
         MinecraftForge.EVENT_BUS.register(this);
+
     }
 
-    private void commonSetup(FMLCommonSetupEvent event) {
+
+    @SubscribeEvent
+    public void commonSetup(FMLCommonSetupEvent event) {
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         event.enqueueWork(FeathersMessages::register);
         registerBrewingRecipes();
     }
 
     private void registerBrewingRecipes() {
+
         // Cold
         PotionBrewing.addMix(Potions.AWKWARD, Items.SNOWBALL, FeathersPotions.COLD_POTION.get());
+
         //Hot
         PotionBrewing.addMix(Potions.AWKWARD, Items.MAGMA_BLOCK, FeathersPotions.HOT_POTION.get());
 
