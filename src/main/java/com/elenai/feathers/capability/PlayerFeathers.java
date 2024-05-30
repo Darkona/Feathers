@@ -32,7 +32,29 @@ public class PlayerFeathers implements IFeathers {
             return "default";
         }
     };
-    public static final IModifier REGENERATION = new RegenerationModifier();
+
+    /**
+     * Basic modifier that applies the regeneration effect.
+     * This modifier is used to regenerate the player's stamina.
+     * The regeneration value is defined in the config.
+     * This modifier is applied once per tick.
+     */
+    public static final IModifier REGENERATION = new IModifier() {
+        @Override
+        public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
+            return FeathersCommonConfig.REGENERATION.get();
+        }
+
+        @Override
+        public int getOrdinal() {
+            return 0;
+        }
+
+        @Override
+        public String getName() {
+            return "regeneration";
+        }
+    };
 
     /**
      * This modifier is used to inverse the regeneration effect.
@@ -302,28 +324,7 @@ public class PlayerFeathers implements IFeathers {
         synchronizeFeathers();
     }
 
-    /**
-     * Basic modifier that applies the regeneration effect.
-     * This modifier is used to regenerate the player's stamina.
-     * The regeneration value is defined in the config.
-     * This modifier is applied once per tick.
-     */
-    public static final class RegenerationModifier implements IModifier {
-        @Override
-        public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
-            return FeathersCommonConfig.REGENERATION.get();
-        }
 
-        @Override
-        public int getOrdinal() {
-            return 0;
-        }
-
-        @Override
-        public String getName() {
-            return "regeneration";
-        }
-    }
 
 
 }
