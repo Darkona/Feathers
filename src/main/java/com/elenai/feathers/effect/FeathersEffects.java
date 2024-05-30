@@ -30,6 +30,11 @@ public class FeathersEffects {
     public static final RegistryObject<MobEffect> FATIGUE = EFFECTS
             .register("fatigued", () -> new FatiguedEffect(MobEffectCategory.HARMFUL, 0x7e0048));
 
+    public static final RegistryObject<MobEffect> MOMENTUM = EFFECTS
+            .register("momentum", () -> new MomentumEffect(MobEffectCategory.BENEFICIAL, 0x7e0048));
+
+    public static final RegistryObject<MobEffect> STRAIN = EFFECTS
+            .register("strain", () -> new StrainEffect(MobEffectCategory.HARMFUL, 0x7e0048));
     public static void register(IEventBus eventBus) {
 
         EFFECTS.register(eventBus);

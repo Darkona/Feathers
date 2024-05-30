@@ -2,13 +2,9 @@ package com.elenai.feathers.handler;
 
 import com.elenai.feathers.Feathers;
 import com.elenai.feathers.api.FeathersHelper;
-import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.effect.FeathersEffects;
 import com.elenai.feathers.effect.PlayerSituationProvider;
-import com.elenai.feathers.networking.FeathersMessages;
-import com.elenai.feathers.networking.packet.Effect;
-import com.elenai.feathers.networking.packet.EffectChangeSTCPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraftforge.event.TickEvent;
@@ -47,7 +43,7 @@ public class EffectHandler {
     public static void handleEffects(TickEvent.PlayerTickEvent event) {
         autoApplyColdEffect(event);
         autoApplyHotEffect(event);
-        handleEnduranceEffect(event);
+
     }
 
     /**
@@ -120,17 +116,4 @@ public class EffectHandler {
         }
     }
 
-
-
-    /**
-     * Handle the Endurance mechanic here, where the potion leaves if the player has no endurance feathers left
-     */
-    static void handleEnduranceEffect(TickEvent.PlayerTickEvent event) {
-        if (FeathersCommonConfig.ENABLE_ENDURANCE.get()) {
-            if (event.player.hasEffect(FeathersEffects.ENDURANCE.get()) &&
-                    FeathersHelper.getEndurance((ServerPlayer) event.player) == 0) {
-                event.player.removeEffect(FeathersEffects.ENDURANCE.get());
-            }
-        }
-    }
 }

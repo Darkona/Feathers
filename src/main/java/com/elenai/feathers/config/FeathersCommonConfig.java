@@ -1,15 +1,13 @@
 package com.elenai.feathers.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.elenai.feathers.Feathers;
 import com.google.common.collect.Lists;
-
 import net.minecraft.world.item.ArmorItem;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FeathersCommonConfig {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
@@ -18,7 +16,6 @@ public class FeathersCommonConfig {
     public static final ForgeConfigSpec SPEC;
 
     public static final ForgeConfigSpec.ConfigValue<Integer> REGENERATION;
-
     public static final ForgeConfigSpec.ConfigValue<Integer> MAX_STAMINA;
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_ARMOR_WEIGHTS;
@@ -39,6 +36,10 @@ public class FeathersCommonConfig {
     public static final ForgeConfigSpec.ConfigValue<Integer> COLD_LINGER;
 
 
+    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_STRAIN;
+    public static final ForgeConfigSpec.ConfigValue<Integer> MAX_STRAIN;
+
+
     //Configs for Cold Sweat
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> COLD_SWEAT_COMPATIBILITY;
@@ -50,12 +51,11 @@ public class FeathersCommonConfig {
     public static final ForgeConfigSpec.ConfigValue<Integer> QUENCH_REGEN_BONUS_MULTIPLIER;
 
 
+
     public static List<String> armorWeightBuilder = new ArrayList<>();
 
     static {
 
-        boolean isThirstLoaded = ModList.get().isLoaded("thirst");
-        boolean isColdSweatLoaded = ModList.get().isLoaded("cold_sweat");
         BUILDER.push("Feathers' Config");
 
         REGENERATION = BUILDER
@@ -125,6 +125,17 @@ public class FeathersCommonConfig {
                 .comment("Whether sleeping always restores feathers to the maximum amount.")
                 .define("Sleeping Always Restores Feathers", true);
 
+        ENABLE_STRAIN = BUILDER
+                .comment("Whether the Strain mechanic is enabled.. " +
+                        "Strain is applied when the player is out of feathers, and goes to negative stamina. " +
+                        "Regeneration is much slower when strained.")
+                .define("Enable Strain Effect", true);
+
+        MAX_STRAIN = BUILDER
+                .comment("Maximum strain the player can have. " +
+                        "When the player has no feathers, the player will enter a negative stamina state. " +
+                        "This value determines how many feathers can be added to the negative stamina state.")
+                .define("Max Strain", 6);
 
         BUILDER.pop();
 

@@ -1,10 +1,14 @@
 package com.elenai.feathers.api;
 
 import com.elenai.feathers.Feathers;
+import com.elenai.feathers.attributes.FeathersAttributes;
+import com.elenai.feathers.capability.Modifiers;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.enchantment.FeathersEnchantments;
+import com.elenai.feathers.event.FeatherAmountEvent;
+import com.elenai.feathers.event.FeatherEvent;
 import com.elenai.feathers.event.StaminaChangeEvent;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
@@ -16,14 +20,34 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.MinecraftForge;
 
-import java.util.function.Function;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import static net.minecraftforge.eventbus.api.Event.Result.DEFAULT;
+
+@SuppressWarnings("UnusedReturnValue")
 public class FeathersAPI {
-
 
     public static int getFeathers(Player player) {
         return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
                      .map(PlayerFeathers::getFeathers).orElse(0);
+    }
+
+    /**
+     * Sets the player's feathers to the specified amount. For tick-based operations, use staminaDeltaModifiers;
+     *
+     * @param player the player
+     * @param amount the amount of feathers to set
+     * @return the amount of feathers set
+     */
+    public static int setFeathers(ServerPlayer player, int amount) {
+        AtomicInteger result = new AtomicInteger(0);
+        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
+              .ifPresent(f -> {
+                  f.setStamina(amount * 10);
+                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
+                  result.set(f.getFeathers());
+              });
+        return result.get();
     }
 
     public static int getMaxFeathers(Player player) {
@@ -31,147 +55,77 @@ public class FeathersAPI {
                      .map(PlayerFeathers::getMaxFeathers).orElse(0);
     }
 
-    public static void setFeathers(Player player, int amount) {
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setFeathers(amount);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
-              });
-    }
-
-    public static void setStaminaDelta(Player player, int delta){
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setStaminaDelta(delta);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
-              });
-    }
     public static void setMaxFeathers(Player player, int amount) {
+        if (player.getAttributes().hasAttribute(FeathersAttributes.MAX_STAMINA.get())) {
+            player.getAttribute(FeathersAttributes.MAX_STAMINA.get())
+                  .setBaseValue(amount * FeathersConstants.STAMINA_PER_FEATHER);
+        }
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
               .ifPresent(f -> {
-                  f.setMaxStamina(amount * FeathersConstants.STAMINA_PER_FEATHER);
+                  f.setMaxStamina((int) player.getAttribute(FeathersAttributes.MAX_STAMINA.get()).getValue());
                   FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
               });
     }
 
-    public static void addFeathers(Player player, int amount) {
+    /**
+     * Give feathers to the player. Returns the amount of feathers gained.
+     * For tick-based operations, use staminaUsageModifiers.
+     * @param player the player
+     * @param amount the amount of feathers to gain
+     * @return the amount of feathers gained
+     */
+    public static int gainFeathers(Player player, int amount) {
+        AtomicInteger result = new AtomicInteger(0);
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
               .ifPresent(f -> {
-                  var gainEvent = new StaminaChangeEvent.Gain.Pre(player, amount);
-                  MinecraftForge.EVENT_BUS.post(gainEvent);
-                  if (!gainEvent.isCanceled()) {
+                  var gainEvent = new FeatherEvent.Gain(player, amount);
+                  boolean cancelled = MinecraftForge.EVENT_BUS.post(gainEvent);
+                  if (!cancelled && gainEvent.getResult() == DEFAULT) {
                       var prev = f.getFeathers();
                       var post = f.gainFeathers(gainEvent.amount);
-                      MinecraftForge.EVENT_BUS.post(new StaminaChangeEvent.Use.Post(player, prev, post));
+                      MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, prev, post));
                       FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
-                  }
-                  f.setStamina(f.getStamina() + (amount * FeathersConstants.STAMINA_PER_FEATHER));
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
-              });
-    }
-
-    public static void useFeathers(Player player, int amount) {
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  var useEvent = new StaminaChangeEvent.Use.Pre(player, amount);
-                  MinecraftForge.EVENT_BUS.post(useEvent);
-                  if (!useEvent.isCanceled()) {
-                      var prev = f.getFeathers();
-                      var post = f.useFeathers(useEvent.amount);
-                      MinecraftForge.EVENT_BUS.post(new StaminaChangeEvent.Use.Post(player, prev, post));
-                      if(player instanceof ServerPlayer p) FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), p);
+                      result.set(prev - post);
                   }
               });
+        return result.get();
     }
 
-    public static void addStamina(Player player, int amount) {
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setStamina(f.getStamina() + amount);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
-              });
+    /**
+     * Spend feathers from the player. Returns the amount of feathers spent.
+     *
+     * @param player the player
+     * @param amount the amount of feathers to spend
+     * @return the amount of feathers spent
+     * @throws UnsupportedOperationException if the amount is negative
+     */
+    public static int spendFeathers(ServerPlayer player, int amount) throws UnsupportedOperationException {
+        if (amount < 0) {
+            throw new UnsupportedOperationException("Cannot spend negative feathers");
+        }
+        AtomicInteger result = new AtomicInteger(0);
+        if (player.isCreative() || player.isSpectator())
+            player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
+                  .ifPresent(f -> {
+                      var useFeatherEvent = new FeatherEvent.Use(player, amount);
+                      boolean cancelled = MinecraftForge.EVENT_BUS.post(useFeatherEvent);
+                      if (!cancelled && useFeatherEvent.getResult() == DEFAULT) {
+                          var prev = f.getFeathers();
+                          var post = f.useFeathers(player, useFeatherEvent.amount);
+                          MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, prev, post));
+                          result.set(post - prev);
+                          if (prev != f.getFeathers())
+                              FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
+                      } else {
+                          result.set(useFeatherEvent.amount);
+                      }
+
+                  });
+        return result.get();
     }
 
-    public static void removeStamina(Player player, int amount) {
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setStamina(f.getStamina() - amount);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
-              });
-    }
-
-    public static void setMaxStamina(Player player, int maxStamina) {
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setMaxStamina(maxStamina);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
-              });
-    }
 
 
-    public static void addMaxStamina(Player player, int amount) {
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setMaxStamina(f.getMaxStamina() + amount);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
-              });
-    }
-
-    public static void removeMaxStamina(Player player, int amount) {
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setMaxStamina(f.getMaxStamina() - amount);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
-              });
-    }
-
-    public static void addStaminaDeltaModifier(Player player, String name, Function<Integer, Integer> modifier) {
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.addDeltaModifier(name, modifier);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
-              });
-    }
-
-    public static void removeStaminaDeltaModifier(Player player, String name) {
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.removeDeltaModifier(name);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
-              });
-    }
-
-    public static int getStamina(Player player) {
-        return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-                     .map(PlayerFeathers::getStamina).orElse(0);
-    }
-
-    public static int getMaxStamina(Player player) {
-        return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-                     .map(PlayerFeathers::getMaxStamina).orElse(0);
-    }
-
-    public static void setMaxStamina(ServerPlayer player, int maxStamina) {
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setMaxStamina(maxStamina);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
-              });
-    }
-
-    public static int getStaminaDelta(Player player) {
-        return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-                     .map(PlayerFeathers::getStaminaDelta).orElse(0);
-    }
-
-    public static void setStamina(ServerPlayer player, int amount) {
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setStamina(amount);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
-              });
-
-    }
 
     public static int getPlayerWeight(ServerPlayer player) {
         if (!FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
@@ -194,14 +148,6 @@ public class FeathersAPI {
         }
         Feathers.logger.warn("Attempted to calculate weight of non armor item: " + itemStack.getDescriptionId());
         return 0;
-    }
-
-    public static void setFeathers(ServerPlayer player, int amount) {
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setStamina(amount * 10);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
-              });
     }
 
 

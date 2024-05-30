@@ -32,7 +32,7 @@ public class FeatherSyncCTSPacket {
         context.enqueueWork(() -> {
             context.getSender().getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
                 f.setFeathers(feathers);
-                f.setEnduranceStamina(endurance);
+                f.setEnduranceFeathers(endurance);
                 FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), context.getSender());
             });
 

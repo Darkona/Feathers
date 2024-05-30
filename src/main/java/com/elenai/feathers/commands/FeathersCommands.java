@@ -1,6 +1,7 @@
 package com.elenai.feathers.commands;
 
 import com.elenai.feathers.api.FeathersAPI;
+import com.elenai.feathers.api.StaminaAPI;
 import com.elenai.feathers.effect.FeathersEffects;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -69,7 +70,7 @@ public class FeathersCommands extends BaseCommand {
         }
         for (Entity entity : entities) {
             if (entity instanceof ServerPlayer player) {
-                int maxStamina = FeathersAPI.getMaxStamina(player);
+                int maxStamina = StaminaAPI.getMaxStamina(player);
                 source.sendSuccess(() -> Component.literal("Max Stamina is: " + maxStamina), true);
             }
         }
@@ -84,7 +85,7 @@ public class FeathersCommands extends BaseCommand {
         }
         for (Entity entity : entities) {
             if (entity instanceof ServerPlayer player) {
-                FeathersAPI.setMaxStamina(player, amount);
+                StaminaAPI.setMaxStamina(player, amount);
             }
         }
 
@@ -105,7 +106,7 @@ public class FeathersCommands extends BaseCommand {
         }
         for (Entity entity : entities) {
             if (entity instanceof ServerPlayer player) {
-                int stamina = FeathersAPI.getStamina(player);
+                int stamina = StaminaAPI.getStamina(player);
                 source.sendSuccess(() -> Component.literal("Stamina is: " + stamina), true);
             }
         }
@@ -146,7 +147,7 @@ public class FeathersCommands extends BaseCommand {
         }
         for (Entity entity : entities) {
             if (entity instanceof ServerPlayer player) {
-                FeathersAPI.setStamina(player, amount);
+                StaminaAPI.setStamina(player, amount);
             }
         }
 

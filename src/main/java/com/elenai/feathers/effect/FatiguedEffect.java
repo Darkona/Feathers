@@ -11,7 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import org.jetbrains.annotations.NotNull;
 
-public class FatiguedEffect extends MobEffect implements IFeatherEffect {
+public class FatiguedEffect extends MobEffect {
 
     public FatiguedEffect(MobEffectCategory mobEffectCategory, int color) {
         super(mobEffectCategory, color);

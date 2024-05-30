@@ -27,7 +27,7 @@ public class FeatherSyncSTCPacket {
     public FeatherSyncSTCPacket(PlayerFeathers feathers) {
         stamina = feathers.getStamina();
         maxStamina = feathers.getMaxStamina();
-        enduranceStamina = feathers.getEnduranceStamina();
+        enduranceStamina = feathers.getEnduranceFeathers();
         weight = ClientFeathersData.weight;
         energized = ClientFeathersData.energized;
         fatigued = ClientFeathersData.fatigued;

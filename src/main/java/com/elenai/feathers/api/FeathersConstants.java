@@ -7,5 +7,4 @@ public class FeathersConstants {
     public static final int STAMINA_CAP = 20000;
 
 
-
 }

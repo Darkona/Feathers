@@ -1,8 +1,10 @@
 package com.elenai.feathers.handler;
 
 import com.elenai.feathers.Feathers;
+import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
+import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -17,6 +19,7 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -30,12 +33,11 @@ public class FeathersEventHandler {
 
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
                 f.setShouldRecalculate(true);
-                f.recalculateStaminaDelta();
+                f.recalculateStaminaDelta(player);
                 FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
             });
         }
     }
-
 
     @SubscribeEvent
     public static void playerTickEvent(PlayerTickEvent event) {
@@ -47,7 +49,18 @@ public class FeathersEventHandler {
 
     }
 
+    @SubscribeEvent
+    public static void onPlayerSleep(PlayerSleepInBedEvent event) {
+        if(!FeathersCommonConfig.SLEEPING_ALWAYS_RESTORES_FEATHERS.get()) return;
+        if (event.getEntity() instanceof ServerPlayer player) {
+            player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
+                f.setStamina(f.getMaxStamina());
+                f.setStrainFeathers(0);
+                FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
+            });
+        }
 
+    }
     @SubscribeEvent
     public static void onPlayerChangeArmor(LivingEquipmentChangeEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && event.getSlot().getType() == EquipmentSlot.Type.ARMOR) {

@@ -2,9 +2,12 @@ package com.elenai.feathers.handler;
 
 import com.elenai.feathers.Feathers;
 import com.elenai.feathers.api.FeathersConstants;
+import com.elenai.feathers.capability.Modifiers;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.config.FeathersCommonConfig;
+import com.elenai.feathers.effect.FeathersEffects;
+import com.elenai.feathers.effect.StrainEffect;
 import com.elenai.feathers.event.FeatherAmountEvent;
 import com.elenai.feathers.event.StaminaChangeEvent;
 import com.elenai.feathers.networking.FeathersMessages;
@@ -16,11 +19,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Mod.EventBusSubscriber(modid = Feathers.MODID)
 public class StaminaDeltaTickHandler {
 
     static Logger log = LogManager.getLogger(Feathers.MODID);
@@ -40,7 +46,7 @@ public class StaminaDeltaTickHandler {
 
                     //If there was any change in the delta modifiers, recalculate.
                     //Internal logic will only run if the flag is set to true
-                    f.recalculateStaminaDelta();
+                    f.recalculateStaminaDelta(player);
 
                     //Event to see if something modifies the stamina delta before applying it and after existing modifiers have been applied.
                     int prevStaminaDelta = f.getStaminaDelta();
@@ -74,7 +80,7 @@ public class StaminaDeltaTickHandler {
                         MinecraftForge.EVENT_BUS.post(new StaminaChangeEvent.Post(player, prevStamina, f.getStamina()));
                         if (f.getStamina() == 0) {
 
-                            MinecraftForge.EVENT_BUS.post(new FeatherAmountEvent.Empty(player));
+                            MinecraftForge.EVENT_BUS.post(new FeatherAmountEvent.Empty(player, prevStamina));
                             FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
 
                         } else if (f.getStamina() == f.getMaxStamina()) {
@@ -92,6 +98,18 @@ public class StaminaDeltaTickHandler {
         );
     }
 
+    @SubscribeEvent
+    public static void applyStrain(FeatherAmountEvent.Empty event){
+        event.getEntity().getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
+            if(FeathersCommonConfig.ENABLE_STRAIN.get()){
+                if(event.prevStamina > 0) {
+                    //event.getEntity().addEffect(FeathersEffects.STRAIN);
+                }else {
+                    //event.getEntity().removeEffect(StrainEffect.INSTANCE.get());
+                }
+            }
+        });
+    }
     private static void logStuff(Player player, PlayerFeathers f) {
         log.info("Stamina: " + f.getStamina() + " Max Stamina: " + f.getMaxStamina() + " Delta: " + f.getStaminaDelta());
         if (player.isAlive()) {

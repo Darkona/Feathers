@@ -1,7 +1,10 @@
 package com.elenai.feathers.effect;
 
+import com.elenai.feathers.api.IModifier;
+import com.elenai.feathers.capability.Modifiers;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
+import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.Effect;
 import com.elenai.feathers.networking.packet.EffectChangeSTCPacket;
@@ -10,6 +13,10 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
+import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Function;
 
 public class EnergizedEffect extends MobEffect {
 
@@ -17,12 +24,36 @@ public class EnergizedEffect extends MobEffect {
         super(mobEffectCategory, color);
     }
 
+    private static final Function<Integer, Integer> energize_one = (i) -> i * 2;
+    public static final IModifier ENERGIZED = new IModifier() {
+
+        @Override
+        public int apply(Player player, PlayerFeathers playerFeathers, int staminaDelta) {
+            if (player.getEffect(FeathersEffects.ENERGIZED.get()) != null) {
+                int strength = player.getEffect(FeathersEffects.ENERGIZED.get()).getAmplifier();
+                float multiplier = 1 + ((strength + 1) * 0.2F);
+                return (int) (FeathersCommonConfig.REGENERATION.get() * multiplier);
+            }
+            return staminaDelta;
+        }
+
+        @Override
+        public int getOrdinal() {
+            return 100;
+        }
+
+        @Override
+        public String getName() {
+            return "hot";
+        }
+    };
     @Override
-    public void addAttributeModifiers(LivingEntity target, AttributeMap map, int strength) {
+    public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
         if (target instanceof ServerPlayer player) {
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
                 if (!f.isEnergized()) {
                     f.setEnergized(true);
+                    f.addDeltaModifier(ENERGIZED);
                     FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.ENERGIZED, true, strength), player);
                 }
             });
@@ -31,19 +62,18 @@ public class EnergizedEffect extends MobEffect {
     }
 
     @Override
-    public void removeAttributeModifiers(LivingEntity target, AttributeMap map, int strength) {
+    public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
         if (target instanceof ServerPlayer player) {
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
                 if (f.isEnergized()) {
                     f.setEnergized(false);
+                    f.removeDeltaModifier(ENERGIZED);
                     FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.ENERGIZED, false, strength), player);
                 }
             });
         }
         super.removeAttributeModifiers(target, map, strength);
     }
-
-
 
 
 }

@@ -8,7 +8,6 @@ import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.enchantment.FeathersEnchantments;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.FeatherSyncCTSPacket;
-import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
 import com.elenai.feathers.util.ArmorHandler;
 import com.elenai.feathers.util.Calculations;
 import net.minecraft.client.Minecraft;
@@ -19,6 +18,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
+@Deprecated
 public class FeathersHelper {
 
     /*
@@ -56,7 +56,7 @@ public class FeathersHelper {
      */
     @Deprecated
     public static void setFeatherRegen(ServerPlayer player, int tickPerFeather) {
-        FeathersAPI.setStaminaDelta(player, Calculations.calculateStaminaRegenPerSecondFromTicksPerFeather(tickPerFeather));
+        StaminaAPI.setStaminaDelta(player, Calculations.calculateStaminaRegenPerSecondFromTicksPerFeather(tickPerFeather));
     }
 
     /**
@@ -116,7 +116,7 @@ public class FeathersHelper {
      * @side server
      */
     public static int getEndurance(ServerPlayer player) {
-        return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).map(PlayerFeathers::getEnduranceStamina)
+        return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).map(PlayerFeathers::getEnduranceFeathers)
                      .orElse(0) / FeathersConstants.STAMINA_PER_FEATHER;
     }
 
@@ -144,23 +144,6 @@ public class FeathersHelper {
         });
     }
 
-    /**
-     * Decreases the inputted players feathers from their total and syncs them to the
-     * client
-     * <p>
-     * NOTE: This differs from spendFeathers as it does not take armor weight into
-     * account and is therefore not recommended, Only use this if you want to drain armor too
-     *
-     * @param player
-     * @param feathers
-     * @side server
-     */
-    public static void subFeathers(ServerPlayer player, int feathers) {
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
-            f.useFeathers(feathers);
-
-        });
-    }
 
     /**
      * Decreases the inputted players feathers + endurance from their total and syncs them to the
@@ -176,25 +159,7 @@ public class FeathersHelper {
      * @side server
      */
     public static boolean spendFeathers(ServerPlayer player, int feathers) {
-
-        if (player.isCreative() || player.isSpectator()) {return true;}
-
-        if (Math.min(getPlayerWeight(player), 20) <= (getFeathers(player) + getEndurance(player) - feathers)) {
-            player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
-
-                int amount = f.getEnduranceStamina() - feathers;
-                if (f.getEnduranceStamina() > 0) {
-                    f.setEnduranceStamina(Math.max(0, amount));
-                }
-                if (amount < 0) {
-                    f.gainFeathers(amount);
-                }
-
-                FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
-            });
-            return true;
-        }
-        return false;
+        return FeathersAPI.spendFeathers(player, feathers) >= 0;
     }
 
     /**
