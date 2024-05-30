@@ -2,6 +2,8 @@ package com.elenai.feathers.attributes;
 
 import com.elenai.feathers.Feathers;
 import com.elenai.feathers.api.FeathersConstants;
+import com.elenai.feathers.config.FeathersCommonConfig;
+import com.elenai.feathers.util.Calculations;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -33,12 +35,13 @@ public class FeathersAttributes {
         "d74ded8f-c5b6-4222-80e2-dbea7ccf8d02"
     );
 
+    private static final double baseFeathersPerSecond = Calculations.calculateFeathersPerSecond(FeathersCommonConfig.REGENERATION.get());
+    private static final double minimumFeathersPerSecond = baseFeathersPerSecond * -20;
+    private static final double maximumFeathersPerSecond = baseFeathersPerSecond * 20;
+
     public static final RegistryObject<Attribute> BASE_FEATHERS_PER_SECOND = registerAttribute(
         "feathers.feathers_per_second",
-        (id) -> new RangedAttribute(id,
-            200.0D / FeathersConstants.STAMINA_PER_FEATHER * 20, // FIXME: source from config
-            (FeathersConstants.STAMINA_CAP / FeathersConstants.STAMINA_PER_FEATHER) / -20.0,
-            (FeathersConstants.STAMINA_CAP / FeathersConstants.STAMINA_PER_FEATHER) / 20.0
+        (id) -> new RangedAttribute(id,baseFeathersPerSecond,minimumFeathersPerSecond,maximumFeathersPerSecond
         ).setSyncable(true),
         "d74ded8f-c5b6-4222-80e2-dbea7ccf8d02"
     );

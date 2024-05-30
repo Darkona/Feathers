@@ -21,122 +21,62 @@ import net.minecraft.world.item.Items;
 @Deprecated
 public class FeathersHelper {
 
-    /*
 
-        /**
-         * Sets the inputted players feathers and syncs them to the client
-         *
-         * @side server
-         * @param player Player to set feathers for
-         * @param feathers Amount of feathers to set
-         */
     @Deprecated
     public static void setFeathers(ServerPlayer player, int feathers) {
         FeathersAPI.setFeathers(player, feathers);
     }
 
-    /**
-     * Sets the inputted player's max feathers and syncs them to the client
-     *
-     * @param player   Player to set max feathers for
-     * @param feathers Amount of feathers to set
-     * @side server
-     */
+
     @Deprecated
     public static void setMaxFeathers(ServerPlayer player, int feathers) {
         FeathersAPI.setMaxFeathers(player, feathers);
     }
 
-    /**
-     * Sets the inputted player's feather regeneration rate and syncs them to the client
-     *
-     * @param player         Player to set max feathers for
-     * @param tickPerFeather Amount of stamina per tick for regeneration
-     * @side server
-     */
     @Deprecated
     public static void setFeatherRegen(ServerPlayer player, int tickPerFeather) {
         StaminaAPI.setStaminaDelta(player, Calculations.calculateStaminaRegenPerSecondFromTicksPerFeather(tickPerFeather));
     }
 
-    /**
-     * Returns the given player's feather count
-     *
-     * @param player Player from which the feather value is being acquired
-     * @return the player's feathers
-     * @side server
-     */
+    @Deprecated
     public static int getFeathers(ServerPlayer player) {
         return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
                      .map(PlayerFeathers::getFeathers).orElse(0);
     }
 
-
+    @Deprecated
     public static int getUseableFeathers(ServerPlayer player) {
         return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
                      .map(PlayerFeathers::getStamina).orElse(0);
     }
 
-    /**
-     * Returns the given player's feather count
-     *
-     * @param player Player from which the feather value is being acquired
-     * @return the player's feathers
-     * @side server
-     */
+    @Deprecated
     public static int getMaxFeathers(ServerPlayer player) {
         return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).map(PlayerFeathers::getMaxFeathers).orElse(0);
     }
 
-    /**
-     * Returns the client player's feather count
-     *
-     * @return the player's feathers
-     * @side client
-     */
+    @Deprecated
     public static int getFeathers() {
         return ClientFeathersData.getFeathers();
     }
 
-    /**
-     * Returns the client player's max feather count
-     *
-     * @return the player's feathers
-     * @side client
-     */
+    @Deprecated
     public static int getMaxFeathers() {
         return ClientFeathersData.getMaxFeathers();
     }
 
-    /**
-     * Returns the given player's endurance count
-     *
-     * @param player Player whose endurance is being acquired
-     * @return the player's feathers
-     * @side server
-     */
+    @Deprecated
     public static int getEndurance(ServerPlayer player) {
         return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).map(PlayerFeathers::getEnduranceFeathers)
                      .orElse(0) / FeathersConstants.STAMINA_PER_FEATHER;
     }
 
-    /**
-     * Returns the client player's endurance count
-     *
-     * @return the player's feathers
-     * @side client
-     */
+    @Deprecated
     public static int getEndurance() {
         return ClientFeathersData.enduranceFeathers / FeathersConstants.STAMINA_PER_FEATHER;
     }
 
-    /**
-     * Adds the inputted players feathers to their total and syncs them to the client
-     *
-     * @param player
-     * @param feathers
-     * @side server
-     */
+    @Deprecated
     public static void addFeathers(ServerPlayer player, int feathers) {
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
             f.gainFeathers(feathers);
@@ -145,35 +85,11 @@ public class FeathersHelper {
     }
 
 
-    /**
-     * Decreases the inputted players feathers + endurance from their total and syncs them to the
-     * client IF the final result is greater than the armor weight, returns whether
-     * it is possible to or not
-     * <p>
-     * TIP: Use this method at the end of if statements when you wish to spend feathers
-     * <p>
-     *
-     * @param player
-     * @param feathers
-     * @return If the effect was applied
-     * @side server
-     */
+    @Deprecated
     public static boolean spendFeathers(ServerPlayer player, int feathers) {
         return FeathersAPI.spendFeathers(player, feathers, 20) >= 0;
     }
 
-    /**
-     * Decreases the inputted players amount + endurance from their total and syncs them to the
-     * server IF the final result is greater than the armor weight, returns whether
-     * it is possible to or not
-     * <p>
-     * TIP: Use this method at the end of if statements when you wish to spend amount
-     * <p>
-     *
-     * @param amount
-     * @return If the effect was applied
-     * @side client
-     */
     @Deprecated
     public static boolean spendFeathers(int amount) {
 
@@ -190,17 +106,7 @@ public class FeathersHelper {
         return false;
     }
 
-    /**
-     * Gets the weight of the given armor item, minus the input lightweight level, if the item has a weight in
-     * the config, returns that value, if not it returns the item's defence rating
-     * <p>
-     * This method is for use when sending items as packets to the server
-     * </p>
-     *
-     * @param item The armor who's weight you wish to get
-     * @return the armor's weight
-     * @side server
-     */
+
     public static int getArmorWeight(Item item, int lightweightLevel, int heavyLevel) {
         if (item instanceof ArmorItem armor) {
             return Math.max(ArmorHandler.getArmorWeight(armor) - lightweightLevel + (heavyLevel * ArmorHandler.getArmorWeight(armor)), 0);
@@ -210,14 +116,6 @@ public class FeathersHelper {
         return 0;
     }
 
-    /**
-     * Gets the weight of the given armor item stack, if the item has a weight in
-     * the config, returns that value, if not it returns the item's defence rating
-     *
-     * @param itemStack The armor who's weight you wish to get
-     * @return the armor's weight
-     * @side server
-     */
     public static int getArmorWeightByStack(ItemStack itemStack) {
         if (itemStack.getItem() instanceof ArmorItem armor) {
             return Math.max(ArmorHandler.getArmorWeight(armor) -
@@ -230,12 +128,6 @@ public class FeathersHelper {
         return 0;
     }
 
-    /**
-     * Gets the total weight of the inputted player based on the armor they are wearing
-     *
-     * @param player
-     * @return
-     */
     public static int getPlayerWeight(ServerPlayer player) {
         if (!FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
             return 0;
@@ -245,28 +137,6 @@ public class FeathersHelper {
             weight += getArmorWeightByStack(i);
         }
         return weight;
-    }
-
-    /**
-     * Returns the given player's coldness
-     *
-     * @param player
-     * @return if the player is cold
-     * @side server
-     */
-    public static boolean getCold(ServerPlayer player) {
-        return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).map(PlayerFeathers::isCold).orElse(false);
-    }
-
-    /**
-     * Returns the given player's hotness
-     *
-     * @param player
-     * @return if the player is hot
-     * @side server
-     */
-    public static boolean getHot(ServerPlayer player) {
-        return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).map(PlayerFeathers::isHot).orElse(false);
     }
 
 

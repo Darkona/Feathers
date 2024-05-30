@@ -12,4 +12,8 @@ public class Calculations {
     public static int calculateStaminaRegenPerSecondFromTicksPerFeather(int ticksPerFeather) {
         return FeathersConstants.STAMINA_PER_FEATHER / ticksPerFeather;
     }
+
+    public static double calculateFeathersPerSecond(int staminaPerTick) {
+        return (double) (staminaPerTick * 20) / FeathersConstants.STAMINA_PER_FEATHER;
+    }
 }
