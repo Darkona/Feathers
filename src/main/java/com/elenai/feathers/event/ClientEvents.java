@@ -47,11 +47,9 @@ public class ClientEvents {
 
         @SubscribeEvent
         public static void clientTickEvents(ClientTickEvent event) {
-
             if (event.phase == TickEvent.Phase.START && Minecraft.getInstance().level != null) {
                 ClientFeathersData.getInstance().tick();
             }
-
         }
 
         @SubscribeEvent
