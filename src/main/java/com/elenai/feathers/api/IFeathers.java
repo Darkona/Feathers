@@ -30,11 +30,6 @@ public interface IFeathers {
 
     int useFeathers(Player player, int feathers);
 
-
-    int getMaxFeathers();
-
-    void setMaxFeathers(int maxFeathers);
-
     int getCooldown();
 
     void setCooldown(int cooldown);
@@ -88,4 +83,6 @@ public interface IFeathers {
     void setShouldRecalculate(boolean shouldRecalculate);
 
     void setMomentum(boolean momentum);
+
+    int getMaxFeathers();
 }

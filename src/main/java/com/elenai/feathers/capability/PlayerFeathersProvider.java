@@ -1,9 +1,13 @@
 package com.elenai.feathers.capability;
 
 import com.elenai.feathers.api.IModifier;
+import com.elenai.feathers.attributes.FeathersAttributes;
+import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.event.FeatherEvent;
+import com.elenai.feathers.util.Calculations;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -77,5 +81,19 @@ public class PlayerFeathersProvider implements ICapabilityProvider, INBTSerializ
 
     public void deserializeNBT(CompoundTag nbt) {
         createPlayerFeathers().loadNBTData(nbt);
+    }
+
+    public static void assignRegenerationAttribute(ServerPlayer player) {
+        var attr = player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get());
+        if (attr != null) {
+            attr.setBaseValue((FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get()));
+        }
+    }
+
+    public static void assignMaxFeathersAttribute(ServerPlayer player) {
+        var attr = player.getAttribute(FeathersAttributes.MAX_FEATHERS.get());
+        if (attr != null) {
+            attr.setBaseValue((FeathersCommonConfig.MAX_FEATHERS.get()));
+        }
     }
 }

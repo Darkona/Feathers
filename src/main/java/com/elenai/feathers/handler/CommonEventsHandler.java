@@ -7,6 +7,7 @@ import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
+import com.elenai.feathers.util.Calculations;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -32,19 +33,18 @@ public class CommonEventsHandler {
         Level level = event.getLevel();
         if (!level.isClientSide && (event.getEntity() instanceof ServerPlayer player)) {
 
+            PlayerFeathersProvider.assignRegenerationAttribute(player);
+            PlayerFeathersProvider.assignMaxFeathersAttribute(player);
+
             player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
-                var attr = player.getAttribute(FeathersAttributes.BASE_FEATHERS_PER_SECOND.get());
-
-                if (attr != null) {
-                    attr.setBaseValue(FeathersCommonConfig.REGENERATION.get());
-                }
-
                 f.setShouldRecalculate(true);
                 f.recalculateStaminaDelta(player);
                 FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
             });
         }
     }
+
+
 
 
     @SubscribeEvent

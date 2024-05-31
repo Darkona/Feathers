@@ -6,7 +6,6 @@ import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.Effect;
-import com.elenai.feathers.networking.packet.EffectChangeSTCPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -48,7 +47,7 @@ public class StrainEffect extends MobEffect {
         @Override
         public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
             if (playerFeathers.getStrainFeathers() > 0) {
-                staminaDelta.set(staminaDelta.get() + (int) (FeathersCommonConfig.REGENERATION.get() * 0.4));
+                staminaDelta.set(staminaDelta.get() + (int) (FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get() * 0.4));
             }
         }
 
@@ -77,7 +76,7 @@ public class StrainEffect extends MobEffect {
                     f.addUsageModifier(STRAIN_USAGE);
                     f.removeDeltaModifier(PlayerFeathers.REGENERATION);
                     f.addDeltaModifier(STRAIN_RECOVERY);
-                    FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.STRAIN, true, strength), player);
+                    //FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.STRAIN, true, strength), player);
                 }
             });
         }
@@ -94,7 +93,7 @@ public class StrainEffect extends MobEffect {
                     f.removeUsageModifier(STRAIN_USAGE);
                     f.removeDeltaModifier(STRAIN_RECOVERY);
                     f.addDeltaModifier(PlayerFeathers.REGENERATION);
-                    FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.STRAIN, false, strength), player);
+                    //FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.STRAIN, false, strength), player);
                 }
             });
         }

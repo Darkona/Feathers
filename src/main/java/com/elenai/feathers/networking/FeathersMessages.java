@@ -26,10 +26,10 @@ public class FeathersMessages {
                                               .simpleChannel();
         INSTANCE = network;
 
-        network.messageBuilder(FeatherSyncCTSPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-               .decoder(FeatherSyncCTSPacket::new)
-               .encoder(FeatherSyncCTSPacket::toBytes)
-               .consumerMainThread(FeatherSyncCTSPacket::handle)
+        network.messageBuilder(ClientFeatherSpendPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+               .decoder(ClientFeatherSpendPacket::new)
+               .encoder(ClientFeatherSpendPacket::toBytes)
+               .consumerMainThread(ClientFeatherSpendPacket::handle)
                .add();
 
         network.messageBuilder(RequestWeightCTSPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
@@ -50,11 +50,11 @@ public class FeathersMessages {
                .consumerMainThread(FeatherSyncSTCPacket::handle)
                .add();
 
-        network.messageBuilder(EffectChangeSTCPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+        /*network.messageBuilder(EffectChangeSTCPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                .decoder(EffectChangeSTCPacket::new)
                .encoder(EffectChangeSTCPacket::toBytes)
                .consumerMainThread(EffectChangeSTCPacket::handle)
-               .add();
+               .add();*/
 
     }
 

@@ -5,6 +5,8 @@ import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.compatibility.coldsweat.FeathersColdSweatConfig;
+import com.elenai.feathers.compatibility.thirst.FeathersThirstConfig;
+import com.elenai.feathers.compatibility.thirst.ThirstManager;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.effect.FeathersEffects;
 import com.elenai.feathers.event.FeatherAmountEvent;
@@ -39,9 +41,15 @@ public class TickEventHandler {
     public static void playerTickEvent(TickEvent.PlayerTickEvent event) {
         if (event.player instanceof ServerPlayer player) {
 
+            handleEffects(event);
+
+
+            if(Feathers.THIRST_LOADED && FeathersThirstConfig.THIRST_COMPATIBILITY.get()) {
+                ThirstManager.handleThirst(event);
+            }
+
             handleStaminaDelta(event);
 
-            handleEffects(event);
 
         }
     }

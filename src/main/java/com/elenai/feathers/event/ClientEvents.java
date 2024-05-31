@@ -50,7 +50,7 @@ public class ClientEvents {
 
             if (event.phase == TickEvent.Phase.START) {
                 if (Minecraft.getInstance().level != null) {
-                    ClientFeathersData.overflowing = ClientFeathersData.getFeathers() > FeathersCommonConfig.MAX_STAMINA.get() / FeathersConstants.STAMINA_PER_FEATHER;
+                    ClientFeathersData.overflowing = ClientFeathersData.getFeathers() > FeathersCommonConfig.MAX_FEATHERS.get() / FeathersConstants.STAMINA_PER_FEATHER;
 
 
                     if (ClientFeathersData.animationCooldown > 0) {

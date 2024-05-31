@@ -48,19 +48,14 @@ public class FeathersAPI {
         return result.get();
     }
 
-    public static int getMaxFeathers(Player player) {
-        return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-                     .map(PlayerFeathers::getMaxFeathers).orElse(0);
-    }
-
     public static void setMaxFeathers(Player player, int amount) {
-        if (player.getAttributes().hasAttribute(FeathersAttributes.MAX_STAMINA.get())) {
-            player.getAttribute(FeathersAttributes.MAX_STAMINA.get())
+        if (player.getAttributes().hasAttribute(FeathersAttributes.MAX_FEATHERS.get())) {
+            player.getAttribute(FeathersAttributes.MAX_FEATHERS.get())
                   .setBaseValue(amount * FeathersConstants.STAMINA_PER_FEATHER);
         }
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
               .ifPresent(f -> {
-                  f.setMaxStamina((int) player.getAttribute(FeathersAttributes.MAX_STAMINA.get()).getValue());
+                  f.setMaxStamina((int) player.getAttribute(FeathersAttributes.MAX_FEATHERS.get()).getValue());
                   FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
               });
     }
@@ -103,30 +98,31 @@ public class FeathersAPI {
             throw new UnsupportedOperationException("Cannot spend negative feathers");
         }
         AtomicInteger result = new AtomicInteger(0);
-        if (player.isCreative() || player.isSpectator())
-            player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-                  .ifPresent(f -> {
+        if (player.isCreative() || player.isSpectator()) return amount;
 
-                      var useFeatherEvent = new FeatherEvent.Use(player, amount);
-                      boolean cancelled = MinecraftForge.EVENT_BUS.post(useFeatherEvent);
+        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
+              .ifPresent(f -> {
 
-                      if (!cancelled && useFeatherEvent.getResult() == DEFAULT) {
+                  var useFeatherEvent = new FeatherEvent.Use(player, amount);
+                  boolean cancelled = MinecraftForge.EVENT_BUS.post(useFeatherEvent);
 
-                          var prev = f.getFeathers();
-                          var post = f.useFeathers(player, useFeatherEvent.amount);
+                  if (!cancelled && useFeatherEvent.getResult() == DEFAULT) {
 
-                          MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, prev, post));
-                          result.set(prev -post);
+                      var prev = f.getFeathers();
+                      var post = f.useFeathers(player, useFeatherEvent.amount);
 
-                          if (prev != post && post != 0)
-                              FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
+                      MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, prev, post));
+                      result.set(prev -post);
 
-                          if (cooldownTicks > 0) f.setCooldown(cooldownTicks);
-                      } else {
-                          result.set(useFeatherEvent.amount);
-                      }
+                      if (prev != post && post != 0)
+                          FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
 
-                  });
+                      if (cooldownTicks > 0) f.setCooldown(cooldownTicks);
+                  } else {
+                      result.set(useFeatherEvent.amount);
+                  }
+
+              });
         return result.get();
     }
 
@@ -163,6 +159,9 @@ public class FeathersAPI {
                      .map(PlayerFeathers::getCooldown).orElse(0);
     }
 
+    public static void markForRecalculation(Player player){
+        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(p -> p.setShouldRecalculate(true));
+    }
     public static boolean isCold(ServerPlayer player) {
         return player.hasEffect(FeathersEffects.COLD.get());
     }

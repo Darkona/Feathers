@@ -5,7 +5,6 @@ import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.Effect;
-import com.elenai.feathers.networking.packet.EffectChangeSTCPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -48,7 +47,7 @@ public class HotEffect extends MobEffect {
                 if (!f.isHot()) {
                     f.setHot(true);
                     f.addUsageModifier(HOT);
-                    FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.HOT, true, strength), player);
+                    //FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.HOT, true, strength), player);
                 }
             });
         }
@@ -62,7 +61,7 @@ public class HotEffect extends MobEffect {
                 if (f.isHot()) {
                     f.setHot(false);
                     f.removeUsageModifier(HOT);
-                    FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.HOT, false, strength), player);
+//FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.HOT, false, strength), player);
                 }
             });
         }

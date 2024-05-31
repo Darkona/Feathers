@@ -1,17 +1,14 @@
 Feathers Attribute
 GUI Overlay
-Feathers regeneration
+
 Effects: Frozen Feathers, Energized Feathers, Endurance Fatigue, Burning Feathers
-Feather use by tick
-Feather use by lump sum
-Modify Feather regen
-Modify Feather amount and max amount
-Provide cancellable events: On feathers gained, on feathers lost, On reached max feathers, On feather use, On feather regeneration begin, On Feather regeneration end
+
+
+
+Provide cancellable events: , on feathers lost, ,, On feather regeneration begin,
 Hooks for:
-- Feather regeneration speed
-- Feather regeneration delay
-- Feather regeneration amount
-- Feather regeneration max amount
+
+
 . - Effects:
 
     + Max Stamina = Endurance
@@ -23,4 +20,8 @@ Hooks for:
     + Usage= Burning
     - Usage= Momentum
 
+
+Revisar Endurance y por que regenera mas rapido
+revisar cold effect removal
+hot & cold no pueden existir a la vez
 

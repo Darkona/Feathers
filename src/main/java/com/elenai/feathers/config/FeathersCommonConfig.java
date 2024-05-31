@@ -14,9 +14,11 @@ public class FeathersCommonConfig {
 
     public static final ForgeConfigSpec SPEC;
 
-    public static final int baseRegen = 20;
-    public static final ForgeConfigSpec.ConfigValue<Integer> REGENERATION;
-    public static final ForgeConfigSpec.ConfigValue<Integer> MAX_STAMINA;
+
+    public static final ForgeConfigSpec.ConfigValue<Double> REGEN_FEATHERS_PER_SECOND;
+    public static final ForgeConfigSpec.ConfigValue<Double> MAX_FEATHERS;
+
+
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_ARMOR_WEIGHTS;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ARMOR_WEIGHTS;
@@ -48,13 +50,15 @@ public class FeathersCommonConfig {
 
         BUILDER.push("Feathers' Config");
 
-        REGENERATION = BUILDER
-                .comment("How many stamina regenerates per tick. 1000 stamina = 1 feather. " +
-                        "Default value of 20 means 1 feather every 50 ticks, or 2.5 seconds. ")
-                .define("Base Stamina Regeneration", baseRegen);
 
-        MAX_STAMINA = BUILDER.comment("Maximum stamina the player can have. 1000 stamina = 1 feather.")
-                             .define("Max Stamina", 20000);
+        REGEN_FEATHERS_PER_SECOND = BUILDER
+                .comment("How many feathers the player will regenerate every second. This will be modified by effects.")
+                .defineInRange("Base Feather Regeneration", 0.4D, -40.0D, 40.0D);
+
+
+        MAX_FEATHERS = BUILDER.comment("Maximum Feathers the player can have.")
+                              .defineInRange("Max Feathers", 20.0D, 0D, 40.0D);
+
 
         /*
          * Add all current armor types on config creation

@@ -4,16 +4,20 @@ import com.elenai.feathers.api.FeathersConstants;
 
 public class Calculations {
 
-    public static int calculateStaminaRegenPerTick(double feathersPerSecond) {
-        double staminaPerSecond = feathersPerSecond * FeathersConstants.STAMINA_PER_FEATHER;
-        return (int) staminaPerSecond / 20;
+    public static int calculateStaminaPerTick(double feathersPerSecond) {
+        return  (int) staminaPerSecond(feathersPerSecond) / 20 ;
     }
 
-    public static int calculateStaminaRegenPerSecondFromTicksPerFeather(int ticksPerFeather) {
-        return FeathersConstants.STAMINA_PER_FEATHER / ticksPerFeather;
+    public static double staminaPerSecond(double feathersPerSecond){
+        return feathersPerSecond * FeathersConstants.STAMINA_PER_FEATHER;
     }
 
-    public static double calculateFeathersPerSecond(int staminaPerTick) {
-        return (double) (staminaPerTick * 20) / FeathersConstants.STAMINA_PER_FEATHER;
+    public static int staminaPerSecond(int staminaPerTick) {
+        return staminaPerTick * 20;
     }
+
+    public static double calculateFeathersPerSecond(int staminaPerTick){
+        return (double) staminaPerSecond(staminaPerTick) / FeathersConstants.STAMINA_PER_FEATHER;
+    }
+
 }

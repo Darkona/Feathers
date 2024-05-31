@@ -6,7 +6,6 @@ import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.Effect;
-import com.elenai.feathers.networking.packet.EffectChangeSTCPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -14,9 +13,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.asm.mixin.injection.At;
 
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
@@ -30,7 +27,7 @@ public class EnergizedEffect extends MobEffect {
             if (effect != null) {
                 int strength =  effect.getAmplifier();
                 float multiplier = 1 + ((strength + 1) * 0.2F);
-                staminaDelta.set((int) (FeathersCommonConfig.REGENERATION.get() * multiplier));
+                staminaDelta.set((int) (FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get() * multiplier));
             }
         }
 
@@ -57,7 +54,7 @@ public class EnergizedEffect extends MobEffect {
                 if (!f.isEnergized()) {
                     f.setEnergized(true);
                     f.addDeltaModifier(ENERGIZED);
-                    FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.ENERGIZED, true, strength), player);
+                    //FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.ENERGIZED, true, strength), player);
                 }
             });
         }
@@ -71,7 +68,7 @@ public class EnergizedEffect extends MobEffect {
                 if (f.isEnergized()) {
                     f.setEnergized(false);
                     f.removeDeltaModifier(ENERGIZED);
-                    FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.ENERGIZED, false, strength), player);
+                    //FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.ENERGIZED, false, strength), player);
                 }
             });
         }

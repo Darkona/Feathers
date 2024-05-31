@@ -107,7 +107,7 @@ public class FeathersHudOverlay {
             for (int i = 0; i < 10; i++) {
                 if ((i + 1 <= Math.ceil((double) ClientFeathersData.getMaxFeathers() / 2))) {
 
-                    GuiIcon icon = ((ClientFeathersData.cold) ? BACK_COLD : BACK_NORMAL);
+                    GuiIcon icon = ((ClientFeathersData.isCold()) ? BACK_COLD : BACK_NORMAL);
 
                     int height = getHeight(i);
                     draw(guiGraphics, getXPos(x, i, xOffset), getYPos(y, rightOffset, height, yOffset), icon);
@@ -122,7 +122,7 @@ public class FeathersHudOverlay {
                 if ((i + 1 <= halvedFeathers) && ClientFeathersData.getFeathers() > 0) {
 
                     GuiIcon icon = (i + 1 == halvedFeathers
-                            && (ClientFeathersData.getFeathers() % 2 != 0)) ?  getIconFull() : getIconHalf() ;
+                            && (ClientFeathersData.getFeathers() % 2 != 0)) ?  getIconHalf() : getIconFull() ;
 
                     int height = getHeight(i);
                     draw(guiGraphics, getXPos(x, i, xOffset), getYPos(y, rightOffset, height, yOffset), icon);
@@ -249,7 +249,7 @@ public class FeathersHudOverlay {
     }
 
     private static GuiIcon getIconFull() {
-        if (ClientFeathersData.cold) {
+        if (ClientFeathersData.isCold()) {
             return COLD_FULL;
         }
         if (ClientFeathersData.hot) {
@@ -262,7 +262,7 @@ public class FeathersHudOverlay {
     }
 
     private static GuiIcon getIconHalf() {
-        if (ClientFeathersData.cold) {
+        if (ClientFeathersData.isCold()) {
             return COLD_HALF;
         }
         if (ClientFeathersData.hot) {
