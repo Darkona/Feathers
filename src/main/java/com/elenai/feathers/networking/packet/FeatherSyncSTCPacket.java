@@ -1,9 +1,11 @@
 package com.elenai.feathers.networking.packet;
 
-import com.elenai.feathers.api.FeathersConstants;
-import com.elenai.feathers.capability.PlayerFeathers;
+import com.elenai.feathers.api.IFeathers;
+import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.client.ClientFeathersData;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -20,7 +22,7 @@ public class FeatherSyncSTCPacket {
     private final int staminaDelta;
 
 
-    public FeatherSyncSTCPacket(PlayerFeathers f) {
+    public FeatherSyncSTCPacket(IFeathers f) {
         stamina = f.getStamina();
         maxStamina = f.getMaxStamina();
         feathers = f.getFeathers();
@@ -48,11 +50,17 @@ public class FeatherSyncSTCPacket {
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
-            ClientFeathersData.feathers = this.feathers;
-            ClientFeathersData.maxFeathers = this.maxFeathers;
-            ClientFeathersData.stamina = this.stamina;
-            ClientFeathersData.maxStamina = this.maxStamina;
-            ClientFeathersData.staminaDelta = this.staminaDelta;
+            Player clientPlayer = Minecraft.getInstance().player;
+            if(clientPlayer != null){
+                clientPlayer.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+                    f.setStamina(stamina);
+                    f.setMaxStamina(maxStamina);
+                    f.setFeathers(feathers);
+                    f.setStaminaDelta(this.staminaDelta);
+                    ClientFeathersData.update(f);
+                });
+            }
+
         });
         return true;
     }

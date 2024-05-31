@@ -100,7 +100,7 @@ public class ThirstManager {
     };
 
     @SubscribeEvent
-    public static void attachThirstDeltaModifiers(FeatherEvent.AttachDeltaModifiers event) {
+    public static void attachThirstDeltaModifiers(FeatherEvent.AttachDefaultDeltaModifiers event) {
         if (Feathers.THIRST_LOADED && FeathersThirstConfig.THIRST_COMPATIBILITY.get()) {
 
             if (FeathersThirstConfig.THIRST_STAMINA_DRAIN.get() > 0)

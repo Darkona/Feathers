@@ -2,11 +2,13 @@ package com.elenai.feathers.client;
 
 import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.api.FeathersConstants;
+import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.effect.FeathersEffects;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -15,49 +17,68 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class ClientFeathersData {
 
-    public static int stamina = 2000;
-    @Setter
-    public static int feathers = 0;
-    public static int maxStamina = 2000;
-    public static int maxFeathers = 0;
-    public static int staminaDelta = 0;
-    public static int previousFeathers = 0;
-    public static int enduranceFeathers = 0;
-    public static int weight = 0;
-    public static int animationCooldown = 0;
-    public static int fadeCooldown = 0;
-    public static boolean hot = false;
-    public static boolean energized = false;
-    public static boolean overflowing = false;
-    public static boolean momentum = false;
-    public static boolean endurance = false;
-    public static boolean fatigued = false;
+    //Use singleton for sanity
+    private static ClientFeathersData instance;
 
-    public static int getFeathers() {
-        return stamina / FeathersConstants.STAMINA_PER_FEATHER;
+    public static ClientFeathersData getInstance() {
+        if (instance == null) {
+            instance = new ClientFeathersData();
+        }
+        return instance;
     }
 
-    public static int getMaxFeathers() {
-        return maxStamina / FeathersConstants.STAMINA_PER_FEATHER;
+    private int stamina = 2000;
+
+    private int feathers = 0;
+    private int maxStamina = 2000;
+    private int maxFeathers = 0;
+    private int staminaDelta = 0;
+    private int previousFeathers = 0;
+    private int enduranceFeathers = 0;
+    private int weight = 0;
+    private int animationCooldown = 0;
+    private int fadeCooldown = 0;
+    private boolean hot = false;
+    private boolean cold = false;
+    private boolean energized = false;
+    private boolean overflowing = false;
+    private boolean momentum = false;
+    private boolean endurance = false;
+    private boolean fatigued = false;
+
+    public void update(IFeathers f) {
+        Player player = Minecraft.getInstance().player;
+        stamina = f.getStamina();
+        maxStamina = f.getMaxStamina();
+        feathers = f.getFeathers();
+        maxFeathers = f.getMaxFeathers();
+        staminaDelta = f.getStaminaDelta();
+        enduranceFeathers = f.getEnduranceFeathers();
+        hot = FeathersAPI.isHot(player);
+        cold = FeathersAPI.isCold(player);
+        energized = FeathersAPI.isEnergized(player);
+        //overflowing = FeathersAPI.isOverflowing(player);
+        //momentum = FeathersAPI.isMomentum(player);
+        //endurance = FeathersAPI.isEndurance(player);
+        fatigued = FeathersAPI.isFatigued(player);
+        //weight = FeathersAPI.getWeight(player);
+
     }
 
-    public static boolean isCold() {
-        var player = Minecraft.getInstance().player;
-        return player != null && FeathersAPI.isCold(player);
+    public boolean hasFullStamina(){
+        return stamina >= maxStamina;
     }
 
-    public static boolean isHot() {
-        var player = Minecraft.getInstance().player;
-        return player != null && FeathersAPI.isHot(player);
+    public boolean hasFeathers(){
+        return feathers > 0;
     }
 
-    public static boolean isEnergized() {
-        var player = Minecraft.getInstance().player;
-        return player != null && FeathersAPI.isEnergized(player);
+    public boolean hasFullFeathers(){
+        return feathers >= maxFeathers;
+    };
+
+    public boolean hasWeight() {
+        return false;
     }
 
-    public static boolean isEndurance() {
-        var player = Minecraft.getInstance().player;
-        return player != null && FeathersAPI.isEnduring(player);
-    }
 }

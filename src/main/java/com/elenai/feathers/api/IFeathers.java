@@ -1,8 +1,13 @@
 package com.elenai.feathers.api;
 
+import com.elenai.feathers.capability.PlayerFeathers;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.capabilities.AutoRegisterCapability;
 
+@AutoRegisterCapability
 public interface IFeathers {
+
 
     int getStamina();
 
@@ -28,6 +33,13 @@ public interface IFeathers {
 
     int gainFeathers(int feathers);
 
+    /**
+     * Spend feathers from the player. Returns the amount of feathers spent.
+     *
+     * @param player the player
+     * @param feathers the amount of feathers to spend
+     * @return the amount of feathers spent
+     */
     int useFeathers(Player player, int feathers);
 
     int getCooldown();
@@ -85,4 +97,14 @@ public interface IFeathers {
     void setMomentum(boolean momentum);
 
     int getMaxFeathers();
+
+    void copyFrom(IFeathers oldStore);
+
+    void  tick(Player player);
+
+    CompoundTag saveNBTData();
+
+    void loadNBTData(CompoundTag nbt);
+
+    void setStaminaDelta(int staminaDelta);
 }

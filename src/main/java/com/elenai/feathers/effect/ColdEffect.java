@@ -2,10 +2,6 @@ package com.elenai.feathers.effect;
 
 import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.attributes.FeathersAttributes;
-import com.elenai.feathers.capability.PlayerFeathersProvider;
-import com.elenai.feathers.networking.FeathersMessages;
-import com.elenai.feathers.networking.packet.Effect;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;

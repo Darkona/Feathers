@@ -1,8 +1,6 @@
 package com.elenai.feathers.effect;
 
-import com.elenai.feathers.capability.PlayerFeathersProvider;
-import com.elenai.feathers.networking.FeathersMessages;
-import com.elenai.feathers.networking.packet.Effect;
+import com.elenai.feathers.capability.Capabilities;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -19,7 +17,7 @@ public class FatiguedEffect extends MobEffect {
     @Override
     public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
         if (target instanceof ServerPlayer player) {
-            player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
+            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
                 if (!f.isFatigued()) {
                     f.setFatigued(true);
                     //FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.FATIGUE, f.isCold(), strength), player);
@@ -32,7 +30,7 @@ public class FatiguedEffect extends MobEffect {
     @Override
     public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
         if (target instanceof ServerPlayer player) {
-            player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
+            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
                 if (f.isFatigued()) {
                     f.setFatigued(false);
                     //FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.FATIGUE, f.isCold(), strength), player);

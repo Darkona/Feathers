@@ -2,8 +2,7 @@ package com.elenai.feathers.api;
 
 import com.elenai.feathers.Feathers;
 import com.elenai.feathers.attributes.FeathersAttributes;
-import com.elenai.feathers.capability.PlayerFeathers;
-import com.elenai.feathers.capability.PlayerFeathersProvider;
+import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.effect.FeathersEffects;
 import com.elenai.feathers.enchantment.FeathersEnchantments;
@@ -26,8 +25,7 @@ import static net.minecraftforge.eventbus.api.Event.Result.DEFAULT;
 public class FeathersAPI {
 
     public static int getFeathers(Player player) {
-        return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-                     .map(PlayerFeathers::getFeathers).orElse(0);
+        return player.getCapability(Capabilities.PLAYER_FEATHERS).map(IFeathers::getFeathers).orElse(0);
     }
 
     /**
@@ -39,7 +37,7 @@ public class FeathersAPI {
      */
     public static int setFeathers(ServerPlayer player, int amount) {
         AtomicInteger result = new AtomicInteger(0);
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
+        player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.setStamina(amount * 10);
                   FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
@@ -53,7 +51,7 @@ public class FeathersAPI {
             player.getAttribute(FeathersAttributes.MAX_FEATHERS.get())
                   .setBaseValue(amount * FeathersConstants.STAMINA_PER_FEATHER);
         }
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
+        player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.setMaxStamina((int) player.getAttribute(FeathersAttributes.MAX_FEATHERS.get()).getValue());
                   FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
@@ -70,7 +68,7 @@ public class FeathersAPI {
      */
     public static int gainFeathers(Player player, int amount) {
         AtomicInteger result = new AtomicInteger(0);
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
+        player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   var gainEvent = new FeatherEvent.Gain(player, amount);
                   boolean cancelled = MinecraftForge.EVENT_BUS.post(gainEvent);
@@ -100,7 +98,7 @@ public class FeathersAPI {
         AtomicInteger result = new AtomicInteger(0);
         if (player.isCreative() || player.isSpectator()) return amount;
 
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
+        player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
 
                   var useFeatherEvent = new FeatherEvent.Use(player, amount);
@@ -150,39 +148,45 @@ public class FeathersAPI {
     }
 
     public static void setCooldown(ServerPlayer player, int cooldownTicks) {
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
+        player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> f.setCooldown(cooldownTicks));
     }
 
     public static int getCooldown(ServerPlayer player) {
-        return player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS)
-                     .map(PlayerFeathers::getCooldown).orElse(0);
+        return player.getCapability(Capabilities.PLAYER_FEATHERS)
+                     .map(IFeathers::getCooldown).orElse(0);
     }
 
     public static void markForRecalculation(Player player){
-        player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(p -> p.setShouldRecalculate(true));
+        player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(p -> p.setShouldRecalculate(true));
     }
     public static boolean isCold(Player player) {
+        if(player == null) return false;
         return player.hasEffect(FeathersEffects.COLD.get());
     }
 
     public static boolean isHot(Player player) {
+        if(player == null) return false;
         return player.hasEffect(FeathersEffects.HOT.get());
     }
 
     public static boolean isEnergized(Player player) {
+        if(player == null) return false;
         return player.hasEffect(FeathersEffects.ENERGIZED.get());
     }
 
     public static boolean isStrained(Player player) {
+        if(player == null) return false;
         return player.hasEffect(FeathersEffects.STRAINED.get());
     }
 
     public static boolean isEnduring(Player player) {
+        if(player == null) return false;
         return player.hasEffect(FeathersEffects.ENDURANCE.get());
     }
 
     public static boolean isFatigued(Player player) {
+        if(player == null) return false;
         return player.hasEffect(FeathersEffects.FATIGUE.get());
     }
 }

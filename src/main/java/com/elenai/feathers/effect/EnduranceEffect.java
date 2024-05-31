@@ -2,10 +2,8 @@ package com.elenai.feathers.effect;
 
 import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.api.IModifier;
+import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.capability.PlayerFeathers;
-import com.elenai.feathers.capability.PlayerFeathersProvider;
-import com.elenai.feathers.networking.FeathersMessages;
-import com.elenai.feathers.networking.packet.Effect;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -66,7 +64,7 @@ public class EnduranceEffect extends MobEffect {
     @Override
     public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
         if (target instanceof ServerPlayer player) {
-            player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
+            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
                 f.setEnduranceFeathers((strength + 1) * 8);
                 f.addUsageModifier(ENDURANCE);
                // FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.ENDURANCE, true, strength), player);
@@ -78,7 +76,7 @@ public class EnduranceEffect extends MobEffect {
     @Override
     public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
         if (target instanceof ServerPlayer player) {
-            player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
+            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
                 f.setEnduranceFeathers(0);
                 f.removeUsageModifier(ENDURANCE);
                 //FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.ENDURANCE, false, strength), player);

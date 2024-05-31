@@ -1,11 +1,9 @@
 package com.elenai.feathers.effect;
 
 import com.elenai.feathers.api.IModifier;
+import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.capability.PlayerFeathers;
-import com.elenai.feathers.capability.PlayerFeathersProvider;
 import com.elenai.feathers.config.FeathersCommonConfig;
-import com.elenai.feathers.networking.FeathersMessages;
-import com.elenai.feathers.networking.packet.Effect;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -70,7 +68,7 @@ public class StrainEffect extends MobEffect {
     public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
         if (!FeathersCommonConfig.ENABLE_STRAIN.get()) return;
         if (target instanceof ServerPlayer player) {
-            player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
+            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
                 if (!f.isStrained()) {
                     f.setStrained(true);
                     f.addUsageModifier(STRAIN_USAGE);
@@ -87,7 +85,7 @@ public class StrainEffect extends MobEffect {
     public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
         if (!FeathersCommonConfig.ENABLE_STRAIN.get()) return;
         if (target instanceof ServerPlayer player) {
-            player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
+            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
                 if (f.isStrained()) {
                     f.setStrained(false);
                     f.removeUsageModifier(STRAIN_USAGE);

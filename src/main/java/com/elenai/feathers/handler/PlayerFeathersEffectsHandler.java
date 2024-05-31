@@ -1,7 +1,7 @@
 package com.elenai.feathers.handler;
 
 import com.elenai.feathers.Feathers;
-import com.elenai.feathers.capability.PlayerFeathersProvider;
+import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.compatibility.coldsweat.FeathersColdSweatConfig;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.effect.FeathersEffects;
@@ -16,7 +16,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = Feathers.MODID)
-public class EffectHandler {
+public class PlayerFeathersEffectsHandler {
 
     @SubscribeEvent
     public static void canApplyEffect(MobEffectEvent.Applicable event) {
@@ -24,31 +24,19 @@ public class EffectHandler {
 
             if (event.getEffectInstance().getEffect() == FeathersEffects.HOT.get()) {
 
-                event.setResult(canBeHot(player) ? Event.Result.ALLOW : Event.Result.DENY);
+                event.setResult(canApplyHotEffect(player) ? Event.Result.ALLOW : Event.Result.DENY);
             }
 
             if (event.getEffectInstance().getEffect() == FeathersEffects.COLD.get()) {
 
-                event.setResult(canBeCold(player) ? Event.Result.ALLOW : Event.Result.DENY);
+                event.setResult(canApplyColdEffect(player) ? Event.Result.ALLOW : Event.Result.DENY);
             }
         }
     }
 
     @SubscribeEvent
-    public static void onEffectApplied(MobEffectEvent.Added event) {
-
-
-    }
-
-    @SubscribeEvent
-    public static void onEffectRemoved(MobEffectEvent.Remove event) {
-
-    }
-
-
-    @SubscribeEvent
     public static void applyStrain(FeatherAmountEvent.Empty event) {
-        event.getEntity().getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(f -> {
+        event.getEntity().getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
 
             if (FeathersCommonConfig.ENABLE_STRAIN.get()) {
 
@@ -64,7 +52,7 @@ public class EffectHandler {
     }
 
 
-    public static boolean canBeCold(ServerPlayer player) {
+    public static boolean canApplyColdEffect(ServerPlayer player) {
 
         if (!FeathersCommonConfig.ENABLE_COLD_EFFECTS.get() || player.getAbilities().invulnerable || player.isCreative()) return false;
 
@@ -81,7 +69,7 @@ public class EffectHandler {
         return !player.hasEffect(FeathersEffects.ENERGIZED.get());
     }
 
-    public static boolean canBeHot(ServerPlayer player) {
+    public static boolean canApplyHotEffect(ServerPlayer player) {
 
         if (!FeathersCommonConfig.ENABLE_HOT_EFFECTS.get() || player.getAbilities().invulnerable || player.isCreative()) return false;
 

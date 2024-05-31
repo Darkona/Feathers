@@ -5,12 +5,22 @@ import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.attributes.FeathersAttributes;
 import com.elenai.feathers.config.FeathersCommonConfig;
-import com.elenai.feathers.util.Calculations;
+import com.elenai.feathers.effect.FeathersEffects;
+import com.elenai.feathers.event.FeatherAmountEvent;
+import com.elenai.feathers.event.FeatherEvent;
+import com.elenai.feathers.event.StaminaChangeEvent;
+import com.elenai.feathers.networking.FeathersMessages;
+import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.Event;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,146 +29,96 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Setter
 public class PlayerFeathers implements IFeathers {
 
-    public static final IModifier DEFAULT_USAGE = new IModifier() {
-        @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger usingFeathers) {
-            //Do nothing
-        }
-
-        @Override
-        public int getOrdinal() {
-            return 0;
-        }
-
-        @Override
-        public String getName() {
-            return "default";
-        }
-    };
-
-    /**
-     * Basic modifier that applies the regeneration effect.
-     * This modifier is used to regenerate the player's stamina.
-     * The regeneration value is defined in the config.
-     * This modifier is applied once per tick.
-     */
-    public static final IModifier REGENERATION = new IModifier() {
-        @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
-
-            var fps = player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get());
-            if (fps == null) {
-                staminaDelta.set(Calculations.calculateStaminaPerTick(FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get()));
-            } else {
-                staminaDelta.set(staminaDelta.get() + Calculations.calculateStaminaPerTick(fps.getValue()));
-            }
-        }
-
-        @Override
-        public int getOrdinal() {
-            return 0;
-        }
-
-        @Override
-        public String getName() {
-            return "regeneration";
-        }
-
-    };
-
-    /**
-     * This modifier is used to inverse the regeneration effect.
-     * Available for modders as an example, but not used in this mod.
-     */
-    public static final IModifier INVERSE_REGENERATION = new IModifier() {
-
-        @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
-            var fps = player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get());
-            if (fps == null) {
-                staminaDelta.set(Calculations.calculateStaminaPerTick(FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get()));
-            } else {
-                staminaDelta.set(staminaDelta.get() - Calculations.calculateStaminaPerTick(fps.getValue()));
-            }
-        }
-
-        @Override
-        public int getOrdinal() {
-            return 0;
-        }
-
-        @Override
-        public String getName() {
-            return "inverse_regeneration";
-        }
-    };
-    /**
-     * This modifier is used to make the regeneration effect non-linear.
-     * Regeneration is faster at the start and slower at the end.
-     * Available for modders as an example, but not used in this mod.
-     */
-    public static final IModifier NON_LINEAR_REGENERATION = new IModifier() {
-
-        @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
-            var fps = player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get());
-            if (fps == null) {
-                staminaDelta.set(Calculations.calculateStaminaPerTick(FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get()));
-            } else {
-                var staminaPerSecond = Calculations.calculateStaminaPerTick(FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get()) * 20;
-                var something = Math.max((int) (1 / Math.log(playerFeathers.getFeathers() / 40d + 1.4) - 3.5) * staminaPerSecond, 1);
-                staminaDelta.set(something);
-            }
-        }
-
-        @Override
-        public int getOrdinal() {
-            return 0;
-        }
-
-        @Override
-        public String getName() {
-            return "non_linear_regeneration";
-        }
-    };
-
-
     private static final int ZERO = 0;
     private int stamina;
     private int maxStamina;
-    private int feathers = ZERO;
-    private int cooldown = ZERO;
-    private int enduranceFeathers = ZERO;
-    private int strainFeathers = ZERO;
-    private int maxStrained = FeathersCommonConfig.MAX_STRAIN.get();
-    private int effectCheckCooldown;
+    private int feathers;
+    private int cooldown;
+    private int enduranceFeathers;
+    private int strainFeathers;
+    private int maxStrained;
     //Recalculation
-    private int staminaDelta = ZERO;
+    private int staminaDelta;
     @Getter(AccessLevel.NONE)
     private boolean shouldRecalculate;
     //Effects
-    private boolean cold = false;
-    private boolean hot = false;
-    private boolean energized = false;
-    private int energizedStrength = ZERO;
-    private boolean fatigued = false;
+    private boolean cold;
+    private boolean hot;
+    private boolean energized;
+    private int energizedStrength;
+    private boolean fatigued;
     @Getter(AccessLevel.NONE)
-    private boolean momentum = false;
+    private boolean momentum;
     private boolean strained;
+
 
     //Modifiers
     private Map<String, IModifier> staminaDeltaModifiers = new HashMap<>();
     private List<IModifier> staminaDeltaModifierList = new ArrayList<>();
+
     private Map<String, IModifier> staminaUsageModifiers = new HashMap<>();
     private List<IModifier> staminaUsageModifiersList = new ArrayList<>();
 
-    public PlayerFeathers(List<IModifier> deltaModifiers, List<IModifier> usageModifiers) {
-
-        deltaModifiers.forEach(modifier -> staminaDeltaModifiers.put(modifier.getName(), modifier));
-        usageModifiers.forEach(modifier -> staminaUsageModifiers.put(modifier.getName(), modifier));
+    /**
+     * Default constructor.
+     */
+    public PlayerFeathers(){
         maxStamina = (int) (FeathersCommonConfig.MAX_FEATHERS.get() * FeathersConstants.STAMINA_PER_FEATHER);
         stamina = maxStamina;
+        synchronizeFeathers();
+        attachDefaultDeltaModifiers();
+        attachDefaultUsageModifiers();
+        cooldown = ZERO;
+        strainFeathers = ZERO;
+        enduranceFeathers = ZERO;
+        maxStrained = FeathersCommonConfig.MAX_STRAIN.get();
+
         shouldRecalculate = true;
+    }
+    public PlayerFeathers(Player player) {
+
+        var attr = player.getAttributes();
+        if(attr.hasAttribute(FeathersAttributes.MAX_FEATHERS.get())){
+            maxStamina = (int) attr.getValue(FeathersAttributes.MAX_FEATHERS.get());
+        } else {
+            maxStamina = (int) (FeathersCommonConfig.MAX_FEATHERS.get() * FeathersConstants.STAMINA_PER_FEATHER);
+        }
+        stamina = maxStamina;
+        synchronizeFeathers();
+        attachDefaultDeltaModifiers();
+        attachDefaultUsageModifiers();
+        cooldown = ZERO;
+        strainFeathers = ZERO;
+        enduranceFeathers = ZERO;
+        maxStrained = FeathersCommonConfig.MAX_STRAIN.get();
+
+        shouldRecalculate = true;
+    }
+
+    private void attachDefaultDeltaModifiers() {
+
+        var event = new FeatherEvent.AttachDefaultDeltaModifiers(new ArrayList<>());
+
+        if (!MinecraftForge.EVENT_BUS.post(event)) return;
+
+        if (event.getResult() == Event.Result.DEFAULT) {
+            event.modifiers.add(StaminaDeltaModifiers.REGENERATION);
+            event.modifiers.forEach(m -> staminaDeltaModifiers.put(m.getName(), m));
+        }
+
+    }
+
+    private void attachDefaultUsageModifiers() {
+
+        var event = new FeatherEvent.AttachDefaultUsageModifiers(new ArrayList<>());
+
+        if (!MinecraftForge.EVENT_BUS.post(event)) return;
+
+        if (event.getResult() == Event.Result.DEFAULT) {
+            event.modifiers.add(StaminaUsageModifiers.DEFAULT_USAGE);
+            event.modifiers.forEach(m -> staminaUsageModifiers.put(m.getName(), m));
+        }
+
     }
 
     public boolean hasMomentum() {
@@ -225,7 +185,6 @@ public class PlayerFeathers implements IFeathers {
 
     private int applyDeltaToStrain() {
 
-
         if (strainFeathers > 0) {
             int prevDelta = staminaDelta;
             int prevStrain = strainFeathers;
@@ -281,13 +240,7 @@ public class PlayerFeathers implements IFeathers {
         return feathers;
     }
 
-    /**
-     * Spend feathers from the player. Returns the amount of feathers spent.
-     *
-     * @param player
-     * @param feathers
-     * @return
-     */
+
     @Override
     public int useFeathers(Player player, int feathers) {
         var prev = this.feathers;
@@ -309,21 +262,21 @@ public class PlayerFeathers implements IFeathers {
         this.stamina = Math.max(this.stamina - stamina, ZERO);
     }
 
-    public void copyFrom(PlayerFeathers source) {
-        this.maxStamina = source.maxStamina;
-        this.staminaDelta = source.staminaDelta;
-        this.stamina = source.stamina;
-        this.enduranceFeathers = source.enduranceFeathers;
-        this.cold = source.cold;
-        this.hot = source.hot;
-        this.energized = source.energized;
+    public void copyFrom(IFeathers source) {
+        this.maxStamina = source.getMaxStamina();
+        this.staminaDelta = source.getStaminaDelta();
+        this.stamina = source.getStamina();
+        this.enduranceFeathers = source.getEnduranceFeathers();
+        this.cold = source.isCold();
+        this.hot = source.isHot();
+        this.energized = source.isEnergized();
         this.shouldRecalculate = true;
-        this.staminaUsageModifiers.putAll(source.staminaUsageModifiers);
-        this.staminaDeltaModifiers.putAll(source.staminaDeltaModifiers);
+        this.staminaUsageModifiers.putAll(source.getStaminaUsageModifiers());
+        this.staminaDeltaModifiers.putAll(source.getStaminaDeltaModifiers());
     }
 
-    public void saveNBTData(CompoundTag nbt) {
-
+    public CompoundTag saveNBTData() {
+        CompoundTag nbt = new CompoundTag();
         nbt.putInt("stamina", this.stamina);
         nbt.putInt("max_stamina", this.maxStamina);
         nbt.putInt("stamina_delta", this.staminaDelta);
@@ -333,7 +286,7 @@ public class PlayerFeathers implements IFeathers {
         nbt.putBoolean("hot", this.hot);
         nbt.putBoolean("energized", this.energized);
         nbt.putBoolean("strained", this.strained);
-
+        return nbt;
     }
 
     public void loadNBTData(CompoundTag nbt) {
@@ -350,5 +303,85 @@ public class PlayerFeathers implements IFeathers {
         synchronizeFeathers();
     }
 
+    private boolean canDoStaminaChange() {
+        if (cooldown > 0) {
+            cooldown--;
+            return false;
+        }
+        return true;
+    }
+
+    private void doStaminaChange(Player player) {
+
+        recalculateStaminaDelta(player);
+
+
+        int prevStamina = stamina;
+        int prevFeathers = feathers;
+        var preChangeEvent = new StaminaChangeEvent.Pre(player, staminaDelta, stamina);
+        if (MinecraftForge.EVENT_BUS.post(preChangeEvent)) return;
+
+        if (preChangeEvent.getResult() != Event.Result.DEFAULT) return;
+        staminaDelta = preChangeEvent.staminaDelta;
+        stamina = preChangeEvent.stamina;
+
+        if (staminaDelta == ZERO) return;
+
+
+        if ((staminaDelta > ZERO && stamina < maxStamina) || (staminaDelta < ZERO && stamina > ZERO)) {
+            applyStaminaDelta();
+        }
+
+        if (stamina != prevStamina) postStaminaChange(player, prevStamina, prevFeathers);
+    }
+
+    private void postStaminaChange(Player player, int prevStamina, int prevFeather) {
+
+
+        MinecraftForge.EVENT_BUS.post(new StaminaChangeEvent.Post(player, prevStamina, stamina));
+        if (stamina <= ZERO) {
+
+            MinecraftForge.EVENT_BUS.post(new FeatherAmountEvent.Empty(player, prevStamina));
+            FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(this), player);
+
+
+        } else if (stamina == maxStamina) {
+
+            MinecraftForge.EVENT_BUS.post(new FeatherAmountEvent.Full(player));
+            FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(this), player);
+
+        }
+
+        if (prevFeather != feathers) {
+
+            if (FeathersCommonConfig.DEBUG_MODE.get()) {
+                player.sendSystemMessage(MutableComponent.create(new LiteralContents("Previous feathers : " + prevFeather + ", now: " + feathers)));
+            }
+
+            FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(this), player);
+        }
+
+        if (stamina < 0) {
+
+            if (FeathersCommonConfig.DEBUG_MODE.get()) {
+                player.sendSystemMessage(MutableComponent.create(new LiteralContents("You are out of stamina!")));
+            }
+
+            if (FeathersCommonConfig.ENABLE_STRAIN.get()) {
+                player.addEffect(new MobEffectInstance(FeathersEffects.STRAINED.get(), -1, 0, false, true));
+            }
+
+        }
+
+    }
+
+    public void tick(Player player) {
+
+        boolean staminaChanged = false;
+        if (canDoStaminaChange()) {
+            doStaminaChange(player);
+        }
+
+    }
 
 }

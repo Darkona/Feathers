@@ -14,7 +14,7 @@ public class FeathersCommonConfig {
 
     public static final ForgeConfigSpec SPEC;
 
-
+    public static final ForgeConfigSpec.ConfigValue<Boolean> DEBUG_MODE;
     public static final ForgeConfigSpec.ConfigValue<Double> REGEN_FEATHERS_PER_SECOND;
     public static final ForgeConfigSpec.ConfigValue<Double> MAX_FEATHERS;
 
@@ -50,6 +50,9 @@ public class FeathersCommonConfig {
 
         BUILDER.push("Feathers' Config");
 
+        DEBUG_MODE = BUILDER
+                .comment("Whether debug mode is enabled. This will print debug messages to the console.")
+                .define("Debug Mode", false);
 
         REGEN_FEATHERS_PER_SECOND = BUILDER
                 .comment("How many feathers the player will regenerate every second. This will be modified by effects.")
