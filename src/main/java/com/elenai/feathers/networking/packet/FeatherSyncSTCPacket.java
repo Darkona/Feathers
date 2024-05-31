@@ -57,7 +57,7 @@ public class FeatherSyncSTCPacket {
                     f.setMaxStamina(maxStamina);
                     f.setFeathers(feathers);
                     f.setStaminaDelta(this.staminaDelta);
-                    ClientFeathersData.update(f);
+                    ClientFeathersData.getInstance().update(f);
                 });
             }
 

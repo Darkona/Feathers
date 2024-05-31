@@ -3,6 +3,7 @@ package com.elenai.feathers.client;
 import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.api.IFeathers;
+import com.elenai.feathers.config.FeathersClientConfig;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.effect.FeathersEffects;
 import lombok.Getter;
@@ -46,6 +47,7 @@ public class ClientFeathersData {
     private boolean endurance = false;
     private boolean fatigued = false;
 
+    private ClientFeathersData(){}
     public void update(IFeathers f) {
         Player player = Minecraft.getInstance().player;
         stamina = f.getStamina();
@@ -65,20 +67,47 @@ public class ClientFeathersData {
 
     }
 
-    public boolean hasFullStamina(){
+    public boolean hasFullStamina() {
         return stamina >= maxStamina;
     }
 
-    public boolean hasFeathers(){
+    public boolean hasFeathers() {
         return feathers > 0;
     }
 
-    public boolean hasFullFeathers(){
+    public boolean hasFullFeathers() {
         return feathers >= maxFeathers;
-    };
+    }
 
     public boolean hasWeight() {
         return false;
     }
 
+    public boolean isOverflowing() {
+        return feathers > maxFeathers;
+    }
+
+    public void tick() {
+
+        if (animationCooldown > 0) animationCooldown--;
+
+        if (feathers != previousFeathers) {
+            if (feathers > previousFeathers &&
+                    FeathersClientConfig.REGEN_EFFECT.get() &&
+                    animationCooldown <= 0) {
+
+                animationCooldown = 18;
+            }
+            previousFeathers = feathers;
+        }
+
+        if (FeathersClientConfig.FADE_WHEN_FULL.get()) {
+            int cooldown = fadeCooldown;
+            if (feathers == getMaxFeathers() || enduranceFeathers > 0) {
+                fadeCooldown = cooldown < FeathersClientConfig.FADE_COOLDOWN.get() ? fadeCooldown + 1 : 0;
+            }
+        }
+
+
+    }
 }

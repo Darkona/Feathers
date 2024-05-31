@@ -3,6 +3,7 @@ package com.elenai.feathers.effect;
 import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.capability.PlayerFeathers;
+import com.elenai.feathers.capability.StaminaDeltaModifiers;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
@@ -72,7 +73,7 @@ public class StrainEffect extends MobEffect {
                 if (!f.isStrained()) {
                     f.setStrained(true);
                     f.addUsageModifier(STRAIN_USAGE);
-                    f.removeDeltaModifier(PlayerFeathers.REGENERATION);
+                    f.removeDeltaModifier(StaminaDeltaModifiers.REGENERATION);
                     f.addDeltaModifier(STRAIN_RECOVERY);
                     //FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.STRAIN, true, strength), player);
                 }
@@ -90,7 +91,7 @@ public class StrainEffect extends MobEffect {
                     f.setStrained(false);
                     f.removeUsageModifier(STRAIN_USAGE);
                     f.removeDeltaModifier(STRAIN_RECOVERY);
-                    f.addDeltaModifier(PlayerFeathers.REGENERATION);
+                    f.addDeltaModifier(StaminaDeltaModifiers.REGENERATION);
                     //FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.STRAIN, false, strength), player);
                 }
             });

@@ -25,7 +25,7 @@ public class FeathersHelper {
         assert player != null;
         if (player.isCreative() || player.isSpectator()) return true;
 
-        if(ClientFeathersData.feathers >= amount){
+        if(ClientFeathersData.getInstance().getFeathers() >= amount){
             FeathersMessages.sendToServer(new ClientFeatherSpendPacket(amount));
             return true;
         }

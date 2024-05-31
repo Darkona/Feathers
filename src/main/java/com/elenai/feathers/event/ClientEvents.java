@@ -44,38 +44,14 @@ public class ClientEvents {
     @Mod.EventBusSubscriber(modid = Feathers.MODID, value = Dist.CLIENT)
     public static class ClientForgeEvents {
 
+
         @SubscribeEvent
         public static void clientTickEvents(ClientTickEvent event) {
 
-
-            if (event.phase == TickEvent.Phase.START) {
-                if (Minecraft.getInstance().level != null) {
-                    ClientFeathersData.overflowing = ClientFeathersData.getFeathers() > FeathersCommonConfig.MAX_FEATHERS.get() / FeathersConstants.STAMINA_PER_FEATHER;
-
-
-                    if (ClientFeathersData.animationCooldown > 0) {
-                        ClientFeathersData.animationCooldown = ClientFeathersData.animationCooldown - 1;
-                    }
-
-                    if (ClientFeathersData.getFeathers() != ClientFeathersData.previousFeathers) {
-                        if (ClientFeathersData.getFeathers() > ClientFeathersData.previousFeathers
-                                && FeathersClientConfig.REGEN_EFFECT.get()) {
-                            ClientFeathersData.animationCooldown = 18;
-                        }
-                        ClientFeathersData.previousFeathers = ClientFeathersData.getFeathers();
-                    }
-
-                    if (FeathersClientConfig.FADE_WHEN_FULL.get()) {
-                        int cooldown = ClientFeathersData.fadeCooldown;
-                        if (ClientFeathersData.getFeathers() == ClientFeathersData.getMaxFeathers()
-                                || ClientFeathersData.enduranceFeathers > 0) {
-                            if (cooldown < FeathersClientConfig.FADE_COOLDOWN.get()) {
-                                ClientFeathersData.fadeCooldown = ClientFeathersData.fadeCooldown + 1;
-                            }
-                        } else {ClientFeathersData.fadeCooldown = 0;}
-                    }
-                }
+            if (event.phase == TickEvent.Phase.START && Minecraft.getInstance().level != null) {
+                ClientFeathersData.getInstance().tick();
             }
+
         }
 
         @SubscribeEvent
