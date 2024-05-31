@@ -81,7 +81,6 @@ public class ThirstManager {
                     var fps = Calculations.calculateFeathersPerSecond(calculation.calculationResult);
                     var modifier = new AttributeModifier(Feathers.MODID + ":quenched", fps, AttributeModifier.Operation.ADDITION);
 
-                    iThirst.updateThirstData(player);
                     Objects.requireNonNull(player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get())).addPermanentModifier(modifier);
                 }
 

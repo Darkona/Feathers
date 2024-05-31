@@ -31,7 +31,8 @@ public class CommonEventsHandler {
     @SubscribeEvent
     public static void onPlayerJoinWorld(EntityJoinLevelEvent event) {
         Level level = event.getLevel();
-        if (!level.isClientSide && (event.getEntity() instanceof ServerPlayer player)) {
+
+        if (event.getEntity() instanceof Player player) {
 
             PlayerFeathersProvider.assignRegenerationAttribute(player);
             PlayerFeathersProvider.assignMaxFeathersAttribute(player);
@@ -42,9 +43,11 @@ public class CommonEventsHandler {
                 FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
             });
         }
+        // if (!level.isClientSide && (event.getEntity() instanceof ServerPlayer player)) {
+
+
+        //}
     }
-
-
 
 
     @SubscribeEvent
@@ -99,7 +102,6 @@ public class CommonEventsHandler {
     public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
         event.register(PlayerFeathers.class);
     }
-
 
 
 }

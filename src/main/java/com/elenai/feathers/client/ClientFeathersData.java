@@ -1,14 +1,18 @@
 package com.elenai.feathers.client;
 
+import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.effect.FeathersEffects;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 @Setter
 @Getter
+@OnlyIn(Dist.CLIENT)
 public class ClientFeathersData {
 
     public static int stamina = 2000;
@@ -39,6 +43,21 @@ public class ClientFeathersData {
 
     public static boolean isCold() {
         var player = Minecraft.getInstance().player;
-        return player != null && player.hasEffect(FeathersEffects.COLD.get());
+        return player != null && FeathersAPI.isCold(player);
+    }
+
+    public static boolean isHot() {
+        var player = Minecraft.getInstance().player;
+        return player != null && FeathersAPI.isHot(player);
+    }
+
+    public static boolean isEnergized() {
+        var player = Minecraft.getInstance().player;
+        return player != null && FeathersAPI.isEnergized(player);
+    }
+
+    public static boolean isEndurance() {
+        var player = Minecraft.getInstance().player;
+        return player != null && FeathersAPI.isEnduring(player);
     }
 }

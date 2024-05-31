@@ -8,6 +8,7 @@ import com.elenai.feathers.util.Calculations;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -83,14 +84,14 @@ public class PlayerFeathersProvider implements ICapabilityProvider, INBTSerializ
         createPlayerFeathers().loadNBTData(nbt);
     }
 
-    public static void assignRegenerationAttribute(ServerPlayer player) {
+    public static void assignRegenerationAttribute(Player player) {
         var attr = player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get());
         if (attr != null) {
             attr.setBaseValue((FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get()));
         }
     }
 
-    public static void assignMaxFeathersAttribute(ServerPlayer player) {
+    public static void assignMaxFeathersAttribute(Player player) {
         var attr = player.getAttribute(FeathersAttributes.MAX_FEATHERS.get());
         if (attr != null) {
             attr.setBaseValue((FeathersCommonConfig.MAX_FEATHERS.get()));

@@ -10,8 +10,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
+@OnlyIn(Dist.CLIENT)
 public class FeathersHudOverlay {
 
     public final static ResourceLocation ICONS = new ResourceLocation(Feathers.MODID, "textures/gui/icons.png");
@@ -252,10 +255,10 @@ public class FeathersHudOverlay {
         if (ClientFeathersData.isCold()) {
             return COLD_FULL;
         }
-        if (ClientFeathersData.hot) {
+        if (ClientFeathersData.isHot()) {
             return HOT_FULL;
         }
-        if (ClientFeathersData.energized) {
+        if (ClientFeathersData.isEnergized()) {
             return ENERGY_FULL;
         }
         return FeathersClientConfig.ALTERNATIVE_FEATHER_COLOR.get() ? GREEN_FULL : NORMAL_FULL;
@@ -265,10 +268,10 @@ public class FeathersHudOverlay {
         if (ClientFeathersData.isCold()) {
             return COLD_HALF;
         }
-        if (ClientFeathersData.hot) {
+        if (ClientFeathersData.isHot()) {
             return HOT_HALF;
         }
-        if (ClientFeathersData.energized) {
+        if (ClientFeathersData.isEnergized()) {
             return ENERGY_HALF;
         }
         return FeathersClientConfig.ALTERNATIVE_FEATHER_COLOR.get() ? GREEN_HALF : NORMAL_HALF;

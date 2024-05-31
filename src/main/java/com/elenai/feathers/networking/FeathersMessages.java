@@ -4,6 +4,7 @@ import com.elenai.feathers.Feathers;
 import com.elenai.feathers.networking.packet.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
@@ -62,7 +63,8 @@ public class FeathersMessages {
         INSTANCE.sendToServer(message);
     }
 
-    public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
-        INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), message);
+    public static <MSG> void sendToPlayer(MSG message, Player player) {
+        if(player instanceof ServerPlayer p)
+            INSTANCE.send(PacketDistributor.PLAYER.with(() -> p), message);
     }
 }

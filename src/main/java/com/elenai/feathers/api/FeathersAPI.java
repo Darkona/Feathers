@@ -162,27 +162,27 @@ public class FeathersAPI {
     public static void markForRecalculation(Player player){
         player.getCapability(PlayerFeathersProvider.PLAYER_FEATHERS).ifPresent(p -> p.setShouldRecalculate(true));
     }
-    public static boolean isCold(ServerPlayer player) {
+    public static boolean isCold(Player player) {
         return player.hasEffect(FeathersEffects.COLD.get());
     }
 
-    public static boolean isHot(ServerPlayer player) {
+    public static boolean isHot(Player player) {
         return player.hasEffect(FeathersEffects.HOT.get());
     }
 
-    public static boolean isEnergized(ServerPlayer player) {
+    public static boolean isEnergized(Player player) {
         return player.hasEffect(FeathersEffects.ENERGIZED.get());
     }
 
-    public static boolean isStrained(ServerPlayer player) {
+    public static boolean isStrained(Player player) {
         return player.hasEffect(FeathersEffects.STRAINED.get());
     }
 
-    public static boolean isEnduring(ServerPlayer player) {
+    public static boolean isEnduring(Player player) {
         return player.hasEffect(FeathersEffects.ENDURANCE.get());
     }
 
-    public static boolean isFatigued(ServerPlayer player) {
+    public static boolean isFatigued(Player player) {
         return player.hasEffect(FeathersEffects.FATIGUE.get());
     }
 }

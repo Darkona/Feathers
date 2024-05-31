@@ -130,8 +130,6 @@ public class TickEventHandler {
                         if (f.getStamina() < 0) {
 
                             player.sendSystemMessage(MutableComponent.create(new LiteralContents("You are out of stamina!")));
-
-
                             player.addEffect(new MobEffectInstance(FeathersEffects.STRAINED.get(), -1, 0, false, true));
                         }
                     }
