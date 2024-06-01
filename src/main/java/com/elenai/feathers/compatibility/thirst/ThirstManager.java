@@ -22,6 +22,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Mod.EventBusSubscriber(modid = Feathers.MODID)
@@ -37,6 +38,8 @@ public class ThirstManager implements ICapabilityPlugin {
     }
 
     public static final IModifier THIRSTY = new IModifier() {
+
+        private final UUID uuid = UUID.fromString("9f2141c4-33bc-4245-97bd-b64a3eceafda");
         @Override
         public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
 
@@ -54,7 +57,10 @@ public class ThirstManager implements ICapabilityPlugin {
                     var modifier = new AttributeModifier(Feathers.MODID + ":thirsty", fps, AttributeModifier.Operation.ADDITION);
 
                     var attr = player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get());
-                    if (attr != null) attr.addTransientModifier(modifier);
+                    if (attr != null){
+                        attr.removeModifier(uuid);
+                        attr.addPermanentModifier(modifier);
+                    }
                 }
             });
         }
@@ -70,28 +76,32 @@ public class ThirstManager implements ICapabilityPlugin {
         }
     };
 
+
     public static final IModifier QUENCHED = new IModifier() {
+
+        private final UUID uuid = UUID.fromString("08c665cf-0c4a-4f87-92da-c63972f19b73");
         @Override
         public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
+
             player.getCapability(ModCapabilities.PLAYER_THIRST).ifPresent(iThirst -> {
 
                 var calculation = new ThirstEvent(player, playerFeathers, ModCapabilities.PLAYER_THIRST);
                 var cancelled = MinecraftForge.EVENT_BUS.post(new ThirstEvent(player, playerFeathers, ModCapabilities.PLAYER_THIRST));
 
-                if (cancelled) {
-
-                    return;
-                } else if (calculation.getResult() == Event.Result.DEFAULT) {
+                if (!cancelled && calculation.getResult() == Event.Result.DEFAULT) {
 
                     calculation.calculationResult = iThirst.getQuenched() * FeathersThirstConfig.THIRST_STAMINA_DRAIN.get();
 
                     var fps = Calculations.calculateFeathersPerSecond(calculation.calculationResult);
-                    var modifier = new AttributeModifier(Feathers.MODID + ":quenched", fps, AttributeModifier.Operation.ADDITION);
 
-                    Objects.requireNonNull(player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get())).addPermanentModifier(modifier);
+                    var modifier = new AttributeModifier(uuid, Feathers.MODID + ":quenched", fps, AttributeModifier.Operation.ADDITION);
+
+                    var attr = player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get());
+                    if (attr != null){
+                        attr.removeModifier(uuid);
+                        attr.addPermanentModifier(modifier);
+                    }
                 }
-
-                //staminaDelta.set(staminaDelta.get() + calculation.calculationResult);
             });
         }
 
