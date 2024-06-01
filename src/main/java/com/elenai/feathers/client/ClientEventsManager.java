@@ -1,7 +1,6 @@
 package com.elenai.feathers.client;
 
 import com.elenai.feathers.Feathers;
-import com.elenai.feathers.client.ClientFeathersData;
 import com.elenai.feathers.client.gui.FeathersHudOverlay;
 import com.elenai.feathers.config.FeathersClientConfig;
 import com.elenai.feathers.enchantment.FeathersEnchantments;

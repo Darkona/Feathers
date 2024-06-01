@@ -1,20 +1,13 @@
 package com.elenai.feathers.effect;
 
 import com.elenai.feathers.Feathers;
-import com.elenai.feathers.api.FeathersAPI;
-import com.elenai.feathers.attributes.FeathersAttributes;
 import com.elenai.feathers.effect.effects.*;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeMap;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import org.jetbrains.annotations.NotNull;
 
 public class FeathersEffects extends MobEffect {
 

@@ -1,17 +1,14 @@
 package com.elenai.feathers.effect.effects;
 
-import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.effect.FeathersEffects;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
-import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
 import static com.elenai.feathers.attributes.FeathersAttributes.FEATHERS_PER_SECOND;
-import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.MULTIPLY_BASE;
 import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.MULTIPLY_TOTAL;
 
 public class ColdEffect extends FeathersEffects {

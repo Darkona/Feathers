@@ -19,12 +19,12 @@ public class ColdSweatManager implements ICapabilityPlugin {
         return instance;
     }
 
-    public static boolean canApplyColdEffect(Player player){
+    public static boolean canApplyColdEffect(Player player) {
         return !(player.hasEffect(ModEffects.GRACE) || player.hasEffect(ModEffects.ICE_RESISTANCE));
     }
 
-    public static boolean canApplyHotEffect(Player player){
-        return !(player.hasEffect(ModEffects.GRACE) || player.hasEffect(MobEffects.FIRE_RESISTANCE) );
+    public static boolean canApplyHotEffect(Player player) {
+        return !(player.hasEffect(ModEffects.GRACE) || player.hasEffect(MobEffects.FIRE_RESISTANCE));
     }
 
     public static boolean isOverheating(Player player) {

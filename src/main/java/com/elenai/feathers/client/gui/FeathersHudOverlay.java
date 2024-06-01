@@ -20,12 +20,10 @@ import static com.elenai.feathers.client.gui.Icons.*;
 public class FeathersHudOverlay {
 
     public final static ResourceLocation ICONS = new ResourceLocation(Feathers.MODID, "textures/gui/icons.png");
+    public static final int ICONS_PER_ROW = 10;
+    private static final ClientFeathersData clientData = ClientFeathersData.getInstance();
     public static int k = 0;
     static float alpha = 1.0f;
-
-    private static final ClientFeathersData clientData = ClientFeathersData.getInstance();
-
-    public static final int ICONS_PER_ROW = 10;
     /**
      * Renders the Feathers to the hotbar
      */
@@ -140,7 +138,7 @@ public class FeathersHudOverlay {
                 for (int j = 0; j < halfEndurance; j++) {
                     var idk = i * 10.0d + j + 1;
                     if (idk <= halfEndurance) {
-                        GuiIcon icon = getHalfOrFull(Icons.ENDURANCE, i,  idk == halfEndurance && !isEven(clientData.getEnduranceFeathers()));
+                        GuiIcon icon = getHalfOrFull(Icons.ENDURANCE, i, idk == halfEndurance && !isEven(clientData.getEnduranceFeathers()));
                         var xPos = getXPos(x, j, xOffset);
                         var yPos = getYPos(screenHeight, rightOffset, getHeight(j), yOffset);
                         draw(guiGraphics, xPos, screenHeight - rightOffset + yOffset - (i * ICONS_PER_ROW), icon);
@@ -199,7 +197,7 @@ public class FeathersHudOverlay {
         if (clientData.hasFeathers()) {
 
             for (int i = 0; i < ICONS_PER_ROW; i++) {
-                if(i + 1 <= halfFeathers){
+                if (i + 1 <= halfFeathers) {
 
                     var icon = getHalfOrFull(icons, i, (i + 1 == halfFeathers) && !isEven(clientData.getFeathers()));
 

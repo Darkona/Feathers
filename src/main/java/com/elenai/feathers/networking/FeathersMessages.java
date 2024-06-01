@@ -1,7 +1,10 @@
 package com.elenai.feathers.networking;
 
 import com.elenai.feathers.Feathers;
-import com.elenai.feathers.networking.packet.*;
+import com.elenai.feathers.networking.packet.ClientFeatherSpendPacket;
+import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
+import com.elenai.feathers.networking.packet.ReplyWithWeightSTCPacket;
+import com.elenai.feathers.networking.packet.RequestWeightCTSPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -64,7 +67,7 @@ public class FeathersMessages {
     }
 
     public static <MSG> void sendToPlayer(MSG message, Player player) {
-        if(player instanceof ServerPlayer p)
+        if (player instanceof ServerPlayer p)
             INSTANCE.send(PacketDistributor.PLAYER.with(() -> p), message);
     }
 }

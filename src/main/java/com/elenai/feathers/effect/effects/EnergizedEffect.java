@@ -1,24 +1,14 @@
 package com.elenai.feathers.effect.effects;
 
 import com.elenai.feathers.api.IFeathers;
-import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.capability.Capabilities;
-import com.elenai.feathers.capability.PlayerFeathers;
-import com.elenai.feathers.config.FeathersCommonConfig;
-import com.elenai.feathers.effect.FeathersEffects;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
-import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-
 import static com.elenai.feathers.attributes.FeathersAttributes.FEATHERS_PER_SECOND;
-import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.MULTIPLY_BASE;
 import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.MULTIPLY_TOTAL;
 
 public class EnergizedEffect extends MobEffect {

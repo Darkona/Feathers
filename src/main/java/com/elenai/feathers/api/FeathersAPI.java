@@ -56,7 +56,7 @@ public class FeathersAPI {
         player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.setMaxStamina((int) player.getAttribute(FeathersAttributes.MAX_FEATHERS.get()).getValue());
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
+                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
               });
     }
 
@@ -78,7 +78,7 @@ public class FeathersAPI {
                       var prev = f.getFeathers();
                       var post = f.gainFeathers(gainEvent.amount);
                       MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, prev, post));
-                      FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
+                      FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
                       result.set(post);
                   }
               });
@@ -165,6 +165,7 @@ public class FeathersAPI {
     public static void markForUsageRecalculation(Player player) {
         player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(IFeathers::sortUsageModifiers);
     }
+
     public static boolean isCold(Player player) {
         return player != null && player.hasEffect(FeathersEffects.COLD.get());
     }
@@ -204,10 +205,10 @@ public class FeathersAPI {
         return (int) Math.ceil((maxFeathers != null ? maxFeathers.getValue() : FeathersCommonConfig.MAX_FEATHERS.get()));
     }
 
-   public static double getPlayerStaminaUsageMultiplier(Player player){
+    public static double getPlayerStaminaUsageMultiplier(Player player) {
         var multiplier = player.getAttribute(FeathersAttributes.STAMINA_USAGE_MULTIPLIER.get());
         return multiplier != null ? multiplier.getValue() : 1.0D;
-   }
+    }
 
 
 }

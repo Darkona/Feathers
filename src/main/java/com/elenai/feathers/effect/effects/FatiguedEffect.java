@@ -1,13 +1,9 @@
 package com.elenai.feathers.effect.effects;
 
-import com.elenai.feathers.attributes.FeathersAttributes;
-import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.effect.FeathersEffects;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import org.jetbrains.annotations.NotNull;
 
 import static com.elenai.feathers.attributes.FeathersAttributes.MAX_FEATHERS;
@@ -20,7 +16,7 @@ public class FatiguedEffect extends FeathersEffects {
 
     public FatiguedEffect(MobEffectCategory mobEffectCategory, int color) {
         super(mobEffectCategory, color);
-        addAttributeModifier(MAX_FEATHERS.get(), MODIFIER_UUID,BASE_STRENGTH, ADDITION);
+        addAttributeModifier(MAX_FEATHERS.get(), MODIFIER_UUID, BASE_STRENGTH, ADDITION);
     }
 
     @Override

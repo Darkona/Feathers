@@ -38,7 +38,7 @@ public interface IFeathers {
     /**
      * Spend feathers from the player.
      *
-     * @param player the player
+     * @param player   the player
      * @param feathers the amount of feathers to spend
      * @return true if the player has enough feathers to spend, false otherwise
      */
@@ -57,6 +57,8 @@ public interface IFeathers {
     void setMaxStrained(int maxStrained);
 
     int getStaminaDelta();
+
+    void setStaminaDelta(int staminaDelta);
 
     boolean shouldRecalculate();
 
@@ -78,13 +80,11 @@ public interface IFeathers {
 
     void copyFrom(IFeathers oldStore);
 
-    void  tick(Player player);
+    void tick(Player player);
 
     CompoundTag saveNBTData();
 
     void loadNBTData(CompoundTag nbt);
-
-    void setStaminaDelta(int staminaDelta);
 
     boolean hasCounter(String name);
 

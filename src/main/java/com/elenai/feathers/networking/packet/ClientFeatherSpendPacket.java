@@ -4,7 +4,6 @@ import com.elenai.feathers.api.FeathersAPI;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 public class ClientFeatherSpendPacket {

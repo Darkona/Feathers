@@ -19,7 +19,6 @@ public class FeathersCommonConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> MAX_FEATHERS;
 
 
-
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_ARMOR_WEIGHTS;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ARMOR_WEIGHTS;
 
@@ -40,8 +39,6 @@ public class FeathersCommonConfig {
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_STRAIN;
     public static final ForgeConfigSpec.ConfigValue<Integer> MAX_STRAIN;
-
-
 
 
     public static List<String> armorWeightBuilder = new ArrayList<>();

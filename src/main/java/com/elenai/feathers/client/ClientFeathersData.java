@@ -18,16 +18,7 @@ public class ClientFeathersData {
 
     //Use singleton for sanity
     private static ClientFeathersData instance;
-
-    public static ClientFeathersData getInstance() {
-        if (instance == null) {
-            instance = new ClientFeathersData();
-        }
-        return instance;
-    }
-
     private int stamina = 2000;
-
     private int feathers = 0;
     private int maxStamina = 2000;
     private int maxFeathers = 0;
@@ -44,8 +35,15 @@ public class ClientFeathersData {
     private boolean momentum = false;
     private boolean fatigued = false;
     private boolean endurance = false;
+    private ClientFeathersData() {}
 
-    private ClientFeathersData(){}
+    public static ClientFeathersData getInstance() {
+        if (instance == null) {
+            instance = new ClientFeathersData();
+        }
+        return instance;
+    }
+
     public void update(IFeathers f) {
         Player player = Minecraft.getInstance().player;
         stamina = f.getStamina();

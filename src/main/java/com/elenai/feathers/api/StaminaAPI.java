@@ -1,7 +1,6 @@
 package com.elenai.feathers.api;
 
 import com.elenai.feathers.capability.Capabilities;
-import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -14,7 +13,7 @@ public class StaminaAPI {
         player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.setStamina(f.getStamina() + amount);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
+                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
               });
     }
 
@@ -22,7 +21,7 @@ public class StaminaAPI {
         player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.setStamina(f.getStamina() - amount);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
+                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
               });
     }
 
@@ -30,7 +29,7 @@ public class StaminaAPI {
         player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.setMaxStamina(maxStamina);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
+                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
               });
     }
 
@@ -39,7 +38,7 @@ public class StaminaAPI {
         player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.setMaxStamina(f.getMaxStamina() + amount);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
+                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
               });
     }
 
@@ -47,7 +46,7 @@ public class StaminaAPI {
         player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.setMaxStamina(f.getMaxStamina() - amount);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
+                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
               });
     }
 
@@ -55,7 +54,7 @@ public class StaminaAPI {
         player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.addDeltaModifier(modifier);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
+                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
               });
     }
 
@@ -63,7 +62,7 @@ public class StaminaAPI {
         player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.removeDeltaModifier(modifier);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
+                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
               });
     }
 
@@ -79,7 +78,7 @@ public class StaminaAPI {
         player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.removeUsageModifier(modifier);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
+                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
               });
     }
 
@@ -87,7 +86,7 @@ public class StaminaAPI {
         player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.setStaminaDelta(delta);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
+                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
               });
     }
 

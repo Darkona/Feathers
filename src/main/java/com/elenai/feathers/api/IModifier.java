@@ -8,14 +8,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public interface IModifier {
 
-    void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta);
-    void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta, AtomicBoolean result);
-
-    int getOrdinal();
-
-    String getName();
-
-
     /**
      * This modifier is used to make the regeneration effect non-linear.
      * Regeneration is faster at the start and slower at the end.
@@ -48,7 +40,6 @@ public interface IModifier {
             return "non_linear_regeneration";
         }
     };
-
     /**
      * This modifier is used to inverse the regeneration effect.
      * Available for modders as an example, but not used in this mod.
@@ -75,7 +66,6 @@ public interface IModifier {
             return "inverse_regeneration";
         }
     };
-
     /**
      * Basic modifier that applies the regeneration effect.
      * This modifier is used to regenerate the player's stamina.
@@ -104,7 +94,6 @@ public interface IModifier {
         }
 
     };
-
     IModifier DEFAULT_USAGE = new IModifier() {
         @Override
         public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger usingFeathers) {
@@ -126,21 +115,25 @@ public interface IModifier {
             return "default";
         }
     };
-
-
-
     /**
      * Usage Modifier Ordinals reference.
-     0 = Hot effect / Momentum effect;
-     they will be applied first. If you are going to spend more/less feathers, these need to be applied first.
-
-     10 = Endurance/Strain effect;
-     If you're going to overspend feathers, or spend endurance feathers this will be applied after knowing how many will be spent.
-
-     1 to 9 are available.
+     * 0 = Hot effect / Momentum effect;
+     * they will be applied first. If you are going to spend more/less feathers, these need to be applied first.
+     * <p>
+     * 10 = Endurance/Strain effect;
+     * If you're going to overspend feathers, or spend endurance feathers this will be applied after knowing how many will be spent.
+     * <p>
+     * 1 to 9 are available.
      **/
     int[] ordinals = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
+    void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta);
+
+    void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta, AtomicBoolean result);
+
+    int getOrdinal();
+
+    String getName();
 
 
 }

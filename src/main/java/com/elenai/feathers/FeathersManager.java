@@ -52,8 +52,6 @@ public class FeathersManager {
 
     private FeathersManager() {}
 
-    ;
-
     public static void registerPlugin(ICapabilityPlugin plugin) {
         plugins.add(plugin);
     }

@@ -8,9 +8,9 @@ import com.elenai.feathers.compatibility.thirst.FeathersThirstConfig;
 import com.elenai.feathers.compatibility.thirst.ThirstManager;
 import com.elenai.feathers.config.FeathersClientConfig;
 import com.elenai.feathers.config.FeathersCommonConfig;
+import com.elenai.feathers.effect.EffectsHandler;
 import com.elenai.feathers.effect.FeathersEffects;
 import com.elenai.feathers.enchantment.FeathersEnchantments;
-import com.elenai.feathers.effect.EffectsHandler;
 import com.elenai.feathers.networking.FeathersMessages;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionBrewing;
@@ -65,10 +65,10 @@ public class Feathers {
         event.enqueueWork(FeathersMessages::register);
         registerBrewingRecipes();
         FeathersManager.registerPlugin(EffectsHandler.getInstance());
-        if(THIRST_LOADED){
+        if (THIRST_LOADED) {
             FeathersManager.registerPlugin(ThirstManager.getInstance());
         }
-        if(COLD_SWEAT_LOADED){
+        if (COLD_SWEAT_LOADED) {
             FeathersManager.registerPlugin(ColdSweatManager.getInstance());
         }
     }

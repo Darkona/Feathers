@@ -8,18 +8,10 @@ public class FeathersThirstConfig {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
 
-
     public static final ForgeConfigSpec SPEC;
-
-    public static boolean isThirstOn(){
-        return Feathers.THIRST_LOADED && THIRST_COMPATIBILITY.get();
-    }
     public static final ForgeConfigSpec.ConfigValue<Boolean> THIRST_COMPATIBILITY;
-
     public static final ForgeConfigSpec.ConfigValue<Integer> THIRST_STAMINA_DRAIN;
-
     public static final ForgeConfigSpec.ConfigValue<Integer> QUENCH_REGEN_BONUS_MULTIPLIER;
-
     public static final ForgeConfigSpec.ConfigValue<Double> THIRST_CONSUMPTION_BY_FEATHER;
 
     static {
@@ -48,5 +40,9 @@ public class FeathersThirstConfig {
         BUILDER.pop();
 
         SPEC = BUILDER.build();
+    }
+
+    public static boolean isThirstOn() {
+        return Feathers.THIRST_LOADED && THIRST_COMPATIBILITY.get();
     }
 }

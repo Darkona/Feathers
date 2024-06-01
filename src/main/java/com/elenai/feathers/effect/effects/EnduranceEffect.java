@@ -1,12 +1,8 @@
 package com.elenai.feathers.effect.effects;
 
-import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.api.IModifier;
-import com.elenai.feathers.api.StaminaAPI;
-import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.capability.PlayerFeathers;
-import com.elenai.feathers.client.ClientFeathersData;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.effect.FeathersEffects;
 import net.minecraft.world.effect.MobEffectCategory;

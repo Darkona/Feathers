@@ -44,7 +44,7 @@ public class FeatherSyncSTCPacket {
         staminaDelta = buf.readInt();
         counterAmount = buf.readInt();
         counters = new HashMap<>();
-        for(int i = 0; i < counterAmount; i++){
+        for (int i = 0; i < counterAmount; i++) {
             var k = buf.readUtf(512);
             var v = buf.readInt();
             counters.put(k, v);
@@ -68,7 +68,7 @@ public class FeatherSyncSTCPacket {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
             Player clientPlayer = Minecraft.getInstance().player;
-            if(clientPlayer != null){
+            if (clientPlayer != null) {
                 clientPlayer.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
                     f.setStamina(stamina);
                     f.setMaxStamina(maxStamina);

@@ -18,8 +18,6 @@ import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operati
 
 public class HotEffect extends FeathersEffects {
 
-    private static final String MODIFIER_UUID = "2a513b45-8047-472b-b5f1-c833440c0134";
-
     public static final double BASE_STRENGTH = 2.0d;
     /**
      * Doubles the amount of feathers used.
@@ -46,6 +44,7 @@ public class HotEffect extends FeathersEffects {
             return "hot";
         }
     };
+    private static final String MODIFIER_UUID = "2a513b45-8047-472b-b5f1-c833440c0134";
 
 
     public HotEffect(MobEffectCategory mobEffectCategory, int color) {

@@ -11,11 +11,6 @@ public class FeathersColdSweatConfig {
 
 
     //Configs for Cold Sweat
-
-    public static boolean isColdSweatEnabled(){
-        return Feathers.COLD_SWEAT_LOADED && COLD_SWEAT_COMPATIBILITY.get();
-    }
-
     public static final ForgeConfigSpec.ConfigValue<Boolean> COLD_SWEAT_COMPATIBILITY;
     public static final ForgeConfigSpec.ConfigValue<Boolean> BEING_COLD_ADDS_COLD_EFFECT;
     public static final ForgeConfigSpec.ConfigValue<Boolean> BEING_HOT_ADDS_HOT_EFFECT;
@@ -38,5 +33,9 @@ public class FeathersColdSweatConfig {
         BUILDER.pop();
 
         SPEC = BUILDER.build();
+    }
+
+    public static boolean isColdSweatEnabled() {
+        return Feathers.COLD_SWEAT_LOADED && COLD_SWEAT_COMPATIBILITY.get();
     }
 }
