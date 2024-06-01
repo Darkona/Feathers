@@ -4,6 +4,7 @@ import com.elenai.feathers.Feathers;
 import com.elenai.feathers.api.ICapabilityPlugin;
 import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.attributes.FeathersAttributes;
+import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.event.FeatherEvent;
 import com.elenai.feathers.util.Calculations;
@@ -45,17 +46,16 @@ public class ThirstManager implements ICapabilityPlugin {
                 var thirstCalculationEvent = new ThirstEvent(player, playerFeathers, ModCapabilities.PLAYER_THIRST);
                 var cancelled = MinecraftForge.EVENT_BUS.post(thirstCalculationEvent);
 
-                 if (!cancelled && thirstCalculationEvent.getResult() == Event.Result.DEFAULT) {
+                if (!cancelled && thirstCalculationEvent.getResult() == Event.Result.DEFAULT) {
 
                     thirstCalculationEvent.calculationResult = (iThirst.getThirst() - maxThirst) * FeathersThirstConfig.THIRST_STAMINA_DRAIN.get();
 
-                    var fps = Calculations.calculateFeathersPerSecond(thirstCalculationEvent.calculationResult);
+                    var fps = Calculations.calculateFeathersPerSecond(thirstCalculationEvent.calculationResult) * -1;
                     var modifier = new AttributeModifier(Feathers.MODID + ":thirsty", fps, AttributeModifier.Operation.ADDITION);
 
-                    Objects.requireNonNull(player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get())).addTransientModifier(modifier);
+                    var attr = player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get());
+                    if (attr != null) attr.addTransientModifier(modifier);
                 }
-
-               // staminaDelta.set(staminaDelta.get() + thirstCalculationEvent.calculationResult);
             });
         }
 
@@ -106,7 +106,8 @@ public class ThirstManager implements ICapabilityPlugin {
         }
     };
 
-
+    private static final String LAST_THIRST_LEVEL = "lastThirstLevel";
+    private static final String LAST_QUENCH_LEVEL = "lastQuenchLevel";
 
     @SubscribeEvent
     public static void onAttachDefaultDeltaModifiers(FeatherEvent.AttachDefaultDeltaModifiers event) {
@@ -116,7 +117,7 @@ public class ThirstManager implements ICapabilityPlugin {
             if (FeathersThirstConfig.THIRST_STAMINA_DRAIN.get() > 0)
                 event.modifiers.add(THIRSTY);
 
-            if(FeathersThirstConfig.QUENCH_REGEN_BONUS_MULTIPLIER.get() > 0)
+            if (FeathersThirstConfig.QUENCH_REGEN_BONUS_MULTIPLIER.get() > 0)
                 event.modifiers.add(QUENCHED);
 
         }
@@ -124,19 +125,48 @@ public class ThirstManager implements ICapabilityPlugin {
 
     @Override
     public void onPlayerJoin(EntityJoinLevelEvent event) {
+        if (event.getEntity() instanceof Player player) {
+            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+                if (!f.hasCounter(LAST_QUENCH_LEVEL))
+                    f.addCounter(LAST_QUENCH_LEVEL, 0);
 
+                if (!f.hasCounter(LAST_THIRST_LEVEL))
+                    f.addCounter(LAST_THIRST_LEVEL, 0);
+
+                player.getCapability(ModCapabilities.PLAYER_THIRST).ifPresent(iThirst -> {
+                    f.setCounter(LAST_THIRST_LEVEL, iThirst.getThirst());
+                    f.setCounter(LAST_QUENCH_LEVEL, iThirst.getQuenched());
+                });
+            });
+
+        }
     }
 
     @Override
     public void onPlayerTickBefore(TickEvent.PlayerTickEvent event) {
-        if(event.phase == TickEvent.Phase.START){
-            if (FeathersThirstConfig.enableThirst()) {
-                event.player.getCapability(ModCapabilities.PLAYER_THIRST).ifPresent(iThirst -> {
 
+        if (!FeathersThirstConfig.enableThirst()) return;
+        if (!(event.player.tickCount % 20 == 0)) return;
+        event.player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+            event.player.getCapability(ModCapabilities.PLAYER_THIRST).ifPresent(t -> {
 
+                f.getCounter(LAST_THIRST_LEVEL).ifPresent(lastThirst -> {
+                    if (lastThirst != t.getThirst()) {
+                        f.setCounter(LAST_THIRST_LEVEL, t.getThirst());
+                        f.setShouldRecalculate(true);
+                    }
                 });
-            }
-        }
+
+                f.getCounter(LAST_QUENCH_LEVEL).ifPresent(lastQuench -> {
+                    if (lastQuench != t.getQuenched()) {
+                        f.setCounter(LAST_QUENCH_LEVEL, t.getQuenched());
+                        f.setShouldRecalculate(true);
+                    }
+                });
+            });
+        });
+
+
     }
 
     @Override

@@ -119,4 +119,6 @@ public interface IFeathers {
     void loadNBTData(CompoundTag nbt);
 
     void setStaminaDelta(int staminaDelta);
+
+    boolean hasCounter(String name);
 }

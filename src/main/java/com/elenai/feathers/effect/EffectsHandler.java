@@ -2,13 +2,13 @@ package com.elenai.feathers.effect;
 
 import com.elenai.feathers.Feathers;
 import com.elenai.feathers.api.ICapabilityPlugin;
+import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.compatibility.coldsweat.ColdSweatManager;
 import com.elenai.feathers.compatibility.coldsweat.FeathersColdSweatConfig;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.effect.effects.FeathersEffects;
 import com.elenai.feathers.event.FeatherAmountEvent;
-import com.momosoftworks.coldsweat.api.util.Temperature;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
@@ -101,17 +101,16 @@ public class EffectsHandler implements ICapabilityPlugin {
     public static void autoApplyColdEffect(Player player) {
         if (!FeathersCommonConfig.ENABLE_COLD_EFFECTS.get()) return;
 
-        var coldEffect = FeathersEffects.COLD.get();
-        var hasCold = player.hasEffect(coldEffect);
-        var coldDuration = hasCold ? player.getActiveEffectsMap().get(coldEffect).getDuration() : 0;
+
+        var hasCold = player.hasEffect(FeathersEffects.COLD.get());
+        var coldDuration = hasCold ? player.getActiveEffectsMap().get(FeathersEffects.COLD.get()).getDuration() : 0;
         var coldLingerDuration = FeathersCommonConfig.COLD_LINGER.get();
 
-        var hotEffect = FeathersEffects.HOT.get();
-        var hasHot = player.hasEffect(hotEffect);
-        var hotDuration = hasHot ? player.getActiveEffectsMap().get(hotEffect).getDuration() : 0;
+        var hasHot = player.hasEffect(FeathersEffects.HOT.get());
+        var hotDuration = hasHot ? player.getActiveEffectsMap().get(FeathersEffects.HOT.get()).getDuration() : 0;
 
-        if (player.isCreative() && player.hasEffect(coldEffect)) {
-            player.removeEffect(coldEffect);
+        if (player.isCreative() && player.hasEffect(FeathersEffects.COLD.get())) {
+            player.removeEffect(FeathersEffects.COLD.get());
             return;
         }
 
@@ -119,16 +118,16 @@ public class EffectsHandler implements ICapabilityPlugin {
 
             if (hotDuration != 0) {
 
-                player.removeEffect(hotEffect);
+                player.removeEffect(FeathersEffects.HOT.get());
             } else if (!hasCold) {
 
-                player.addEffect(new MobEffectInstance(coldEffect, -1, 0, false, true));
+                player.addEffect(new MobEffectInstance(FeathersEffects.COLD.get(), -1, 0, false, true));
             }
 
         } else if (coldDuration > coldLingerDuration || coldDuration == -1) {
 
-            player.removeEffect(coldEffect);
-            player.addEffect(new MobEffectInstance(coldEffect, coldLingerDuration, 0, false, true));
+            player.removeEffect(FeathersEffects.COLD.get());
+            player.addEffect(new MobEffectInstance(FeathersEffects.COLD.get(), coldLingerDuration, 0, false, true));
         }
     }
 
@@ -139,16 +138,14 @@ public class EffectsHandler implements ICapabilityPlugin {
     public static void autoApplyHotEffect(Player player) {
         if (!FeathersCommonConfig.ENABLE_HOT_EFFECTS.get()) return;
 
-        var coldEffect = FeathersEffects.COLD.get();
-        var hasCold = player.hasEffect(coldEffect);
-        var coldDuration = hasCold ? player.getActiveEffectsMap().get(coldEffect).getDuration() : 0;
+        var hasCold = player.hasEffect(FeathersEffects.COLD.get());
+        var coldDuration = hasCold ? player.getActiveEffectsMap().get(FeathersEffects.COLD.get()).getDuration() : 0;
 
-        var hotEffect = FeathersEffects.HOT.get();
-        var hasHot = player.hasEffect(hotEffect);
-        var hotDuration = hasHot ? player.getActiveEffectsMap().get(hotEffect).getDuration() : 0;
+        var hasHot = player.hasEffect(FeathersEffects.HOT.get());
+        var hotDuration = hasHot ? player.getActiveEffectsMap().get(FeathersEffects.HOT.get()).getDuration() : 0;
 
         if (player.isCreative() && hasHot) {
-            player.removeEffect(hotEffect);
+            player.removeEffect(FeathersEffects.HOT.get());
             return;
         }
 
@@ -156,24 +153,22 @@ public class EffectsHandler implements ICapabilityPlugin {
 
             if (coldDuration != 0) {
 
-                player.removeEffect(coldEffect);
+                player.removeEffect(FeathersEffects.COLD.get());
 
             } else if (!hasHot) {
 
-                player.addEffect(new MobEffectInstance(hotEffect, -1, 0, false, true));
+                player.addEffect(new MobEffectInstance(FeathersEffects.HOT.get(), -1, 0, false, true));
             }
 
         } else if (hotDuration > FeathersCommonConfig.COLD_LINGER.get() || hotDuration == -1) {
 
-            player.removeEffect(hotEffect);
-            player.addEffect(new MobEffectInstance(hotEffect, FeathersCommonConfig.COLD_LINGER.get(), 0, false, true));
+            player.removeEffect(FeathersEffects.HOT.get());
+            player.addEffect(new MobEffectInstance(FeathersEffects.HOT.get(), FeathersCommonConfig.COLD_LINGER.get(), 0, false, true));
         }
     }
 
 
     public static boolean isInColdSituation(Player player) {
-
-
 
         if (FeathersColdSweatConfig.isColdSweatEnabled() && FeathersColdSweatConfig.BEING_COLD_ADDS_COLD_EFFECT.get()) {
             return ColdSweatManager.isFreezing(player);
@@ -184,7 +179,7 @@ public class EffectsHandler implements ICapabilityPlugin {
 
         boolean isInColdBiome = player.level().getBiome(player.blockPosition()).get().coldEnoughToSnow(player.blockPosition());
 
-        return (isInColdBiome && isExposedToWeather ) || player.isFreezing();
+        return (isInColdBiome && isExposedToWeather) || player.isFreezing();
     }
 
 
@@ -205,10 +200,12 @@ public class EffectsHandler implements ICapabilityPlugin {
 
     @Override
     public void onPlayerTickBefore(TickEvent.PlayerTickEvent event) {
+        if (event.player.level().isClientSide()) return;
 
-        autoApplyColdEffect(event.player);
-
-        autoApplyHotEffect(event.player);
+        if (event.player.tickCount % 40 == 0) {
+            autoApplyColdEffect(event.player);
+            autoApplyHotEffect(event.player);
+        }
 
     }
 
@@ -221,4 +218,6 @@ public class EffectsHandler implements ICapabilityPlugin {
     public void onPlayerJoin(EntityJoinLevelEvent event) {
 
     }
+
+
 }

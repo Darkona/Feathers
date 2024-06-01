@@ -51,6 +51,7 @@ public class PlayerFeathers implements IFeathers {
     private boolean momentum;
     private boolean strained;
 
+    //Checks
     private Map<String, Integer> counters = new HashMap<>();
 
     //Modifiers
@@ -85,6 +86,10 @@ public class PlayerFeathers implements IFeathers {
 
     public void removeCounter(String name) {
         counters.remove(name);
+    }
+
+    public boolean hasCounter(String name) {
+        return counters.containsKey(name);
     }
 
     public Optional<Integer> getCounter(String name) {
@@ -291,6 +296,9 @@ public class PlayerFeathers implements IFeathers {
         nbt.putBoolean("hot", this.hot);
         nbt.putBoolean("energized", this.energized);
         nbt.putBoolean("strained", this.strained);
+        nbt.put("counter", counters.entrySet().stream()
+                                   .collect(CompoundTag::new, (tag, entry) ->
+                                           tag.putInt(entry.getKey(), entry.getValue()), (tag1, tag2) -> {}));
         return nbt;
     }
 
@@ -305,6 +313,7 @@ public class PlayerFeathers implements IFeathers {
         this.hot = nbt.getBoolean("hot");
         this.energized = nbt.getBoolean("energized");
         this.strained = nbt.getBoolean("strained");
+        nbt.getAllKeys().stream().map(( key) -> (String) key).forEach((key) -> counters.put(key, nbt.getInt(key)));
         synchronizeFeathers();
     }
 

@@ -134,7 +134,7 @@ public class FeathersHudOverlay {
     private static int drawEndurance(GuiGraphics guiGraphics, int screenHeight, int lines, Set icons, int x, int xOffset, int rightOffset, int yOffset) {
         if (clientData.getEnduranceFeathers() > 0) {
 
-            for (int i = 0; i < Math.ceil((double) clientData.getEnduranceFeathers() / FeathersConstants.STAMINA_PER_FEATHER); i++) { //TODO: fix half feathers
+            for (int i = 0; i < clientData.getEnduranceFeathers(); i++) { //TODO: fix half feathers
                 lines += ICONS_PER_ROW;
                 for (int j = 0; j < ICONS_PER_ROW; j++) {
                     var halfEndurance = Math.ceil((double) clientData.getEnduranceFeathers() / 2.0d);
@@ -172,8 +172,6 @@ public class FeathersHudOverlay {
                 if (i + 1 <= excessFeathers) {
 
                     GuiIcon icon = getHalfOrFull(icons, i, (i + 1 == excessFeathers) && isEven(clientData.getStamina()));
-
-
                     draw(guiGraphics, getXPos(x, i, xOffset), getYPos(screenHeight, rightOffset, getHeight(i), yOffset), icon);
 
                 } else {
@@ -203,13 +201,15 @@ public class FeathersHudOverlay {
         if (clientData.hasFeathers()) {
 
             for (int i = 0; i < ICONS_PER_ROW; i++) {
+                if(i + 1 <= halfFeathers){
 
-                var icon = getHalfOrFull(icons, i, (i == halfFeathers) && isEven(clientData.getFeathers()));
+                    var icon = getHalfOrFull(icons, i, (i + 1 == halfFeathers) && !isEven(clientData.getFeathers()));
 
-                var xPos = getXPos(x, i, xOffset);
-                var yPos = getYPos(screenHeight, rightOffset, getHeight(i), yOffset);
+                    var xPos = getXPos(x, i, xOffset);
+                    var yPos = getYPos(screenHeight, rightOffset, getHeight(i), yOffset);
 
-                draw(guiGraphics, xPos, yPos, icon);
+                    draw(guiGraphics, xPos, yPos, icon);
+                }
             }
         }
     }
