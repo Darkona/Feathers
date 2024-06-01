@@ -31,9 +31,13 @@ public class FeathersAttributes {
 
     public static final RegistryObject<Attribute> FEATHERS_PER_SECOND = registerAttribute("feathers.feathers_per_second",
         (id) -> new RangedAttribute(id,0.4D,-40.0,40.0D).setSyncable(true),
-        "d74ded8f-c5b6-4222-80e2-dbea7ccf8d02"
+        "f39cfede-259c-45dd-b3fd-7307a8cc1255"
     );
 
+    public static final RegistryObject<Attribute> STAMINA_USAGE_MULTIPLIER = registerAttribute("feathers.usage_multiplier",
+        (id) -> new RangedAttribute(id, 1.0D, 0.0D, 40.0D).setSyncable(true),
+        "d9caa995-9dc5-46e9-8559-6c4542ba89bc"
+    );
     public static RegistryObject<Attribute> registerAttribute(
         String name, Function<String, Attribute> attribute, String uuid
     ) {

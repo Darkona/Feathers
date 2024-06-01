@@ -1,20 +1,27 @@
 package com.elenai.feathers.effect.effects;
 
+import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.api.IModifier;
+import com.elenai.feathers.api.StaminaAPI;
 import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.capability.PlayerFeathers;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffect;
+import com.elenai.feathers.client.ClientFeathersData;
+import com.elenai.feathers.config.FeathersCommonConfig;
+import com.elenai.feathers.effect.FeathersEffects;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class EnduranceEffect extends FeathersEffects {
+
+    public static final String ENDURANCE_COUNTER = "endurance";
+
 
     /**
      * Uses Endurance Feathers before using regular feathers.
@@ -23,32 +30,35 @@ public class EnduranceEffect extends FeathersEffects {
     public static final IModifier ENDURANCE = new IModifier() {
         @Override
         public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaToUse) {
-            if (!player.hasEffect(FeathersEffects.ENDURANCE.get())) return;
-
-            int feathersToUse = staminaToUse.get() / FeathersConstants.STAMINA_PER_FEATHER;
-
-            if (playerFeathers.getEnduranceFeathers() > 0) {
-
-                int enduranceFeathers = playerFeathers.getEnduranceFeathers();
-
-                if (enduranceFeathers >= feathersToUse) {
-
-                    playerFeathers.setEnduranceFeathers(enduranceFeathers - feathersToUse);
-                } else {
-
-                    player.removeEffect(FeathersEffects.ENDURANCE.get());
-
-                    staminaToUse.set((feathersToUse - enduranceFeathers) * FeathersConstants.STAMINA_PER_FEATHER);
-                }
-
-            }
 
 
         }
 
         @Override
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaToUse, AtomicBoolean result) {
+            if (!player.hasEffect(FeathersEffects.ENDURANCE.get())) return;
+
+
+            playerFeathers.getCounter(ENDURANCE_COUNTER).ifPresent(enduranceFeathers -> {
+
+                int enduranceStamina = enduranceFeathers * FeathersConstants.STAMINA_PER_FEATHER;
+
+                int enduranceLeft = enduranceStamina - staminaToUse.get();
+
+                if (enduranceLeft <= 0) {
+                    staminaToUse.addAndGet(-enduranceLeft);
+                    enduranceLeft = 0;
+                    player.removeEffect(FeathersEffects.ENDURANCE.get());
+                } else {
+                    staminaToUse.set(0);
+                }
+                playerFeathers.setCounter(ENDURANCE_COUNTER, enduranceLeft / FeathersConstants.STAMINA_PER_FEATHER);
+            });
+        }
+
+        @Override
         public int getOrdinal() {
-            return 0;
+            return 10;
         }
 
         @Override
@@ -63,26 +73,14 @@ public class EnduranceEffect extends FeathersEffects {
 
     @Override
     public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        if (target instanceof ServerPlayer player) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-                f.setEnduranceFeathers((strength + 1) * 8);
-                f.addUsageModifier(ENDURANCE);
-               // FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.ENDURANCE, true, strength), player);
-            });
-        }
+        if (!FeathersCommonConfig.ENABLE_ENDURANCE.get()) return;
         super.addAttributeModifiers(target, map, strength);
     }
 
     @Override
     public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        if (target instanceof ServerPlayer player) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-                f.setEnduranceFeathers(0);
-                f.removeUsageModifier(ENDURANCE);
-                //FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.ENDURANCE, false, strength), player);
-            });
-        }
-        super.removeAttributeModifiers(target, map, strength);
+        if (!FeathersCommonConfig.ENABLE_ENDURANCE.get()) return;
+        super.addAttributeModifiers(target, map, strength);
     }
 
 }

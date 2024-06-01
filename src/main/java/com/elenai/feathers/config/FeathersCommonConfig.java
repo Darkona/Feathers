@@ -94,7 +94,7 @@ public class FeathersCommonConfig {
 
         ENABLE_HOT_EFFECTS = BUILDER
                 .comment("Whether the Hot Effect is enabled. When the effect is active, feathers are reduced. Fatigue is applied when the player is hot or burning")
-                .define("Enable Hot Effect", false);
+                .define("Enable Hot Effect", true);
 
         HOT_EFFECT_STRENGTH = BUILDER.
                 comment("Multiplier for the feather consumption when affected by heat. Values can range from 1 to 5." +
@@ -103,16 +103,16 @@ public class FeathersCommonConfig {
 
         ENABLE_LIGHTWEIGHT_ENCHANTMENT = BUILDER
                 .comment("Whether the Lightweight enchantment can be applied in an enchantment table, or if it is treasure only.")
-                .define("Enable Lightweight Enchantment in Table", false);
+                .define("Enable Lightweight Enchantment in Table", true);
 
         ENABLE_ENDURANCE = BUILDER
                 .comment("Whether the Endurance effect is enabled and the potions registered.")
-                .define("Enable Endurance effect", false);
+                .define("Enable Endurance effect", true);
 
         ENDURANCE_ENCHANTMENT_REGEN = BUILDER
                 .comment("Whether the Endurance effect also regenerates the extra feathers while active. " +
                         "If false, the effect only adds temporal extra feathers.")
-                .define("Endurance Enchantment Regeneration", false);
+                .define("Endurance Enchantment Regeneration", true);
 
         COLD_LINGER = BUILDER
                 .comment("How long does the Cold Effect linger after stopping being cold")

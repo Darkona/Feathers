@@ -1,9 +1,11 @@
 package com.elenai.feathers.effect.effects;
 
+import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.config.FeathersCommonConfig;
+import com.elenai.feathers.effect.FeathersEffects;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -15,62 +17,31 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
+import static com.elenai.feathers.attributes.FeathersAttributes.FEATHERS_PER_SECOND;
+import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.MULTIPLY_BASE;
+import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.MULTIPLY_TOTAL;
+
 public class EnergizedEffect extends MobEffect {
 
-    public static final IModifier ENERGIZED = new IModifier() {
-
-        @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
-            var effect = player.getEffect(FeathersEffects.ENERGIZED.get());
-            if (effect != null) {
-                int strength =  effect.getAmplifier();
-                float multiplier = 1 + ((strength + 1) * 0.2F);
-                staminaDelta.set((int) (FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get() * multiplier));
-            }
-        }
-
-        @Override
-        public int getOrdinal() {
-            return 100;
-        }
-
-        @Override
-        public String getName() {
-            return "hot";
-        }
-    };
-    private static final Function<Integer, Integer> energize_one = (i) -> i * 2;
+    public static final String MODIFIER_UUID = "848704c2-d3b5-4b71-9e96-7ab5c42095e2";
+    public static final double BASE_STRENGTH = 1.5D;
 
     public EnergizedEffect(MobEffectCategory mobEffectCategory, int color) {
         super(mobEffectCategory, color);
+        addAttributeModifier(FEATHERS_PER_SECOND.get(), MODIFIER_UUID, BASE_STRENGTH, MULTIPLY_TOTAL);
     }
 
     @Override
     public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        if (target instanceof ServerPlayer player) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-                if (!f.isEnergized()) {
-                    f.setEnergized(true);
-                    f.addDeltaModifier(ENERGIZED);
-                    //FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.ENERGIZED, true, strength), player);
-                }
-            });
-        }
+        target.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(IFeathers::shouldRecalculate);
         super.addAttributeModifiers(target, map, strength);
     }
 
     @Override
     public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        if (target instanceof ServerPlayer player) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-                if (f.isEnergized()) {
-                    f.setEnergized(false);
-                    f.removeDeltaModifier(ENERGIZED);
-                    //FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.ENERGIZED, false, strength), player);
-                }
-            });
-        }
         super.removeAttributeModifiers(target, map, strength);
+        target.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(IFeathers::shouldRecalculate);
+
     }
 
 

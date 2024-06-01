@@ -4,6 +4,7 @@ import com.elenai.feathers.api.FeathersAPI;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 public class ClientFeatherSpendPacket {
@@ -24,9 +25,6 @@ public class ClientFeatherSpendPacket {
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() -> {
-            FeathersAPI.spendFeathers(context.getSender(), feathers, 20);
-        });
-        return true;
+        return context.enqueueWork(() -> FeathersAPI.spendFeathers(context.getSender(), feathers, 20)).isDone();
     }
 }

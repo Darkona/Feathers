@@ -4,14 +4,15 @@ import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.config.FeathersCommonConfig;
+import com.elenai.feathers.effect.FeathersEffects;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class StrainEffect extends FeathersEffects {
@@ -29,6 +30,11 @@ public class StrainEffect extends FeathersEffects {
                     playerFeathers.setStrainFeathers(strain + feathers.get());
                 }
             }
+        }
+
+        @Override
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+
         }
 
         @Override
@@ -50,6 +56,11 @@ public class StrainEffect extends FeathersEffects {
         }
 
         @Override
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+
+        }
+
+        @Override
         public int getOrdinal() {
             return 0;
         }
@@ -60,7 +71,7 @@ public class StrainEffect extends FeathersEffects {
         }
     };
 
-    protected StrainEffect(MobEffectCategory p_19451_, int p_19452_) {
+    public StrainEffect(MobEffectCategory p_19451_, int p_19452_) {
         super(p_19451_, p_19452_);
     }
 
@@ -69,13 +80,8 @@ public class StrainEffect extends FeathersEffects {
         if (!FeathersCommonConfig.ENABLE_STRAIN.get()) return;
         if (target instanceof ServerPlayer player) {
             player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-                if (!f.isStrained()) {
-                    f.setStrained(true);
-                    f.addUsageModifier(STRAIN_USAGE);
-                    f.removeDeltaModifier(IModifier.REGENERATION);
-                    f.addDeltaModifier(STRAIN_RECOVERY);
-                    //FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.STRAIN, true, strength), player);
-                }
+
+
             });
         }
         super.addAttributeModifiers(target, map, strength);
@@ -86,13 +92,7 @@ public class StrainEffect extends FeathersEffects {
         if (!FeathersCommonConfig.ENABLE_STRAIN.get()) return;
         if (target instanceof ServerPlayer player) {
             player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-                if (f.isStrained()) {
-                    f.setStrained(false);
-                    f.removeUsageModifier(STRAIN_USAGE);
-                    f.removeDeltaModifier(STRAIN_RECOVERY);
-                    f.addDeltaModifier(IModifier.REGENERATION);
-                    //FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.STRAIN, false, strength), player);
-                }
+
             });
         }
         super.removeAttributeModifiers(target, map, strength);

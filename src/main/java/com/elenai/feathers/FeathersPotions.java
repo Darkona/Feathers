@@ -1,7 +1,6 @@
 package com.elenai.feathers;
 
-import com.elenai.feathers.Feathers;
-import com.elenai.feathers.effect.effects.FeathersEffects;
+import com.elenai.feathers.effect.FeathersEffects;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraftforge.eventbus.api.IEventBus;

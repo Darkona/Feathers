@@ -3,6 +3,7 @@ package com.elenai.feathers.client;
 import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.config.FeathersClientConfig;
+import com.elenai.feathers.effect.effects.EnduranceEffect;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
@@ -41,8 +42,8 @@ public class ClientFeathersData {
     private boolean energized = false;
     private boolean overflowing = false;
     private boolean momentum = false;
-    private boolean endurance = false;
     private boolean fatigued = false;
+    private boolean endurance = false;
 
     private ClientFeathersData(){}
     public void update(IFeathers f) {
@@ -52,16 +53,12 @@ public class ClientFeathersData {
         feathers = f.getFeathers();
         maxFeathers = f.getMaxFeathers();
         staminaDelta = f.getStaminaDelta();
-        enduranceFeathers = f.getEnduranceFeathers();
+        enduranceFeathers = f.getCounter(EnduranceEffect.ENDURANCE_COUNTER).orElse(0);
+        endurance = FeathersAPI.isEnduring(player);
         hot = FeathersAPI.isHot(player);
         cold = FeathersAPI.isCold(player);
         energized = FeathersAPI.isEnergized(player);
-        //overflowing = FeathersAPI.isOverflowing(player);
-        //momentum = FeathersAPI.isMomentum(player);
-        //endurance = FeathersAPI.isEndurance(player);
         fatigued = FeathersAPI.isFatigued(player);
-        //weight = FeathersAPI.getWeight(player);
-
     }
 
     public boolean hasFullStamina() {
@@ -89,10 +86,7 @@ public class ClientFeathersData {
         if (animationCooldown > 0) animationCooldown--;
 
         if (feathers != previousFeathers) {
-            if (feathers > previousFeathers &&
-                    FeathersClientConfig.REGEN_EFFECT.get() &&
-                    animationCooldown <= 0) {
-
+            if (feathers > previousFeathers && FeathersClientConfig.REGEN_EFFECT.get() && animationCooldown <= 0) {
                 animationCooldown = 18;
             }
             previousFeathers = feathers;
@@ -104,7 +98,5 @@ public class ClientFeathersData {
                 fadeCooldown = cooldown < FeathersClientConfig.FADE_COOLDOWN.get() ? fadeCooldown + 1 : 0;
             }
         }
-
-
     }
 }

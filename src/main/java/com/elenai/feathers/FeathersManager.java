@@ -1,15 +1,17 @@
 package com.elenai.feathers;
 
-import com.elenai.feathers.Feathers;
+import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.api.ICapabilityPlugin;
 import com.elenai.feathers.api.IFeathers;
+import com.elenai.feathers.api.StaminaAPI;
 import com.elenai.feathers.attributes.FeathersAttributes;
-import com.elenai.feathers.capability.*;
-import com.elenai.feathers.compatibility.thirst.FeathersThirstConfig;
+import com.elenai.feathers.capability.Capabilities;
+import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.config.FeathersCommonConfig;
+import com.elenai.feathers.effect.FeathersEffects;
+import com.elenai.feathers.effect.effects.EnduranceEffect;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
-import dev.ghen.thirst.foundation.common.capability.ModCapabilities;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -27,6 +29,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -46,10 +49,17 @@ public class FeathersManager {
     private static final String THIRST_COUNTER = "thirst";
 
     private static final List<ICapabilityPlugin> plugins = new ArrayList<>();
-    private FeathersManager(){};
+
+    private FeathersManager() {}
+
+    ;
 
     public static void registerPlugin(ICapabilityPlugin plugin) {
         plugins.add(plugin);
+    }
+
+    public static void deRegisterPlugin(ICapabilityPlugin plugin) {
+        plugins.remove(plugin);
     }
 
     @SubscribeEvent
@@ -109,18 +119,14 @@ public class FeathersManager {
             assignFeathersAttributes(player);
 
             player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-                f.setShouldRecalculate(true);
-
-
-                if (FeathersThirstConfig.enableThirst() && player.getCapability(ModCapabilities.PLAYER_THIRST).isPresent()) {
-                    f.addCounter(THIRST_COUNTER, 0);
-                } else {
-                    f.removeCounter(THIRST_COUNTER);
-                }
-
+                f.setShouldRecalculate();
                 FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
             });
+
+            plugins.forEach(p -> p.onPlayerJoin(event));
         }
+
+
     }
 
     @SubscribeEvent
@@ -158,7 +164,7 @@ public class FeathersManager {
             assignFeathersAttributes(player);
 
             player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-                f.setShouldRecalculate(true);
+                f.setShouldRecalculate();
                 f.recalculateStaminaDelta(player);
             });
         });
@@ -176,6 +182,7 @@ public class FeathersManager {
         }
 
     }
+
     @SubscribeEvent
     public static void playerTickEvent(TickEvent.PlayerTickEvent event) {
         Player player = event.player;
@@ -187,7 +194,37 @@ public class FeathersManager {
         player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> f.tick(player));
 
         plugins.forEach(p -> p.onPlayerTickAfter(event));
+
+        checkEffects(player);
     }
 
+    private static void checkEffects(Player player) {
+        player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+            if (FeathersAPI.isEnduring(player) && f.getCounter(EnduranceEffect.ENDURANCE_COUNTER).orElse(0) == 0) {
 
+                player.removeEffect(FeathersEffects.ENDURANCE.get());
+            }
+        });
+
+    }
+
+    @SubscribeEvent
+    public static void onEffectAdded(MobEffectEvent.Added event) {
+        if (event.getEntity() instanceof Player player && event.getEffectInstance().getEffect() instanceof FeathersEffects effect) {
+            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+                f.addCounter(EnduranceEffect.ENDURANCE_COUNTER, (event.getEffectInstance().getAmplifier() + 1) * 4);
+                StaminaAPI.addStaminaUsageModifier(player, EnduranceEffect.ENDURANCE);
+            });
+        }
+    }
+
+    @SubscribeEvent
+    public static void onEffectRemoved(MobEffectEvent.Remove event) {
+        if (event.getEntity() instanceof Player player && player.hasEffect(FeathersEffects.ENDURANCE.get())) {
+            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+                f.removeCounter(EnduranceEffect.ENDURANCE_COUNTER);
+                StaminaAPI.removeStaminaUsageModifier(player, EnduranceEffect.ENDURANCE);
+            });
+        }
+    }
 }

@@ -1,11 +1,9 @@
 package com.elenai.feathers.api;
 
-import com.elenai.feathers.capability.PlayerFeathers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.AutoRegisterCapability;
 
-import javax.swing.text.html.Option;
 import java.util.Map;
 import java.util.Optional;
 
@@ -35,24 +33,20 @@ public interface IFeathers {
 
     void setMaxStamina(int maxStamina);
 
-    int gainFeathers(int feathers);
+    boolean gainFeathers(int feathers);
 
     /**
-     * Spend feathers from the player. Returns the amount of feathers spent.
+     * Spend feathers from the player.
      *
      * @param player the player
      * @param feathers the amount of feathers to spend
-     * @return the amount of feathers spent
+     * @return true if the player has enough feathers to spend, false otherwise
      */
-    int useFeathers(Player player, int feathers);
+    boolean useFeathers(Player player, int feathers);
 
     int getCooldown();
 
     void setCooldown(int cooldown);
-
-    int getEnduranceFeathers();
-
-    void setEnduranceFeathers(int enduranceFeathers);
 
     int getStrainFeathers();
 
@@ -66,32 +60,6 @@ public interface IFeathers {
 
     boolean shouldRecalculate();
 
-    boolean isCold();
-
-    void setCold(boolean cold);
-
-    boolean isHot();
-
-    void setHot(boolean hot);
-
-    boolean isEnergized();
-
-    void setEnergized(boolean energized);
-
-    int getEnergizedStrength();
-
-    void setEnergizedStrength(int energizedStrength);
-
-    boolean isFatigued();
-
-    void setFatigued(boolean fatigued);
-
-    boolean isStrained();
-
-    void setStrained(boolean strain);
-
-    boolean hasMomentum();
-
     Map<String, IModifier> getStaminaDeltaModifiers();
 
     Map<String, IModifier> getStaminaUsageModifiers();
@@ -104,9 +72,7 @@ public interface IFeathers {
 
     void setCounter(String name, int value);
 
-    void setShouldRecalculate(boolean shouldRecalculate);
-
-    void setMomentum(boolean momentum);
+    void setShouldRecalculate();
 
     int getMaxFeathers();
 
@@ -121,4 +87,8 @@ public interface IFeathers {
     void setStaminaDelta(int staminaDelta);
 
     boolean hasCounter(String name);
+
+    Map<String, Integer> getCounters();
+
+    void sortUsageModifiers();
 }

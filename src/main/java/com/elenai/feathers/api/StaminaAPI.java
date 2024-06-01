@@ -71,7 +71,7 @@ public class StaminaAPI {
         player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.addUsageModifier(modifier);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), (ServerPlayer) player);
+                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
               });
     }
 

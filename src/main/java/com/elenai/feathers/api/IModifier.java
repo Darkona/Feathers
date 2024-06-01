@@ -3,16 +3,17 @@ package com.elenai.feathers.api;
 import com.elenai.feathers.capability.PlayerFeathers;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public interface IModifier {
 
     void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta);
+    void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta, AtomicBoolean result);
 
     int getOrdinal();
 
     String getName();
-
 
 
     /**
@@ -29,6 +30,11 @@ public interface IModifier {
             var maxStamina = playerFeathers.getMaxStamina();
             var value = Math.max((int) (1 / Math.log(playerFeathers.getFeathers() / 40d + 1.4) - 3.5) * staminaPerSecond, 1);
             staminaDelta.set(value);
+
+        }
+
+        @Override
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
 
         }
 
@@ -55,6 +61,11 @@ public interface IModifier {
         }
 
         @Override
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+
+        }
+
+        @Override
         public int getOrdinal() {
             return 0;
         }
@@ -78,6 +89,11 @@ public interface IModifier {
         }
 
         @Override
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+
+        }
+
+        @Override
         public int getOrdinal() {
             return 0;
         }
@@ -96,6 +112,11 @@ public interface IModifier {
         }
 
         @Override
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+            result.set(true);
+        }
+
+        @Override
         public int getOrdinal() {
             return 0;
         }
@@ -105,4 +126,21 @@ public interface IModifier {
             return "default";
         }
     };
+
+
+
+    /**
+     * Usage Modifier Ordinals reference.
+     0 = Hot effect / Momentum effect;
+     they will be applied first. If you are going to spend more/less feathers, these need to be applied first.
+
+     10 = Endurance/Strain effect;
+     If you're going to overspend feathers, or spend endurance feathers this will be applied after knowing how many will be spent.
+
+     1 to 9 are available.
+     **/
+    int[] ordinals = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+
+
 }

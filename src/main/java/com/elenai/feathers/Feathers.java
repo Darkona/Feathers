@@ -8,7 +8,7 @@ import com.elenai.feathers.compatibility.thirst.FeathersThirstConfig;
 import com.elenai.feathers.compatibility.thirst.ThirstManager;
 import com.elenai.feathers.config.FeathersClientConfig;
 import com.elenai.feathers.config.FeathersCommonConfig;
-import com.elenai.feathers.effect.effects.FeathersEffects;
+import com.elenai.feathers.effect.FeathersEffects;
 import com.elenai.feathers.enchantment.FeathersEnchantments;
 import com.elenai.feathers.effect.EffectsHandler;
 import com.elenai.feathers.networking.FeathersMessages;

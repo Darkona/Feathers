@@ -11,7 +11,7 @@ public class FeathersThirstConfig {
 
     public static final ForgeConfigSpec SPEC;
 
-    public static boolean enableThirst(){
+    public static boolean isThirstOn(){
         return Feathers.THIRST_LOADED && THIRST_COMPATIBILITY.get();
     }
     public static final ForgeConfigSpec.ConfigValue<Boolean> THIRST_COMPATIBILITY;

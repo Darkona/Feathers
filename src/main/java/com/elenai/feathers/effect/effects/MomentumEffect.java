@@ -3,10 +3,11 @@ package com.elenai.feathers.effect.effects;
 import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.capability.PlayerFeathers;
-import net.minecraft.world.effect.MobEffect;
+import com.elenai.feathers.effect.FeathersEffects;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MomentumEffect extends FeathersEffects {
@@ -18,7 +19,12 @@ public class MomentumEffect extends FeathersEffects {
 
         @Override
         public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger feathersToUse) {
-             feathersToUse.set((feathersToUse.get() * FeathersConstants.STAMINA_PER_FEATHER) / 2);
+
+        }
+
+        @Override
+        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger feathersToUse, AtomicBoolean result) {
+            feathersToUse.set((feathersToUse.get() * FeathersConstants.STAMINA_PER_FEATHER) / 2);
         }
 
         @Override
@@ -32,7 +38,7 @@ public class MomentumEffect extends FeathersEffects {
         }
     };
 
-    protected MomentumEffect(MobEffectCategory p_19451_, int p_19452_) {
+    public MomentumEffect(MobEffectCategory p_19451_, int p_19452_) {
         super(p_19451_, p_19452_);
     }
 }

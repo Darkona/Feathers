@@ -2,12 +2,10 @@ package com.elenai.feathers.effect;
 
 import com.elenai.feathers.Feathers;
 import com.elenai.feathers.api.ICapabilityPlugin;
-import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.compatibility.coldsweat.ColdSweatManager;
 import com.elenai.feathers.compatibility.coldsweat.FeathersColdSweatConfig;
 import com.elenai.feathers.config.FeathersCommonConfig;
-import com.elenai.feathers.effect.effects.FeathersEffects;
 import com.elenai.feathers.event.FeatherAmountEvent;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -19,6 +17,9 @@ import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import static net.minecraftforge.eventbus.api.Event.Result.ALLOW;
+import static net.minecraftforge.eventbus.api.Event.Result.DENY;
 
 @Mod.EventBusSubscriber(modid = Feathers.MODID)
 public class EffectsHandler implements ICapabilityPlugin {
@@ -43,11 +44,15 @@ public class EffectsHandler implements ICapabilityPlugin {
                     player.isCreative()) return;
 
             if (effect == FeathersEffects.HOT.get()) {
-                event.setResult(canApplyHotEffect(player) ? Event.Result.ALLOW : Event.Result.DENY);
+                event.setResult(canApplyHotEffect(player) ? ALLOW : DENY);
             }
 
             if (effect == FeathersEffects.COLD.get()) {
-                event.setResult(canApplyColdEffect(player) ? Event.Result.ALLOW : Event.Result.DENY);
+                event.setResult(canApplyColdEffect(player) ? ALLOW : DENY);
+            }
+
+            if (effect == FeathersEffects.ENDURANCE.get()) {
+                event.setResult(FeathersCommonConfig.ENABLE_ENDURANCE.get() ? ALLOW : DENY);
             }
         }
     }

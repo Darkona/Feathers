@@ -49,9 +49,9 @@ public abstract class FeatherEvent extends PlayerEvent {
     public static class Changed extends FeatherEvent {
 
         public int prev;
-        public int post;
+        public boolean post;
 
-        public Changed(Player player, int prev, int post) {
+        public Changed(Player player, int prev, boolean post) {
             super(player);
             this.prev = prev;
             this.post = post;

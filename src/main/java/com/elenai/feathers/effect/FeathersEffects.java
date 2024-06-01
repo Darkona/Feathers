@@ -1,14 +1,22 @@
-package com.elenai.feathers.effect.effects;
+package com.elenai.feathers.effect;
 
 import com.elenai.feathers.Feathers;
+import com.elenai.feathers.api.FeathersAPI;
+import com.elenai.feathers.attributes.FeathersAttributes;
+import com.elenai.feathers.effect.effects.*;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeMap;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import org.jetbrains.annotations.NotNull;
 
-public class FeathersEffects extends MobEffect{
+public class FeathersEffects extends MobEffect {
 
     public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, Feathers.MODID);
 
@@ -16,6 +24,7 @@ public class FeathersEffects extends MobEffect{
             .register("endurance", () -> new EnduranceEffect(MobEffectCategory.BENEFICIAL, 16776960));
     public static final RegistryObject<MobEffect> COLD = EFFECTS
             .register("cold", () -> new ColdEffect(MobEffectCategory.HARMFUL, 11993087));
+
     public static final RegistryObject<MobEffect> ENERGIZED = EFFECTS
             .register("energized", () -> new EnergizedEffect(MobEffectCategory.BENEFICIAL, 7458303));
 

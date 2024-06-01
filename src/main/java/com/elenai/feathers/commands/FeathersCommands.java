@@ -1,7 +1,7 @@
 package com.elenai.feathers.commands;
 
 import com.elenai.feathers.api.StaminaAPI;
-import com.elenai.feathers.effect.effects.FeathersEffects;
+import com.elenai.feathers.effect.FeathersEffects;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;

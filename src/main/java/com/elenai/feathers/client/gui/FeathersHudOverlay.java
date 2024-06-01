@@ -70,12 +70,12 @@ public class FeathersHudOverlay {
             /*
              * Only render the currently worn armor
              */
-            drawWeight(guiGraphics, screenHeight, halfFeathers, icons, x, xOffset, rightOffset, yOffset);
+            drawWeight(guiGraphics, screenHeight, halfFeathers, x, xOffset, rightOffset, yOffset);
 
             /*
              * Render feathers past 20 in a different color
              */
-            drawOverflow(guiGraphics, screenHeight, icons, x, xOffset, rightOffset, yOffset);
+            drawOverflow(guiGraphics, screenHeight, x, xOffset, rightOffset, yOffset);
 
             /*
              * Render the Regeneration effect
@@ -101,7 +101,7 @@ public class FeathersHudOverlay {
             /*
              * Only render the currently active endurance feathers by line
              */
-            lines = drawEndurance(guiGraphics, screenHeight, lines, icons, x, xOffset, rightOffset, yOffset);
+            lines = drawEndurance(guiGraphics, screenHeight, lines, x, xOffset, rightOffset, yOffset);
 
 
             if (FeathersClientConfig.AFFECTED_BY_RIGHT_HEIGHT.get()) {
@@ -131,22 +131,20 @@ public class FeathersHudOverlay {
         }
     }
 
-    private static int drawEndurance(GuiGraphics guiGraphics, int screenHeight, int lines, Set icons, int x, int xOffset, int rightOffset, int yOffset) {
+    private static int drawEndurance(GuiGraphics guiGraphics, int screenHeight, int lines, int x, int xOffset, int rightOffset, int yOffset) {
         if (clientData.getEnduranceFeathers() > 0) {
+            var halfEndurance = Math.ceil((double) clientData.getEnduranceFeathers() / 2.0d);
 
-            for (int i = 0; i < clientData.getEnduranceFeathers(); i++) { //TODO: fix half feathers
+            for (int i = 0; i < Math.ceil((double) clientData.getEnduranceFeathers() / 20.0d); i++) {
                 lines += ICONS_PER_ROW;
-                for (int j = 0; j < ICONS_PER_ROW; j++) {
-                    var halfEndurance = Math.ceil((double) clientData.getEnduranceFeathers() / 2.0d);
-                    if ((((i) * 10.0d) + (j + 1) <= halfEndurance)) {
+                for (int j = 0; j < halfEndurance; j++) {
+                    var idk = i * 10.0d + j + 1;
+                    if (idk <= halfEndurance) {
+                        GuiIcon icon = getHalfOrFull(Icons.ENDURANCE, i,  idk == halfEndurance && !isEven(clientData.getEnduranceFeathers()));
+                        var xPos = getXPos(x, j, xOffset);
+                        var yPos = getYPos(screenHeight, rightOffset, getHeight(j), yOffset);
+                        draw(guiGraphics, xPos, screenHeight - rightOffset + yOffset - (i * ICONS_PER_ROW), icon);
 
-                        GuiIcon icon = getHalfOrFull(icons, i, (((j + 1) + (ICONS_PER_ROW * i) == halfEndurance)
-                                && isEven(clientData.getEnduranceFeathers())));
-
-                        draw(guiGraphics, getXPos(x, j, xOffset), screenHeight - rightOffset + yOffset - ((i) * ICONS_PER_ROW), icon);
-
-                    } else {
-                        break;
                     }
                 }
             }
@@ -165,13 +163,13 @@ public class FeathersHudOverlay {
         }
     }
 
-    private static void drawOverflow(GuiGraphics guiGraphics, int screenHeight, Set icons, int x, int xOffset, int rightOffset, int yOffset) {
+    private static void drawOverflow(GuiGraphics guiGraphics, int screenHeight, int x, int xOffset, int rightOffset, int yOffset) {
         if (clientData.getFeathers() > 2 * ICONS_PER_ROW) {
             var excessFeathers = (double) (clientData.getFeathers() - clientData.getMaxFeathers());
             for (int i = 0; i < ICONS_PER_ROW; i++) {
                 if (i + 1 <= excessFeathers) {
 
-                    GuiIcon icon = getHalfOrFull(icons, i, (i + 1 == excessFeathers) && isEven(clientData.getStamina()));
+                    GuiIcon icon = getHalfOrFull(Icons.OVERFLOW, i, (i + 1 == excessFeathers) && isEven(clientData.getStamina()));
                     draw(guiGraphics, getXPos(x, i, xOffset), getYPos(screenHeight, rightOffset, getHeight(i), yOffset), icon);
 
                 } else {
@@ -181,13 +179,13 @@ public class FeathersHudOverlay {
         }
     }
 
-    private static void drawWeight(GuiGraphics guiGraphics, int screenHeight, double halfFeathers, Set icons, int x, int xOffset, int rightOffset, int yOffset) {
+    private static void drawWeight(GuiGraphics guiGraphics, int screenHeight, double halfFeathers, int x, int xOffset, int rightOffset, int yOffset) {
         if (clientData.hasWeight()) {
             for (int i = 0; i < ICONS_PER_ROW; i++) {
                 var halfWeight = Math.ceil((double) clientData.getWeight() / 2.0d);
                 if ((i + 1 <= halfWeight) && (i + 1 <= halfFeathers)) {
 
-                    var icon = getHalfOrFull(icons, i, (i + 1 == halfWeight) && isEven(clientData.getWeight()));
+                    var icon = getHalfOrFull(Icons.ARMOR, i, (i + 1 == halfWeight) && isEven(clientData.getWeight()));
 
                     draw(guiGraphics, getXPos(x, i, xOffset), getYPos(screenHeight, rightOffset, getHeight(i), yOffset), icon);
                 } else {
@@ -262,9 +260,6 @@ public class FeathersHudOverlay {
         if (clientData.isHot()) {
             return HOT;
         }
-        if (clientData.isOverflowing()) {
-            return OVERFLOW;
-        }
 
         if (clientData.isEnergized()) {
             return ENERGY;
@@ -272,10 +267,6 @@ public class FeathersHudOverlay {
 
         if (clientData.isMomentum()) {
             return MOMENTUM;
-        }
-
-        if (clientData.isEndurance()) {
-            return ENDURANCE;
         }
 
         if (clientData.isFatigued()) {
