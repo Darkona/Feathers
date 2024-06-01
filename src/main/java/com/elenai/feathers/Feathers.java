@@ -2,14 +2,16 @@ package com.elenai.feathers;
 
 import com.elenai.feathers.attributes.FeathersAttributes;
 import com.elenai.feathers.commands.CommandInit;
+import com.elenai.feathers.compatibility.coldsweat.ColdSweatManager;
 import com.elenai.feathers.compatibility.coldsweat.FeathersColdSweatConfig;
 import com.elenai.feathers.compatibility.thirst.FeathersThirstConfig;
+import com.elenai.feathers.compatibility.thirst.ThirstManager;
 import com.elenai.feathers.config.FeathersClientConfig;
 import com.elenai.feathers.config.FeathersCommonConfig;
-import com.elenai.feathers.effect.FeathersEffects;
+import com.elenai.feathers.effect.effects.FeathersEffects;
 import com.elenai.feathers.enchantment.FeathersEnchantments;
+import com.elenai.feathers.effect.EffectsHandler;
 import com.elenai.feathers.networking.FeathersMessages;
-import com.elenai.feathers.potion.FeathersPotions;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.alchemy.Potions;
@@ -19,12 +21,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.IConfigEvent;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -66,6 +64,13 @@ public class Feathers {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         event.enqueueWork(FeathersMessages::register);
         registerBrewingRecipes();
+        FeathersManager.registerPlugin(EffectsHandler.getInstance());
+        if(THIRST_LOADED){
+            FeathersManager.registerPlugin(ThirstManager.getInstance());
+        }
+        if(COLD_SWEAT_LOADED){
+            FeathersManager.registerPlugin(ColdSweatManager.getInstance());
+        }
     }
 
     private void registerBrewingRecipes() {
@@ -86,4 +91,5 @@ public class Feathers {
         PotionBrewing.addMix(FeathersPotions.ENERGIZED_POTION.get(), Items.REDSTONE, FeathersPotions.LONG_ENERGIZED_POTION.get());
         PotionBrewing.addMix(FeathersPotions.ENERGIZED_POTION.get(), Items.GLOWSTONE_DUST, FeathersPotions.STRONG_ENERGIZED_POTION.get());
     }
+
 }

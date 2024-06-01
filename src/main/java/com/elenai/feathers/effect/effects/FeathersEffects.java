@@ -1,4 +1,4 @@
-package com.elenai.feathers.effect;
+package com.elenai.feathers.effect.effects;
 
 import com.elenai.feathers.Feathers;
 import net.minecraft.world.effect.MobEffect;
@@ -8,7 +8,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-public class FeathersEffects {
+public class FeathersEffects extends MobEffect{
 
     public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, Feathers.MODID);
 
@@ -30,6 +30,10 @@ public class FeathersEffects {
 
     public static final RegistryObject<MobEffect> STRAINED = EFFECTS
             .register("strain", () -> new StrainEffect(MobEffectCategory.HARMFUL, 0x7e0048));
+
+    protected FeathersEffects(MobEffectCategory p_19451_, int p_19452_) {
+        super(p_19451_, p_19452_);
+    }
 
     public static void register(IEventBus eventBus) {
 

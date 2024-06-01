@@ -1,5 +1,6 @@
 package com.elenai.feathers.compatibility.coldsweat;
 
+import com.elenai.feathers.Feathers;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class FeathersColdSweatConfig {
@@ -10,6 +11,10 @@ public class FeathersColdSweatConfig {
 
 
     //Configs for Cold Sweat
+
+    public static boolean isColdSweatEnabled(){
+        return Feathers.COLD_SWEAT_LOADED && COLD_SWEAT_COMPATIBILITY.get();
+    }
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> COLD_SWEAT_COMPATIBILITY;
     public static final ForgeConfigSpec.ConfigValue<Boolean> BEING_COLD_ADDS_COLD_EFFECT;

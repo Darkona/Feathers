@@ -1,5 +1,6 @@
 package com.elenai.feathers.compatibility.thirst;
 
+import com.elenai.feathers.Feathers;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class FeathersThirstConfig {
@@ -7,8 +8,12 @@ public class FeathersThirstConfig {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
 
+
     public static final ForgeConfigSpec SPEC;
 
+    public static boolean enableThirst(){
+        return Feathers.THIRST_LOADED && THIRST_COMPATIBILITY.get();
+    }
     public static final ForgeConfigSpec.ConfigValue<Boolean> THIRST_COMPATIBILITY;
 
     public static final ForgeConfigSpec.ConfigValue<Integer> THIRST_STAMINA_DRAIN;

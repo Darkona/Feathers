@@ -25,6 +25,7 @@ public class FeathersHudOverlay {
 
     private static final ClientFeathersData clientData = ClientFeathersData.getInstance();
 
+    public static final int ICONS_PER_ROW = 10;
     /**
      * Renders the Feathers to the hotbar
      */
@@ -92,7 +93,7 @@ public class FeathersHudOverlay {
             }
 
             if (FeathersClientConfig.AFFECTED_BY_RIGHT_HEIGHT.get()) {
-                rightOffset += 10;
+                rightOffset += ICONS_PER_ROW;
             }
 
             int lines = 0;
@@ -104,11 +105,11 @@ public class FeathersHudOverlay {
 
 
             if (FeathersClientConfig.AFFECTED_BY_RIGHT_HEIGHT.get()) {
-                gui.rightHeight += 10 + lines;
+                gui.rightHeight += ICONS_PER_ROW + lines;
             }
 
             if (Feathers.OB_LOADED) {
-                RowCountRenderer.drawBarRowCount(guiGraphics, x + 100 + xOffset, screenHeight - rightOffset + 10 + yOffset,
+                RowCountRenderer.drawBarRowCount(guiGraphics, x + 100 + xOffset, screenHeight - rightOffset + ICONS_PER_ROW + yOffset,
                         clientData.getFeathers(), true, Minecraft.getInstance().font);
             }
 
@@ -134,15 +135,15 @@ public class FeathersHudOverlay {
         if (clientData.getEnduranceFeathers() > 0) {
 
             for (int i = 0; i < Math.ceil((double) clientData.getEnduranceFeathers() / FeathersConstants.STAMINA_PER_FEATHER); i++) { //TODO: fix half feathers
-                lines += 10;
-                for (int j = 0; j < 10; j++) {
+                lines += ICONS_PER_ROW;
+                for (int j = 0; j < ICONS_PER_ROW; j++) {
                     var halfEndurance = Math.ceil((double) clientData.getEnduranceFeathers() / 2.0d);
                     if ((((i) * 10.0d) + (j + 1) <= halfEndurance)) {
 
-                        GuiIcon icon = getHalfOrFull(icons, i, (((j + 1) + (10 * i) == halfEndurance)
+                        GuiIcon icon = getHalfOrFull(icons, i, (((j + 1) + (ICONS_PER_ROW * i) == halfEndurance)
                                 && isEven(clientData.getEnduranceFeathers())));
 
-                        draw(guiGraphics, getXPos(x, j, xOffset), screenHeight - rightOffset + yOffset - ((i) * 10), icon);
+                        draw(guiGraphics, getXPos(x, j, xOffset), screenHeight - rightOffset + yOffset - ((i) * ICONS_PER_ROW), icon);
 
                     } else {
                         break;
@@ -155,8 +156,8 @@ public class FeathersHudOverlay {
     }
 
     private static void drawOverlay(GuiGraphics guiGraphics, int screenHeight, int x, int xOffset, int rightOffset, int yOffset) {
-        for (int i = 0; i < 10; i++) {
-            if (clientData.getAnimationCooldown() >= 18 || clientData.getAnimationCooldown() == 10) {
+        for (int i = 0; i < ICONS_PER_ROW; i++) {
+            if (clientData.getAnimationCooldown() >= 18 || clientData.getAnimationCooldown() == ICONS_PER_ROW) {
                 if ((i + 1 <= Math.ceil((double) clientData.getMaxStamina() / FeathersConstants.STAMINA_PER_FEATHER))) {
                     draw(guiGraphics, getXPos(x, i, xOffset), screenHeight - rightOffset + yOffset, REGEN_OVERLAY);
                 }
@@ -165,9 +166,9 @@ public class FeathersHudOverlay {
     }
 
     private static void drawOverflow(GuiGraphics guiGraphics, int screenHeight, Set icons, int x, int xOffset, int rightOffset, int yOffset) {
-        if (clientData.isOverflowing()) {
-            var excessFeathers = Math.ceil((double) (clientData.getFeathers() - clientData.getMaxFeathers()));
-            for (int i = 0; i < 10; i++) {
+        if (clientData.getFeathers() > 2 * ICONS_PER_ROW) {
+            var excessFeathers = (double) (clientData.getFeathers() - clientData.getMaxFeathers());
+            for (int i = 0; i < ICONS_PER_ROW; i++) {
                 if (i + 1 <= excessFeathers) {
 
                     GuiIcon icon = getHalfOrFull(icons, i, (i + 1 == excessFeathers) && isEven(clientData.getStamina()));
@@ -184,7 +185,7 @@ public class FeathersHudOverlay {
 
     private static void drawWeight(GuiGraphics guiGraphics, int screenHeight, double halfFeathers, Set icons, int x, int xOffset, int rightOffset, int yOffset) {
         if (clientData.hasWeight()) {
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < ICONS_PER_ROW; i++) {
                 var halfWeight = Math.ceil((double) clientData.getWeight() / 2.0d);
                 if ((i + 1 <= halfWeight) && (i + 1 <= halfFeathers)) {
 
@@ -200,29 +201,32 @@ public class FeathersHudOverlay {
 
     private static void drawFeathers(GuiGraphics guiGraphics, int screenHeight, double halfFeathers, Set icons, int x, int xOffset, int rightOffset, int yOffset) {
         if (clientData.hasFeathers()) {
-            for (int i = 0; i < 10; i++) {
 
-                if ((i + 1 <= halfFeathers)) {
+            for (int i = 0; i < ICONS_PER_ROW; i++) {
 
-                    var icon = getHalfOrFull(icons, i, (i + 1 == halfFeathers && isEven(clientData.getFeathers())));
+                var icon = getHalfOrFull(icons, i, (i == halfFeathers) && isEven(clientData.getFeathers()));
 
-                    draw(guiGraphics, getXPos(x, i, xOffset), getYPos(screenHeight, rightOffset, getHeight(i), yOffset), icon);
+                var xPos = getXPos(x, i, xOffset);
+                var yPos = getYPos(screenHeight, rightOffset, getHeight(i), yOffset);
 
-                } else {
-                    break;
-                }
+                draw(guiGraphics, xPos, yPos, icon);
             }
         }
     }
 
     private static void drawBackground(GuiGraphics guiGraphics, int screenHeight, double halfFeathers, int x, int xOffset, int rightOffset, int yOffset, Set icons) {
-        for (int i = 0; i < 10; i++) {
-            if ((i + 1 <= halfFeathers)) {
 
-                draw(guiGraphics, getXPos(x, i, xOffset), getYPos(screenHeight, rightOffset, getHeight(i), yOffset), icons.background());
+        // Loop through each feather up to a maximum of 10
+        for (int i = 0; i < ICONS_PER_ROW; i++) {
 
-            }
+            // Get the position coordinates for drawing
+            int xPos = getXPos(x, i, xOffset);
+            int yPos = getYPos(screenHeight, rightOffset, getHeight(i), yOffset);
+
+            // Draw the feather background at the calculated position
+            draw(guiGraphics, xPos, yPos, icons.background());
         }
+
     }
 
     private static boolean isEven(int i) {
@@ -243,7 +247,7 @@ public class FeathersHudOverlay {
     }
 
     private static int getHeight(int i) {
-        return (k > i * 10 && k < (i + 1) * 10) ? 2 : 0;
+        return (k > i * ICONS_PER_ROW && k < (i + 1) * ICONS_PER_ROW) ? 2 : 0;
     }
 
     private static GuiIcon getHalfOrFull(Icons.Set set, int i, boolean isHalf) {

@@ -1,11 +1,8 @@
 package com.elenai.feathers.client;
 
 import com.elenai.feathers.api.FeathersAPI;
-import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.config.FeathersClientConfig;
-import com.elenai.feathers.config.FeathersCommonConfig;
-import com.elenai.feathers.effect.FeathersEffects;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;

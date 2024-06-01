@@ -4,12 +4,13 @@ import com.elenai.feathers.Feathers;
 import com.elenai.feathers.attributes.FeathersAttributes;
 import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.config.FeathersCommonConfig;
-import com.elenai.feathers.effect.FeathersEffects;
+import com.elenai.feathers.effect.effects.FeathersEffects;
 import com.elenai.feathers.enchantment.FeathersEnchantments;
 import com.elenai.feathers.event.FeatherEvent;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
 import com.elenai.feathers.util.ArmorHandler;
+import com.elenai.feathers.util.Calculations;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
@@ -110,7 +111,7 @@ public class FeathersAPI {
                       var post = f.useFeathers(player, useFeatherEvent.amount);
 
                       MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, prev, post));
-                      result.set(prev -post);
+                      result.set(prev - post);
 
                       if (prev != post && post != 0)
                           FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
@@ -157,36 +158,51 @@ public class FeathersAPI {
                      .map(IFeathers::getCooldown).orElse(0);
     }
 
-    public static void markForRecalculation(Player player){
+    public static void markForRecalculation(Player player) {
         player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(p -> p.setShouldRecalculate(true));
     }
+
     public static boolean isCold(Player player) {
-        if(player == null) return false;
+        if (player == null) return false;
         return player.hasEffect(FeathersEffects.COLD.get());
     }
 
     public static boolean isHot(Player player) {
-        if(player == null) return false;
+        if (player == null) return false;
         return player.hasEffect(FeathersEffects.HOT.get());
     }
 
     public static boolean isEnergized(Player player) {
-        if(player == null) return false;
+        if (player == null) return false;
         return player.hasEffect(FeathersEffects.ENERGIZED.get());
     }
 
     public static boolean isStrained(Player player) {
-        if(player == null) return false;
+        if (player == null) return false;
         return player.hasEffect(FeathersEffects.STRAINED.get());
     }
 
     public static boolean isEnduring(Player player) {
-        if(player == null) return false;
+        if (player == null) return false;
         return player.hasEffect(FeathersEffects.ENDURANCE.get());
     }
 
     public static boolean isFatigued(Player player) {
-        if(player == null) return false;
+        if (player == null) return false;
         return player.hasEffect(FeathersEffects.FATIGUE.get());
+    }
+
+    public static double getPlayerFeatherRegenerationPerSecond(Player player) {
+        var regen = player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get());
+        return regen != null ? regen.getValue() : FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get();
+    }
+
+    public static int getPlayerStaminaRegenerationPerTick(Player player) {
+        return Calculations.calculateStaminaPerTick(getPlayerFeatherRegenerationPerSecond(player));
+    }
+
+    public static int getPlayerMaxFeathers(Player player) {
+        var maxFeathers = player.getAttribute(FeathersAttributes.MAX_FEATHERS.get());
+        return (int) Math.ceil((maxFeathers != null ? maxFeathers.getValue() : FeathersCommonConfig.MAX_FEATHERS.get()));
     }
 }

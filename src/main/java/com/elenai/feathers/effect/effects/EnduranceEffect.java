@@ -1,4 +1,4 @@
-package com.elenai.feathers.effect;
+package com.elenai.feathers.effect.effects;
 
 import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.api.IModifier;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class EnduranceEffect extends MobEffect {
+public class EnduranceEffect extends FeathersEffects {
 
     /**
      * Uses Endurance Feathers before using regular feathers.

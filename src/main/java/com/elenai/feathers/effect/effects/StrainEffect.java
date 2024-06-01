@@ -1,9 +1,8 @@
-package com.elenai.feathers.effect;
+package com.elenai.feathers.effect.effects;
 
 import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.capability.PlayerFeathers;
-import com.elenai.feathers.capability.StaminaDeltaModifiers;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
@@ -15,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class StrainEffect extends MobEffect {
+public class StrainEffect extends FeathersEffects {
     /**
      * This modifier is used to over-spend feathers when no more feathers are available.
      * While strained, the player will enter a negative stamina state.
@@ -73,7 +72,7 @@ public class StrainEffect extends MobEffect {
                 if (!f.isStrained()) {
                     f.setStrained(true);
                     f.addUsageModifier(STRAIN_USAGE);
-                    f.removeDeltaModifier(StaminaDeltaModifiers.REGENERATION);
+                    f.removeDeltaModifier(IModifier.REGENERATION);
                     f.addDeltaModifier(STRAIN_RECOVERY);
                     //FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.STRAIN, true, strength), player);
                 }
@@ -91,7 +90,7 @@ public class StrainEffect extends MobEffect {
                     f.setStrained(false);
                     f.removeUsageModifier(STRAIN_USAGE);
                     f.removeDeltaModifier(STRAIN_RECOVERY);
-                    f.addDeltaModifier(StaminaDeltaModifiers.REGENERATION);
+                    f.addDeltaModifier(IModifier.REGENERATION);
                     //FeathersMessages.sendToPlayer(new EffectChangeSTCPacket(Effect.STRAIN, false, strength), player);
                 }
             });

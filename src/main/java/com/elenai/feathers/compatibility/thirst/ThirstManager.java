@@ -1,6 +1,7 @@
 package com.elenai.feathers.compatibility.thirst;
 
 import com.elenai.feathers.Feathers;
+import com.elenai.feathers.api.ICapabilityPlugin;
 import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.attributes.FeathersAttributes;
 import com.elenai.feathers.capability.PlayerFeathers;
@@ -13,6 +14,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -22,8 +24,16 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Mod.EventBusSubscriber(modid = Feathers.MODID)
-public class ThirstManager {
+public class ThirstManager implements ICapabilityPlugin {
 
+    private static ICapabilityPlugin instance;
+
+    public static ICapabilityPlugin getInstance() {
+        if (instance == null) {
+            instance = new ThirstManager();
+        }
+        return instance;
+    }
 
     public static final IModifier THIRSTY = new IModifier() {
         @Override
@@ -31,24 +41,21 @@ public class ThirstManager {
 
             player.getCapability(ModCapabilities.PLAYER_THIRST).ifPresent(iThirst -> {
 
+                var maxThirst = 20;
+                var thirstCalculationEvent = new ThirstEvent(player, playerFeathers, ModCapabilities.PLAYER_THIRST);
+                var cancelled = MinecraftForge.EVENT_BUS.post(thirstCalculationEvent);
 
-                var calculation = new ThirstManager.ThirstCalculation(player, playerFeathers, ModCapabilities.PLAYER_THIRST);
-                var cancelled = MinecraftForge.EVENT_BUS.post(new ThirstManager.ThirstCalculation(player, playerFeathers, ModCapabilities.PLAYER_THIRST));
+                 if (!cancelled && thirstCalculationEvent.getResult() == Event.Result.DEFAULT) {
 
-                if (cancelled) {
+                    thirstCalculationEvent.calculationResult = (iThirst.getThirst() - maxThirst) * FeathersThirstConfig.THIRST_STAMINA_DRAIN.get();
 
-                    return;
-                } else if (calculation.getResult() == Event.Result.DEFAULT) {
-
-                    calculation.calculationResult = (iThirst.getThirst() - 20) * FeathersThirstConfig.THIRST_STAMINA_DRAIN.get();
-
-                    var fps = Calculations.calculateFeathersPerSecond(calculation.calculationResult);
+                    var fps = Calculations.calculateFeathersPerSecond(thirstCalculationEvent.calculationResult);
                     var modifier = new AttributeModifier(Feathers.MODID + ":thirsty", fps, AttributeModifier.Operation.ADDITION);
 
                     Objects.requireNonNull(player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get())).addTransientModifier(modifier);
                 }
 
-               // staminaDelta.set(staminaDelta.get() + calculation.calculationResult);
+               // staminaDelta.set(staminaDelta.get() + thirstCalculationEvent.calculationResult);
             });
         }
 
@@ -68,8 +75,8 @@ public class ThirstManager {
         public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
             player.getCapability(ModCapabilities.PLAYER_THIRST).ifPresent(iThirst -> {
 
-                var calculation = new ThirstCalculation(player, playerFeathers, ModCapabilities.PLAYER_THIRST);
-                var cancelled = MinecraftForge.EVENT_BUS.post(new ThirstCalculation(player, playerFeathers, ModCapabilities.PLAYER_THIRST));
+                var calculation = new ThirstEvent(player, playerFeathers, ModCapabilities.PLAYER_THIRST);
+                var cancelled = MinecraftForge.EVENT_BUS.post(new ThirstEvent(player, playerFeathers, ModCapabilities.PLAYER_THIRST));
 
                 if (cancelled) {
 
@@ -99,8 +106,11 @@ public class ThirstManager {
         }
     };
 
+
+
     @SubscribeEvent
-    public static void attachThirstDeltaModifiers(FeatherEvent.AttachDefaultDeltaModifiers event) {
+    public static void onAttachDefaultDeltaModifiers(FeatherEvent.AttachDefaultDeltaModifiers event) {
+
         if (Feathers.THIRST_LOADED && FeathersThirstConfig.THIRST_COMPATIBILITY.get()) {
 
             if (FeathersThirstConfig.THIRST_STAMINA_DRAIN.get() > 0)
@@ -112,35 +122,42 @@ public class ThirstManager {
         }
     }
 
-    public static void handleThirst(TickEvent.PlayerTickEvent event) {
-        if(event.phase == TickEvent.Phase.START){
-            if (Feathers.THIRST_LOADED && FeathersThirstConfig.THIRST_COMPATIBILITY.get()) {
-                event.player.getCapability(ModCapabilities.PLAYER_THIRST).ifPresent(iThirst -> {
-
-                    if(iThirst.getShouldTickThirst()){
-                        var thirst = iThirst.getThirst();
-                        var quenched = iThirst.getQuenched();
-
-                        //TODO stuff
-                    }
-                });
-            }
-        }
+    @Override
+    public void onPlayerJoin(EntityJoinLevelEvent event) {
 
     }
 
-    public static class ThirstCalculation extends PlayerEvent {
+    @Override
+    public void onPlayerTickBefore(TickEvent.PlayerTickEvent event) {
+        if(event.phase == TickEvent.Phase.START){
+            if (FeathersThirstConfig.enableThirst()) {
+                event.player.getCapability(ModCapabilities.PLAYER_THIRST).ifPresent(iThirst -> {
+
+
+                });
+            }
+        }
+    }
+
+    @Override
+    public void onPlayerTickAfter(TickEvent.PlayerTickEvent event) {
+
+    }
+
+    public static class ThirstEvent extends PlayerEvent {
 
         public int calculationResult;
         public PlayerFeathers playerFeathers;
 
         public Capability<IThirst> thirst;
 
-        public ThirstCalculation(Player player, PlayerFeathers playerFeathers, Capability<IThirst> thirst) {
+        public ThirstEvent(Player player, PlayerFeathers playerFeathers, Capability<IThirst> thirst) {
             super(player);
             this.playerFeathers = playerFeathers;
             this.thirst = thirst;
         }
 
     }
+
+
 }

@@ -30,6 +30,8 @@ public abstract class FeatherEvent extends PlayerEvent {
 
     }
 
+
+
     public static class AttachDefaultUsageModifiers extends Event {
 
         public final List<IModifier> modifiers;

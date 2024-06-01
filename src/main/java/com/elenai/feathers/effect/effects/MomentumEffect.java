@@ -1,4 +1,4 @@
-package com.elenai.feathers.effect;
+package com.elenai.feathers.effect.effects;
 
 import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.api.IModifier;
@@ -9,7 +9,7 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MomentumEffect extends MobEffect {
+public class MomentumEffect extends FeathersEffects {
 
     /**
      * Halves the amount of stamina used.

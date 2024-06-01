@@ -1,11 +1,9 @@
-package com.elenai.feathers.event;
+package com.elenai.feathers.client;
 
 import com.elenai.feathers.Feathers;
-import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.client.ClientFeathersData;
 import com.elenai.feathers.client.gui.FeathersHudOverlay;
 import com.elenai.feathers.config.FeathersClientConfig;
-import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.enchantment.FeathersEnchantments;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.RequestWeightCTSPacket;
@@ -28,7 +26,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.List;
 
-public class ClientEvents {
+public class ClientEventsManager {
 
     public static int currentWeight;
 

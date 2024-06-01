@@ -1,7 +1,7 @@
-package com.elenai.feathers.potion;
+package com.elenai.feathers;
 
 import com.elenai.feathers.Feathers;
-import com.elenai.feathers.effect.FeathersEffects;
+import com.elenai.feathers.effect.effects.FeathersEffects;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -18,10 +18,10 @@ public class FeathersPotions {
     public static final RegistryObject<Potion> LONG_ENDURANCE_POTION = POTIONS.register("long_endurance_potion", () -> new Potion(new MobEffectInstance(FeathersEffects.ENDURANCE.get(), 4200, 0)));
 
     public static final RegistryObject<Potion> COLD_POTION = POTIONS.register("cold_potion", () -> new Potion(new MobEffectInstance(FeathersEffects.COLD.get(), 6000, 0)));
-    public static final RegistryObject<Potion> STRONG_COLD_POTION = POTIONS.register("cold_potion", () -> new Potion(new MobEffectInstance(FeathersEffects.COLD.get(), 3000, 1)));
+    public static final RegistryObject<Potion> STRONG_COLD_POTION = POTIONS.register("strong_cold_potion", () -> new Potion(new MobEffectInstance(FeathersEffects.COLD.get(), 3000, 1)));
 
     public static final RegistryObject<Potion> HOT_POTION = POTIONS.register("hot_potion", () -> new Potion(new MobEffectInstance(FeathersEffects.HOT.get(), 6000, 0)));
-    public static final RegistryObject<Potion> STRONG_HOT_POTION = POTIONS.register("hot_potion", () -> new Potion(new MobEffectInstance(FeathersEffects.HOT.get(), 3000, 1)));
+    public static final RegistryObject<Potion> STRONG_HOT_POTION = POTIONS.register("strong_hot_potion", () -> new Potion(new MobEffectInstance(FeathersEffects.HOT.get(), 3000, 1)));
 
     public static final RegistryObject<Potion> ENERGIZED_POTION = POTIONS.register("energized_potion", () -> new Potion(new MobEffectInstance(FeathersEffects.ENERGIZED.get(), 1600, 0)));
     public static final RegistryObject<Potion> STRONG_ENERGIZED_POTION = POTIONS.register("strong_energized_potion", () -> new Potion(new MobEffectInstance(FeathersEffects.ENERGIZED.get(), 1000, 1)));

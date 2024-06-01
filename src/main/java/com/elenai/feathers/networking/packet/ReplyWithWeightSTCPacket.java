@@ -1,6 +1,6 @@
 package com.elenai.feathers.networking.packet;
 
-import com.elenai.feathers.event.ClientEvents;
+import com.elenai.feathers.client.ClientEventsManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -24,7 +24,7 @@ public class ReplyWithWeightSTCPacket {
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
-            ClientEvents.currentWeight = weight;
+            ClientEventsManager.currentWeight = weight;
         });
         return true;
     }

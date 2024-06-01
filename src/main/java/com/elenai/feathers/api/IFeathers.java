@@ -5,6 +5,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.AutoRegisterCapability;
 
+import javax.swing.text.html.Option;
+import java.util.Map;
+import java.util.Optional;
+
 @AutoRegisterCapability
 public interface IFeathers {
 
@@ -88,9 +92,17 @@ public interface IFeathers {
 
     boolean hasMomentum();
 
-    java.util.Map<String, IModifier> getStaminaDeltaModifiers();
+    Map<String, IModifier> getStaminaDeltaModifiers();
 
-    java.util.Map<String, IModifier> getStaminaUsageModifiers();
+    Map<String, IModifier> getStaminaUsageModifiers();
+
+    void addCounter(String name, int value);
+
+    void removeCounter(String name);
+
+    Optional<Integer> getCounter(String name);
+
+    void setCounter(String name, int value);
 
     void setShouldRecalculate(boolean shouldRecalculate);
 

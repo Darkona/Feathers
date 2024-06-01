@@ -3,9 +3,8 @@ package com.elenai.feathers.capability;
 import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.api.IModifier;
-import com.elenai.feathers.attributes.FeathersAttributes;
 import com.elenai.feathers.config.FeathersCommonConfig;
-import com.elenai.feathers.effect.FeathersEffects;
+import com.elenai.feathers.effect.effects.FeathersEffects;
 import com.elenai.feathers.event.FeatherAmountEvent;
 import com.elenai.feathers.event.FeatherEvent;
 import com.elenai.feathers.event.StaminaChangeEvent;
@@ -37,20 +36,22 @@ public class PlayerFeathers implements IFeathers {
     private int enduranceFeathers;
     private int strainFeathers;
     private int maxStrained;
-    //Recalculation
+
+    //Stamina delta calculation
     private int staminaDelta;
     @Getter(AccessLevel.NONE)
     private boolean shouldRecalculate;
+
     //Effects
     private boolean cold;
     private boolean hot;
     private boolean energized;
     private int energizedStrength;
     private boolean fatigued;
-    @Getter(AccessLevel.NONE)
     private boolean momentum;
     private boolean strained;
 
+    private Map<String, Integer> counters = new HashMap<>();
 
     //Modifiers
     private Map<String, IModifier> staminaDeltaModifiers = new HashMap<>();
@@ -59,51 +60,50 @@ public class PlayerFeathers implements IFeathers {
     private Map<String, IModifier> staminaUsageModifiers = new HashMap<>();
     private List<IModifier> staminaUsageModifiersList = new ArrayList<>();
 
-    /**
-     * Default constructor.
-     */
+
     public PlayerFeathers(){
         maxStamina = (int) (FeathersCommonConfig.MAX_FEATHERS.get() * FeathersConstants.STAMINA_PER_FEATHER);
         stamina = maxStamina;
-        synchronizeFeathers();
-        attachDefaultDeltaModifiers();
-        attachDefaultUsageModifiers();
+
         cooldown = ZERO;
         strainFeathers = ZERO;
         enduranceFeathers = ZERO;
         maxStrained = FeathersCommonConfig.MAX_STRAIN.get();
+
+        attachDefaultDeltaModifiers();
+
+        attachDefaultUsageModifiers();
+
+        synchronizeFeathers();
 
         shouldRecalculate = true;
     }
-    public PlayerFeathers(Player player) {
 
-        var attr = player.getAttributes();
-        if(attr.hasAttribute(FeathersAttributes.MAX_FEATHERS.get())){
-            maxStamina = (int) attr.getValue(FeathersAttributes.MAX_FEATHERS.get());
-        } else {
-            maxStamina = (int) (FeathersCommonConfig.MAX_FEATHERS.get() * FeathersConstants.STAMINA_PER_FEATHER);
-        }
-        stamina = maxStamina;
-        synchronizeFeathers();
-        attachDefaultDeltaModifiers();
-        attachDefaultUsageModifiers();
-        cooldown = ZERO;
-        strainFeathers = ZERO;
-        enduranceFeathers = ZERO;
-        maxStrained = FeathersCommonConfig.MAX_STRAIN.get();
+    public void addCounter(String name, int value) {
+        counters.put(name, value);
+    }
 
-        shouldRecalculate = true;
+    public void removeCounter(String name) {
+        counters.remove(name);
+    }
+
+    public Optional<Integer> getCounter(String name) {
+        return Optional.ofNullable(counters.get(name));
+    }
+
+    public void setCounter(String name, int value) {
+        counters.put(name, value);
     }
 
     private void attachDefaultDeltaModifiers() {
 
-        var event = new FeatherEvent.AttachDefaultDeltaModifiers(new ArrayList<>());
-
-        if (!MinecraftForge.EVENT_BUS.post(event)) return;
+        var modifiers = new ArrayList<IModifier>();
+        var event = new FeatherEvent.AttachDefaultDeltaModifiers(modifiers);
+        modifiers.add(IModifier.REGENERATION);
+        if (MinecraftForge.EVENT_BUS.post(event)) return;
 
         if (event.getResult() == Event.Result.DEFAULT) {
-            event.modifiers.add(StaminaDeltaModifiers.REGENERATION);
-            event.modifiers.forEach(m -> staminaDeltaModifiers.put(m.getName(), m));
+            event.modifiers.forEach(this::addDeltaModifier);
         }
 
     }
@@ -115,7 +115,7 @@ public class PlayerFeathers implements IFeathers {
         if (!MinecraftForge.EVENT_BUS.post(event)) return;
 
         if (event.getResult() == Event.Result.DEFAULT) {
-            event.modifiers.add(StaminaUsageModifiers.DEFAULT_USAGE);
+            event.modifiers.add(IModifier.DEFAULT_USAGE);
             event.modifiers.forEach(m -> staminaUsageModifiers.put(m.getName(), m));
         }
 
@@ -174,12 +174,15 @@ public class PlayerFeathers implements IFeathers {
     @Override
     public void recalculateStaminaDelta(Player player) {
         if (!shouldRecalculate) return;
-        AtomicInteger delta = new AtomicInteger(ZERO);
+
+        final AtomicInteger delta = new AtomicInteger(ZERO);
+
         sortDeltaModifiers();
-        for (IModifier modifier : staminaDeltaModifierList) {
-            modifier.apply(player, this, delta);
-        }
+
+        staminaDeltaModifierList.forEach(m -> m.apply(player, this, delta));
+
         staminaDelta = delta.get();
+
         shouldRecalculate = false;
     }
 
@@ -202,8 +205,11 @@ public class PlayerFeathers implements IFeathers {
         if (stamina <= ZERO) staminaDelta = applyDeltaToStrain();
 
         stamina += staminaDelta;
+
         if (stamina > maxStamina) stamina = maxStamina;
+
         if (stamina < ZERO) stamina = ZERO;
+
         synchronizeFeathers();
     }
 
@@ -239,7 +245,6 @@ public class PlayerFeathers implements IFeathers {
         addStamina(feathers * FeathersConstants.STAMINA_PER_FEATHER);
         return feathers;
     }
-
 
     @Override
     public int useFeathers(Player player, int feathers) {
@@ -315,7 +320,6 @@ public class PlayerFeathers implements IFeathers {
 
         recalculateStaminaDelta(player);
 
-
         int prevStamina = stamina;
         int prevFeathers = feathers;
         var preChangeEvent = new StaminaChangeEvent.Pre(player, staminaDelta, stamina);
@@ -377,10 +381,14 @@ public class PlayerFeathers implements IFeathers {
 
     public void tick(Player player) {
 
-        boolean staminaChanged = false;
+        if(shouldRecalculate)
+            recalculateStaminaDelta(player);
+
         if (canDoStaminaChange()) {
             doStaminaChange(player);
         }
+
+
 
     }
 

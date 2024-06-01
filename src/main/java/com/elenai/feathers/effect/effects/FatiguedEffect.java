@@ -1,4 +1,4 @@
-package com.elenai.feathers.effect;
+package com.elenai.feathers.effect.effects;
 
 import com.elenai.feathers.capability.Capabilities;
 import net.minecraft.server.level.ServerPlayer;
@@ -8,7 +8,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import org.jetbrains.annotations.NotNull;
 
-public class FatiguedEffect extends MobEffect {
+public class FatiguedEffect extends FeathersEffects {
 
     public FatiguedEffect(MobEffectCategory mobEffectCategory, int color) {
         super(mobEffectCategory, color);

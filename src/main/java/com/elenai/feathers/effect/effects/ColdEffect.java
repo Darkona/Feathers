@@ -1,4 +1,4 @@
-package com.elenai.feathers.effect;
+package com.elenai.feathers.effect.effects;
 
 import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.attributes.FeathersAttributes;
@@ -10,7 +10,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class ColdEffect extends MobEffect {
+public class ColdEffect extends FeathersEffects {
 
 
     public static final String MODIFIER_UUID = "848704c2-d3b5-4b71-9e96-7ab5c42095e2";

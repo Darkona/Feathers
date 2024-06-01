@@ -1,12 +1,15 @@
-package com.elenai.feathers.handler;
+package com.elenai.feathers;
 
 import com.elenai.feathers.Feathers;
+import com.elenai.feathers.api.ICapabilityPlugin;
 import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.attributes.FeathersAttributes;
 import com.elenai.feathers.capability.*;
+import com.elenai.feathers.compatibility.thirst.FeathersThirstConfig;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.networking.FeathersMessages;
 import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
+import dev.ghen.thirst.foundation.common.capability.ModCapabilities;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -21,6 +24,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -33,27 +37,38 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Mod.EventBusSubscriber(modid = Feathers.MODID)
-public class PlayerFeathersEventManager {
+public class FeathersManager {
+
+    private static final String THIRST_COUNTER = "thirst";
+
+    private static final List<ICapabilityPlugin> plugins = new ArrayList<>();
+    private FeathersManager(){};
+
+    public static void registerPlugin(ICapabilityPlugin plugin) {
+        plugins.add(plugin);
+    }
 
     @SubscribeEvent
     public static void attachCapabilityToEntity(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof Player player) {
-            final IFeathers feathersCapability = new PlayerFeathers(player);
-            final LazyOptional<IFeathers> capOptional = LazyOptional.of(() -> feathersCapability);
-            ICapabilityProvider provider = getiCapabilityProvider(capOptional, feathersCapability);
-
             if (!event.getObject().getCapability(Capabilities.PLAYER_FEATHERS).isPresent()) {
-                event.addCapability(new ResourceLocation(Feathers.MODID, "properties"), provider);
+                event.addCapability(new ResourceLocation(Feathers.MODID, "properties"), getProvider());
             }
         }
     }
 
     @NotNull
-    private static ICapabilityProvider getiCapabilityProvider(LazyOptional<IFeathers> capOptional, IFeathers feathersCapability) {
+    private static ICapabilityProvider getProvider() {
         final Capability<IFeathers> capability = Capabilities.PLAYER_FEATHERS;
         return new ICapabilitySerializable<CompoundTag>() {
+
+            final IFeathers feathersCapability = new PlayerFeathers();
+            final LazyOptional<IFeathers> capOptional = LazyOptional.of(() -> feathersCapability);
+
             @Nonnull
             public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction direction) {
                 return cap == capability ? capOptional.cast() : LazyOptional.empty();
@@ -95,7 +110,14 @@ public class PlayerFeathersEventManager {
 
             player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
                 f.setShouldRecalculate(true);
-                f.recalculateStaminaDelta(player);
+
+
+                if (FeathersThirstConfig.enableThirst() && player.getCapability(ModCapabilities.PLAYER_THIRST).isPresent()) {
+                    f.addCounter(THIRST_COUNTER, 0);
+                } else {
+                    f.removeCounter(THIRST_COUNTER);
+                }
+
                 FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
             });
         }
@@ -145,14 +167,27 @@ public class PlayerFeathersEventManager {
     public static void assignFeathersAttributes(Player player) {
         var attr = player.getAttribute(FeathersAttributes.MAX_FEATHERS.get());
 
-        if (attr != null && attr.getBaseValue() != FeathersCommonConfig.MAX_FEATHERS.get()){
-                attr.setBaseValue((FeathersCommonConfig.MAX_FEATHERS.get()));
+        if (attr != null && attr.getBaseValue() != FeathersCommonConfig.MAX_FEATHERS.get()) {
+            attr.setBaseValue((FeathersCommonConfig.MAX_FEATHERS.get()));
         }
 
-        if (attr != null && attr.getBaseValue() != FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get()){
-                attr.setBaseValue((FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get()));
+        if (attr != null && attr.getBaseValue() != FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get()) {
+            attr.setBaseValue((FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get()));
         }
 
     }
+    @SubscribeEvent
+    public static void playerTickEvent(TickEvent.PlayerTickEvent event) {
+        Player player = event.player;
+
+        if (!player.isAlive() || player.isCreative() || player.isSpectator()) return;
+
+        plugins.forEach(p -> p.onPlayerTickBefore(event));
+
+        player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> f.tick(player));
+
+        plugins.forEach(p -> p.onPlayerTickAfter(event));
+    }
+
 
 }
