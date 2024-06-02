@@ -66,7 +66,7 @@ public class FeatherSyncSTCPacket {
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() -> {
+        return context.enqueueWork(() -> {
             Player clientPlayer = Minecraft.getInstance().player;
             if (clientPlayer != null) {
                 clientPlayer.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
@@ -75,10 +75,9 @@ public class FeatherSyncSTCPacket {
                     f.setFeathers(feathers);
                     f.setStaminaDelta(this.staminaDelta);
                     counters.forEach(f::setCounter);
-                    ClientFeathersData.getInstance().update(f);
+                    ClientFeathersData.getInstance().update(clientPlayer, f);
                 });
             }
-        });
-        return true;
+        }).isDone();
     }
 }

@@ -23,7 +23,6 @@ public class FeathersAttributes {
     public static final HashMap<RegistryObject<Attribute>, UUID> UUIDS = new HashMap<>();
     public static final DeferredRegister<Attribute> ATTRIBUTES = DeferredRegister.create(ForgeRegistries.ATTRIBUTES, Feathers.MODID);
 
-
     public static final RegistryObject<Attribute> MAX_FEATHERS = registerAttribute("feathers.max_feathers",
             (id) -> new RangedAttribute(id, 20.0D, 0.0D, 40.0D).setSyncable(true),
             "d74ded8f-c5b6-4222-80e2-dbea7ccf8d02"

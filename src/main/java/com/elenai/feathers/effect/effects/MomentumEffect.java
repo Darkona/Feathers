@@ -18,12 +18,12 @@ public class MomentumEffect extends FeathersEffects {
     public static final IModifier MOMENTUM = new IModifier() {
 
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger feathersToUse) {
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger feathersToUse) {
 
         }
 
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger feathersToUse, AtomicBoolean result) {
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger feathersToUse, AtomicBoolean result) {
             feathersToUse.set((feathersToUse.get() * FeathersConstants.STAMINA_PER_FEATHER) / 2);
         }
 

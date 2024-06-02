@@ -16,17 +16,17 @@ public interface IModifier {
     IModifier NON_LINEAR_REGENERATION = new IModifier() {
 
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta) {
 
             var staminaPerSecond = FeathersAPI.getPlayerStaminaRegenerationPerTick(player);
-            var maxStamina = playerFeathers.getMaxStamina();
-            var value = Math.max((int) (1 / Math.log(playerFeathers.getFeathers() / 40d + 1.4) - 3.5) * staminaPerSecond, 1);
+            var maxStamina = iFeathers.getMaxStamina();
+            var value = Math.max((int) (1 / Math.log(iFeathers.getFeathers() / 40d + 1.4) - 3.5) * staminaPerSecond, 1);
             staminaDelta.set(value);
 
         }
 
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
 
         }
 
@@ -47,12 +47,12 @@ public interface IModifier {
     IModifier INVERSE_REGENERATION = new IModifier() {
 
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta) {
             staminaDelta.set(staminaDelta.get() - FeathersAPI.getPlayerStaminaRegenerationPerTick(player));
         }
 
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
 
         }
 
@@ -74,12 +74,12 @@ public interface IModifier {
      */
     IModifier REGENERATION = new IModifier() {
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta) {
             staminaDelta.set(staminaDelta.get() + FeathersAPI.getPlayerStaminaRegenerationPerTick(player));
         }
 
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
 
         }
 
@@ -96,12 +96,12 @@ public interface IModifier {
     };
     IModifier DEFAULT_USAGE = new IModifier() {
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger usingFeathers) {
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger usingFeathers) {
             //Do nothing
         }
 
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
             result.set(true);
         }
 
@@ -115,6 +115,7 @@ public interface IModifier {
             return "default";
         }
     };
+
     /**
      * Usage Modifier Ordinals reference.
      * 0 = Hot effect / Momentum effect;
@@ -127,9 +128,9 @@ public interface IModifier {
      **/
     int[] ordinals = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
-    void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta);
+    void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta);
 
-    void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta, AtomicBoolean result);
+    void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result);
 
     int getOrdinal();
 

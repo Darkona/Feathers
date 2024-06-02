@@ -53,7 +53,7 @@ public class FeathersCommonConfig {
 
         REGEN_FEATHERS_PER_SECOND = BUILDER
                 .comment("How many feathers the player will regenerate every second. This will be modified by effects.")
-                .defineInRange("Base Feather Regeneration", 0.4D, -40.0D, 40.0D);
+                .defineInRange("Base Feather Regeneration", 0.33D, -40.0D, 40.0D);
 
 
         MAX_FEATHERS = BUILDER.comment("Maximum Feathers the player can have.")

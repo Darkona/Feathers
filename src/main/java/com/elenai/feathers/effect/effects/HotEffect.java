@@ -25,12 +25,12 @@ public class HotEffect extends FeathersEffects {
     public static final IModifier HOT = new IModifier() {
 
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger feathersToUse) {
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger feathersToUse) {
             feathersToUse.set(feathersToUse.get() * 2);
         }
 
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
 
         }
 

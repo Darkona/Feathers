@@ -44,8 +44,7 @@ public class ClientFeathersData {
         return instance;
     }
 
-    public void update(IFeathers f) {
-        Player player = Minecraft.getInstance().player;
+    public void update(Player player, IFeathers f) {
         stamina = f.getStamina();
         maxStamina = f.getMaxStamina();
         feathers = f.getFeathers();

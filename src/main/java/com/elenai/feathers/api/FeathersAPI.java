@@ -93,7 +93,7 @@ public class FeathersAPI {
      * @return the amount of feathers spent
      * @throws UnsupportedOperationException if the amount is negative
      */
-    public static boolean spendFeathers(ServerPlayer player, int amount, int cooldownTicks) throws UnsupportedOperationException {
+    public static boolean spendFeathers(Player player, int amount, int cooldownTicks) throws UnsupportedOperationException {
         if (amount < 0) {
             throw new UnsupportedOperationException("Cannot spend negative feathers");
         }

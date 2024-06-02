@@ -2,8 +2,6 @@ package com.elenai.feathers;
 
 import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.api.ICapabilityPlugin;
-import com.elenai.feathers.api.IFeathers;
-import com.elenai.feathers.api.StaminaAPI;
 import com.elenai.feathers.attributes.FeathersAttributes;
 import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.capability.PlayerFeathers;
@@ -29,7 +27,6 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
-import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -71,11 +68,11 @@ public class FeathersManager {
 
     @NotNull
     private static ICapabilityProvider getProvider() {
-        final Capability<IFeathers> capability = Capabilities.PLAYER_FEATHERS;
+        final Capability<com.elenai.feathers.api.IFeathers> capability = Capabilities.PLAYER_FEATHERS;
         return new ICapabilitySerializable<CompoundTag>() {
 
-            final IFeathers feathersCapability = new PlayerFeathers();
-            final LazyOptional<IFeathers> capOptional = LazyOptional.of(() -> feathersCapability);
+            final com.elenai.feathers.api.IFeathers feathersCapability = new PlayerFeathers();
+            final LazyOptional<com.elenai.feathers.api.IFeathers> capOptional = LazyOptional.of(() -> feathersCapability);
 
             @Nonnull
             public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction direction) {
@@ -206,23 +203,5 @@ public class FeathersManager {
 
     }
 
-    @SubscribeEvent
-    public static void onEffectAdded(MobEffectEvent.Added event) {
-        if (event.getEntity() instanceof Player player && event.getEffectInstance().getEffect() instanceof FeathersEffects effect) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-                f.addCounter(EnduranceEffect.ENDURANCE_COUNTER, (event.getEffectInstance().getAmplifier() + 1) * 4);
-                StaminaAPI.addStaminaUsageModifier(player, EnduranceEffect.ENDURANCE);
-            });
-        }
-    }
 
-    @SubscribeEvent
-    public static void onEffectRemoved(MobEffectEvent.Remove event) {
-        if (event.getEntity() instanceof Player player && player.hasEffect(FeathersEffects.ENDURANCE.get())) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-                f.removeCounter(EnduranceEffect.ENDURANCE_COUNTER);
-                StaminaAPI.removeStaminaUsageModifier(player, EnduranceEffect.ENDURANCE);
-            });
-        }
-    }
 }

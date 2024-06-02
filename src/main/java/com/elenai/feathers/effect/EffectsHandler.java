@@ -2,10 +2,12 @@ package com.elenai.feathers.effect;
 
 import com.elenai.feathers.Feathers;
 import com.elenai.feathers.api.ICapabilityPlugin;
+import com.elenai.feathers.api.StaminaAPI;
 import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.compatibility.coldsweat.ColdSweatManager;
 import com.elenai.feathers.compatibility.coldsweat.FeathersColdSweatConfig;
 import com.elenai.feathers.config.FeathersCommonConfig;
+import com.elenai.feathers.effect.effects.EnduranceEffect;
 import com.elenai.feathers.event.FeatherAmountEvent;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -30,6 +32,25 @@ public class EffectsHandler implements ICapabilityPlugin {
             instance = new EffectsHandler();
         }
         return instance;
+    }
+
+    @SubscribeEvent
+    public static void onEffectAdded(MobEffectEvent.Added event) {
+        if (event.getEntity() instanceof Player player &&
+                event.getEffectInstance().getEffect() instanceof FeathersEffects effect) {
+            effect.applyEffect(player, event.getEffectInstance());
+        }
+    }
+
+
+
+    @SubscribeEvent
+    public static void onEffectRemoved(MobEffectEvent.Remove event) {
+        if (event.getEntity() instanceof Player player &&
+                event.getEffect() instanceof FeathersEffects effect &&
+                player.hasEffect(effect)) {
+            effect.removeEffect(player, event.getEffectInstance());
+        }
     }
 
     @SubscribeEvent
@@ -75,7 +96,9 @@ public class EffectsHandler implements ICapabilityPlugin {
 
 
     public static boolean canApplyColdEffect(Player player) {
-
+       /* if (!FeathersCommonConfig.ENABLE_HOT_EFFECTS.get() ||
+                player.getAbilities().invulnerable ||
+                player.isCreative()) return false;*/
 
         if (FeathersColdSweatConfig.isColdSweatEnabled()) {
             return ColdSweatManager.canApplyColdEffect(player);
@@ -86,10 +109,10 @@ public class EffectsHandler implements ICapabilityPlugin {
 
     public static boolean canApplyHotEffect(Player player) {
 
-        if (!FeathersCommonConfig.ENABLE_HOT_EFFECTS.get() ||
+       /* if (!FeathersCommonConfig.ENABLE_HOT_EFFECTS.get() ||
                 player.getAbilities().invulnerable ||
                 player.isCreative()) return false;
-
+*/
 
         if (FeathersColdSweatConfig.isColdSweatEnabled()) {
             return ColdSweatManager.canApplyHotEffect(player);

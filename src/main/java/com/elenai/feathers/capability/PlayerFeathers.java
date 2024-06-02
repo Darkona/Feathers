@@ -2,7 +2,6 @@ package com.elenai.feathers.capability;
 
 import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.api.FeathersConstants;
-import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.client.ClientFeathersData;
 import com.elenai.feathers.config.FeathersCommonConfig;
@@ -29,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
 @Setter
-public class PlayerFeathers implements IFeathers {
+public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
 
     private static final int ZERO = 0;
     private int stamina;
@@ -232,12 +231,12 @@ public class PlayerFeathers implements IFeathers {
     public boolean useFeathers(Player player, int feathers) {
         var prev = this.feathers;
         var multiplier = FeathersAPI.getPlayerStaminaUsageMultiplier(player);
-        var staminaToRemove = new AtomicInteger((int) (feathers * FeathersConstants.STAMINA_PER_FEATHER * multiplier));
+        var staminaToUse = new AtomicInteger((int) (feathers * FeathersConstants.STAMINA_PER_FEATHER * multiplier));
         var approve = new AtomicBoolean(false);
-        staminaUsageModifiersList.forEach(m -> m.apply(player, this, staminaToRemove, approve));
+        staminaUsageModifiersList.forEach(m -> m.apply(player, this, staminaToUse, approve));
 
-        if (staminaToRemove.get() <= 0) return true;
-        subtractStamina(staminaToRemove.get());
+        if (staminaToUse.get() <= 0) return true;
+        subtractStamina(staminaToUse.get());
         synchronizeFeathers();
         return approve.get();
     }
@@ -250,7 +249,7 @@ public class PlayerFeathers implements IFeathers {
         this.stamina = Math.max(this.stamina - stamina, ZERO);
     }
 
-    public void copyFrom(IFeathers source) {
+    public void copyFrom(com.elenai.feathers.api.IFeathers source) {
         this.maxStamina = source.getMaxStamina();
         this.staminaDelta = source.getStaminaDelta();
         this.stamina = source.getStamina();
@@ -363,7 +362,7 @@ public class PlayerFeathers implements IFeathers {
             doStaminaChange(player);
         }
 
-        if (player.tickCount % 2 == 0 && player.level().isClientSide) ClientFeathersData.getInstance().update(this);
+        if (player.tickCount % 2 == 0 && player.level().isClientSide) ClientFeathersData.getInstance().update(player, this);
     }
 
 }

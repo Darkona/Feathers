@@ -20,20 +20,21 @@ public class StrainEffect extends FeathersEffects {
      * This modifier is used to over-spend feathers when no more feathers are available.
      * While strained, the player will enter a negative stamina state.
      * This modifier adds Strained Feathers up to Max_strain when stamina is 0.
+     * While strained, regeneration is much, much slower.
      */
     public static final IModifier STRAIN_USAGE = new IModifier() {
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger feathers) {
-            if (playerFeathers.getFeathers() == 0) {
-                int strain = playerFeathers.getStrainFeathers();
-                if (strain + feathers.get() <= playerFeathers.getMaxStrained()) {
-                    playerFeathers.setStrainFeathers(strain + feathers.get());
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger feathers) {
+            if (iFeathers.getFeathers() == 0) {
+                int strain = iFeathers.getStrainFeathers();
+                if (strain + feathers.get() <= iFeathers.getMaxStrained()) {
+                    iFeathers.setStrainFeathers(strain + feathers.get());
                 }
             }
         }
 
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
 
         }
 
@@ -49,14 +50,14 @@ public class StrainEffect extends FeathersEffects {
     };
     public static final IModifier STRAIN_RECOVERY = new IModifier() {
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta) {
-            if (playerFeathers.getStrainFeathers() > 0) {
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta) {
+            if (iFeathers.getStrainFeathers() > 0) {
                 staminaDelta.set(staminaDelta.get() + (int) (FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get() * 0.4));
             }
         }
 
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
 
         }
 
@@ -96,6 +97,12 @@ public class StrainEffect extends FeathersEffects {
             });
         }
         super.removeAttributeModifiers(target, map, strength);
+    }
+
+    public void applyEffect(LivingEntity entity) {
+        entity.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+            f.addCounter("Strain", 0);
+        });
     }
 
 }

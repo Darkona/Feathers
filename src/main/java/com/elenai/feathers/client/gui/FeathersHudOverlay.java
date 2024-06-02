@@ -39,83 +39,84 @@ public class FeathersHudOverlay {
 
         int rightOffset = FeathersClientConfig.AFFECTED_BY_RIGHT_HEIGHT.get() ? gui.rightHeight : 0;
 
+        if (Minecraft.getInstance().options.hideGui || !gui.shouldDrawSurvivalElements()) return;
+
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.enableBlend();
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
         RenderSystem.setShaderTexture(0, ICONS);
+        /*
+         * If enabled, decrease the overlay's alpha value relative to the fade in/out duration
+         */
+        determineFadeEffect(fadeCooldown, fadeOut, fadeIn);
 
-        if (!Minecraft.getInstance().options.hideGui && gui.shouldDrawSurvivalElements()) {
-            /*
-             * If enabled, decrease the overlay's alpha value relative to the fade in/out duration
-             */
-            determineFadeEffect(fadeCooldown, fadeOut, fadeIn);
+        if (alpha <= 0) return;
 
-            if (alpha <= 0) return;
+        double halfFeathers = Math.ceil(clientData.getFeathers() / 2.0d);
+        Icons.Set icons = getIconSet();
 
-            double halfFeathers = Math.ceil(clientData.getFeathers() / 2.0d);
-            Icons.Set icons = getIconSet();
+        /*
+         * Always render the background up to the maximum feather amount
+         */
+        drawBackground(guiGraphics, screenHeight, halfFeathers, x, xOffset, rightOffset, yOffset, icons);
 
-            /*
-             * Always render the background up to the maximum feather amount
-             */
-            drawBackground(guiGraphics, screenHeight, halfFeathers, x, xOffset, rightOffset, yOffset, icons);
+        /*
+         * Render the currently active feathers
+         */
+        drawFeathers(guiGraphics, screenHeight, halfFeathers, icons, x, xOffset, rightOffset, yOffset);
 
-            /*
-             * Render the currently active feathers
-             */
-            drawFeathers(guiGraphics, screenHeight, halfFeathers, icons, x, xOffset, rightOffset, yOffset);
+        /*
+         * Only render the currently worn armor
+         */
+        drawWeight(guiGraphics, screenHeight, halfFeathers, x, xOffset, rightOffset, yOffset);
 
-            /*
-             * Only render the currently worn armor
-             */
-            drawWeight(guiGraphics, screenHeight, halfFeathers, x, xOffset, rightOffset, yOffset);
+        /*
+         * Render feathers past 20 in a different color
+         */
+        drawOverflow(guiGraphics, screenHeight, x, xOffset, rightOffset, yOffset);
 
-            /*
-             * Render feathers past 20 in a different color
-             */
-            drawOverflow(guiGraphics, screenHeight, x, xOffset, rightOffset, yOffset);
+        /*
+         * Render the Regeneration effect
+         */
+        drawOverlay(guiGraphics, screenHeight, x, xOffset, rightOffset, yOffset);
 
-            /*
-             * Render the Regeneration effect
-             */
-            drawOverlay(guiGraphics, screenHeight, x, xOffset, rightOffset, yOffset);
+        energizedK();
 
-            if (clientData.isEnergized()) {
-                if (k == 100) {
-                    k = -40;
-                } else {
-                    k += 2;
-                }
-            } else if (k != 0) {
-                k = 0;
-            }
+        if (FeathersClientConfig.AFFECTED_BY_RIGHT_HEIGHT.get()) {
+            rightOffset += ICONS_PER_ROW;
+        }
 
-            if (FeathersClientConfig.AFFECTED_BY_RIGHT_HEIGHT.get()) {
-                rightOffset += ICONS_PER_ROW;
-            }
+        int lines = 0;
 
-            int lines = 0;
-
-            /*
-             * Only render the currently active endurance feathers by line
-             */
-            lines = drawEndurance(guiGraphics, screenHeight, lines, x, xOffset, rightOffset, yOffset);
+        /*
+         * Only render the currently active endurance feathers by line
+         */
+        lines = drawEndurance(guiGraphics, screenHeight, lines, x, xOffset, rightOffset, yOffset);
 
 
-            if (FeathersClientConfig.AFFECTED_BY_RIGHT_HEIGHT.get()) {
-                gui.rightHeight += ICONS_PER_ROW + lines;
-            }
+        if (FeathersClientConfig.AFFECTED_BY_RIGHT_HEIGHT.get()) {
+            gui.rightHeight += ICONS_PER_ROW + lines;
+        }
 
-            if (Feathers.OB_LOADED) {
-                RowCountRenderer.drawBarRowCount(guiGraphics, x + 100 + xOffset, screenHeight - rightOffset + ICONS_PER_ROW + yOffset,
-                        clientData.getFeathers(), true, Minecraft.getInstance().font);
-            }
-
+        if (Feathers.OB_LOADED) {
+            RowCountRenderer.drawBarRowCount(guiGraphics, x + 100 + xOffset, screenHeight - rightOffset + ICONS_PER_ROW + yOffset,
+                    clientData.getFeathers(), true, Minecraft.getInstance().font);
         }
 
         RenderSystem.disableBlend();
-
     };
+
+    private static void energizedK() {
+        if (clientData.isEnergized()) {
+            if (k == 100) {
+                k = -40;
+            } else {
+                k += 2;
+            }
+        } else if (k != 0) {
+            k = 0;
+        }
+    }
 
     private static void determineFadeEffect(int fadeCooldown, int fadeOut, int fadeIn) {
         if (FeathersClientConfig.FADE_WHEN_FULL.get()) {
@@ -130,10 +131,10 @@ public class FeathersHudOverlay {
     }
 
     private static int drawEndurance(GuiGraphics guiGraphics, int screenHeight, int lines, int x, int xOffset, int rightOffset, int yOffset) {
-        if (clientData.getEnduranceFeathers() > 0) {
+        if (clientData.isEndurance()) {
             var halfEndurance = Math.ceil((double) clientData.getEnduranceFeathers() / 2.0d);
 
-            for (int i = 0; i < Math.ceil((double) clientData.getEnduranceFeathers() / 20.0d); i++) {
+            for (int i = 0; i < halfEndurance / 10; i++) {
                 lines += ICONS_PER_ROW;
                 for (int j = 0; j < halfEndurance; j++) {
                     var idk = i * 10.0d + j + 1;

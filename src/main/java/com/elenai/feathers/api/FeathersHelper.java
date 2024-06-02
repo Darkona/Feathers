@@ -1,7 +1,6 @@
 package com.elenai.feathers.api;
 
 import com.elenai.feathers.Feathers;
-import com.elenai.feathers.client.ClientFeathersData;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.enchantment.FeathersEnchantments;
 import com.elenai.feathers.networking.FeathersMessages;
@@ -14,8 +13,10 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@Deprecated
+@OnlyIn(Dist.CLIENT)
 public class FeathersHelper {
 
     @Deprecated
@@ -23,13 +24,15 @@ public class FeathersHelper {
 
         Player player = Minecraft.getInstance().player;
         assert player != null;
-        if (player.isCreative() || player.isSpectator()) return true;
 
-        if (ClientFeathersData.getInstance().getFeathers() >= amount) {
+        var spent = player.isCreative() ||
+                player.isSpectator() ||
+                FeathersAPI.spendFeathers(player, amount, 20);
+
+        if (spent) {
             FeathersMessages.sendToServer(new ClientFeatherSpendPacket(amount));
-            return true;
         }
-        return false;
+        return spent;
     }
 
 

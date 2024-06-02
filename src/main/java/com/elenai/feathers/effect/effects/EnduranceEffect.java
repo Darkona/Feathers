@@ -2,10 +2,13 @@ package com.elenai.feathers.effect.effects;
 
 import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.api.IModifier;
+import com.elenai.feathers.api.StaminaAPI;
+import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.effect.FeathersEffects;
 import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.player.Player;
@@ -25,31 +28,38 @@ public class EnduranceEffect extends FeathersEffects {
      */
     public static final IModifier ENDURANCE = new IModifier() {
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaToUse) {
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaToUse) {
 
 
         }
 
         @Override
-        public void apply(Player player, PlayerFeathers playerFeathers, AtomicInteger staminaToUse, AtomicBoolean result) {
-            if (!player.hasEffect(FeathersEffects.ENDURANCE.get())) return;
+        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaToUse, AtomicBoolean result) {
+            if (player.hasEffect(FeathersEffects.ENDURANCE.get())) {
+                iFeathers.getCounter(ENDURANCE_COUNTER).ifPresent(enduranceFeathers -> {
 
+                    int availableEnduranceStamina = enduranceFeathers * FeathersConstants.STAMINA_PER_FEATHER;
 
-            playerFeathers.getCounter(ENDURANCE_COUNTER).ifPresent(enduranceFeathers -> {
+                    int remaining = availableEnduranceStamina - staminaToUse.get();
 
-                int enduranceStamina = enduranceFeathers * FeathersConstants.STAMINA_PER_FEATHER;
+                    if (remaining <= 0) {
+                        resetEndurance(player, iFeathers, staminaToUse, remaining);
+                    } else {
+                        updateEndurance(iFeathers, staminaToUse, remaining);
+                    }
+                });
+            }
+        }
 
-                int enduranceLeft = enduranceStamina - staminaToUse.get();
+        private void resetEndurance(Player player, PlayerFeathers iFeathers, AtomicInteger staminaToUse, int remainingStamina) {
+            iFeathers.setCounter(ENDURANCE_COUNTER, 0);
+            staminaToUse.addAndGet(-1 * remainingStamina);
+            player.removeEffect(FeathersEffects.ENDURANCE.get());
+        }
 
-                if (enduranceLeft <= 0) {
-                    staminaToUse.addAndGet(-enduranceLeft);
-                    enduranceLeft = 0;
-                    player.removeEffect(FeathersEffects.ENDURANCE.get());
-                } else {
-                    staminaToUse.set(0);
-                }
-                playerFeathers.setCounter(ENDURANCE_COUNTER, enduranceLeft / FeathersConstants.STAMINA_PER_FEATHER);
-            });
+        private void updateEndurance(PlayerFeathers iFeathers, AtomicInteger staminaToUse, int remainingStamina) {
+            iFeathers.setCounter(ENDURANCE_COUNTER, remainingStamina / FeathersConstants.STAMINA_PER_FEATHER);
+            staminaToUse.set(0);
         }
 
         @Override
@@ -79,4 +89,19 @@ public class EnduranceEffect extends FeathersEffects {
         super.addAttributeModifiers(target, map, strength);
     }
 
+    public void applyEffect(LivingEntity entity, MobEffectInstance effect) {
+        entity.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+            f.addCounter(EnduranceEffect.ENDURANCE_COUNTER, (effect.getAmplifier() + 1) * 8);
+            StaminaAPI.addStaminaUsageModifier((Player) entity, EnduranceEffect.ENDURANCE);
+        });
+
+    }
+
+    public void removeEffect(LivingEntity entity, MobEffectInstance effectInstance) {
+        entity.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+            f.removeCounter(EnduranceEffect.ENDURANCE_COUNTER);
+            StaminaAPI.removeStaminaUsageModifier((Player) entity, EnduranceEffect.ENDURANCE);
+        });
+
+    }
 }
