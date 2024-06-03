@@ -59,6 +59,7 @@ public class ArmorHandler {
         }
         return i;
     }
+
     public static int getItemEnchantmentLevel(Enchantment enchantment, ItemStack itemstack) {
         return itemstack.getEnchantmentLevel(enchantment);
     }

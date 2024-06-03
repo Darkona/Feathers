@@ -301,10 +301,7 @@ public class PlayerFeathers implements IFeathers {
             doStaminaChange(player);
         }
 
-        if (player.tickCount % 2 == 0) {
-            ClientFeathersData.getInstance().update(player, this);
-        }
-
+        if (player.tickCount % 2 == 0) ClientFeathersData.getInstance().update(player, this);
     }
 
     private void calculateStaminaDelta(Player player) {
@@ -331,9 +328,8 @@ public class PlayerFeathers implements IFeathers {
         if (staminaDelta == ZERO) return;
 
 
-        if ((staminaDelta > ZERO && stamina < maxStamina) || (staminaDelta < ZERO && stamina > ZERO)) {
-            applyStaminaDelta();
-        }
+        if ((staminaDelta > ZERO && stamina < maxStamina) || (staminaDelta < ZERO && stamina > ZERO)) applyStaminaDelta();
+
 
         if (stamina != prevStamina) postStaminaChange(player, prevStamina, prevFeathers);
 
