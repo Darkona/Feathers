@@ -1,89 +1,114 @@
 package com.elenai.feathers.client;
 
+import com.elenai.feathers.api.FeathersAPI;
+import com.elenai.feathers.api.FeathersConstants;
+import com.elenai.feathers.api.IFeathers;
+import com.elenai.feathers.config.FeathersClientConfig;
+import com.elenai.feathers.effect.effects.EnduranceEffect;
+import com.elenai.feathers.effect.effects.StrainEffect;
+import lombok.Getter;
+import lombok.Setter;
+import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+
+@Setter
+@Getter
+@OnlyIn(Dist.CLIENT)
 public class ClientFeathersData {
-    private static int feathers = 20;
-	private static int maxFeathers = 20;
-	private static int regenRate = 1;
-    private static int previousFeathers = feathers;
-    private static int enduranceFeathers = 0;
-    private static int weight = 20;
-    private static int animationCooldown = 0;
-	private static int fadeCooldown = 0;
-    private static boolean cold = false;
-    private static boolean energized = false;
-	private static boolean overflowing = false;
 
-    public static void setFeathers(int feathers) {
-        ClientFeathersData.feathers = feathers;
+    //Use singleton for sanity
+    private static ClientFeathersData instance;
+    private int stamina = 2000;
+    private int feathers = 0;
+    private int maxStamina = 2000;
+    private int maxFeathers = 0;
+    private int staminaDelta = 0;
+    private int previousFeathers = 0;
+    private int enduranceFeathers = 0;
+    private int weight = 0;
+    private int animationCooldown = 0;
+    private int fadeCooldown = 0;
+    private int strainFeathers = 0;
+    private boolean hot = false;
+    private boolean cold = false;
+    private boolean energized = false;
+    private boolean overflowing = false;
+    private boolean momentum = false;
+    private boolean fatigued = false;
+    private boolean endurance = false;
+    private boolean strained = false;
+
+    private ClientFeathersData() {}
+
+    public static ClientFeathersData getInstance() {
+        if (instance == null) {
+            instance = new ClientFeathersData();
+        }
+        return instance;
     }
 
-    public static int getFeathers() {
-        return ClientFeathersData.feathers;
+    public void update(Player player, IFeathers f) {
+        stamina = f.getStamina();
+        maxStamina = f.getMaxStamina();
+        feathers = f.getFeathers();
+        maxFeathers = f.getMaxFeathers();
+        staminaDelta = f.getStaminaDelta();
+        enduranceFeathers = f.getCounter(EnduranceEffect.ENDURANCE_COUNTER).orElse(0);
+        strainFeathers = f.getCounter(StrainEffect.STRAIN_COUNTER).orElse(0);
+        endurance = FeathersAPI.isEnduring(player);
+        weight = f.getWeight();
+        hot = FeathersAPI.isHot(player);
+        cold = FeathersAPI.isCold(player);
+        energized = FeathersAPI.isEnergized(player);
+        fatigued = FeathersAPI.isFatigued(player);
+        strained = FeathersAPI.isStrained(player);
     }
 
-	public static int getRegenRate() {return ClientFeathersData.regenRate; }
+    public boolean hasFullStamina() {
+        return stamina >= maxStamina;
+    }
 
-	public static void setRegenRate(int ticks) {ClientFeathersData.regenRate = ticks; }
+    public boolean hasFeathers() {
+        return feathers > 0;
+    }
 
-	public static void setMaxFeathers(int feathers) { ClientFeathersData.maxFeathers = feathers; }
+    public boolean hasFullFeathers() {
+        return feathers >= maxFeathers;
+    }
 
-	public static int getMaxFeathers() { return ClientFeathersData.maxFeathers; }
+    public boolean hasWeight() {
+        return weight > 0;
+    }
 
-	public static void setWeight(int weight) {
-		ClientFeathersData.weight = weight;
-	}
+    public boolean isOverflowing() {
+        return feathers > maxFeathers;
+    }
 
-	public static int getWeight() {
-		return ClientFeathersData.weight;
-	}
+    public void tick() {
 
-	public static int getAnimationCooldown() { return animationCooldown; }
+        if (animationCooldown > 0) animationCooldown--;
 
-	public static void setAnimationCooldown(int i) {
-		ClientFeathersData.animationCooldown = i;
-	}
+        if (feathers != previousFeathers) {
+            if (feathers > previousFeathers && FeathersClientConfig.REGEN_EFFECT.get() && animationCooldown <= 0) {
+                animationCooldown = 18;
+            }
+            previousFeathers = feathers;
+        }
 
-	public static int getFadeCooldown() { return fadeCooldown; }
+        if (FeathersClientConfig.FADE_WHEN_FULL.get()) {
+            int cooldown = fadeCooldown;
+            if (feathers == getMaxFeathers() || enduranceFeathers > 0) {
+                fadeCooldown = cooldown < FeathersClientConfig.FADE_COOLDOWN.get() ? fadeCooldown + 1 : 0;
+            }
+        }
+    }
 
-	public static void setFadeCooldown(int i) { ClientFeathersData.fadeCooldown = i; }
+    public int getStrainFeathers() {
+        return strainFeathers > 0 ? strainFeathers / FeathersConstants.STAMINA_PER_FEATHER : 0;
+    }
 
-	public static boolean isCold() {
-		return cold;
-	}
-
-	public static void setCold(boolean cold) {
-		ClientFeathersData.cold = cold;
-	}
-
-	public static boolean isOverflowing() {
-		return overflowing;
-	}
-
-	public static void setOverflowing(boolean overflowing) {
-		ClientFeathersData.overflowing = overflowing;
-	}
-
-	public static int getEnduranceFeathers() {
-		return enduranceFeathers;
-	}
-
-	public static void setEnduranceFeathers(int enduranceFeathers) {
-		ClientFeathersData.enduranceFeathers = enduranceFeathers;
-	}
-
-	public static boolean isEnergized() {
-		return energized;
-	}
-
-	public static void setEnergized(boolean energized) {
-		ClientFeathersData.energized = energized;
-	}
-
-	public static int getPreviousFeathers() {
-		return previousFeathers;
-	}
-
-	public static void setPreviousFeathers(int previousFeathers) {
-		ClientFeathersData.previousFeathers = previousFeathers;
-	}
+    public int getAvailableFeathers() {
+        return feathers - weight;
+    }
 }
