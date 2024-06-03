@@ -26,16 +26,13 @@ public class FeathersCommands extends BaseCommand {
 
     public LiteralArgumentBuilder<CommandSourceStack> setExecution() {
 
-        setFeathersCommands(builder);
-
-        setMaxFeathersCommands(builder);
-
-
-
+        feathersCommands(builder);
+        maxFeathersCommands(builder);
+        regenCommands(builder);
         return builder;
     }
 
-    private void setFeathersCommands(LiteralArgumentBuilder<CommandSourceStack> stack) {
+    private void feathersCommands(LiteralArgumentBuilder<CommandSourceStack> stack) {
         stack
                 .then(Commands.literal("getFeathers")
                               .then(Commands.argument("entities", EntityArgument.entities())
@@ -73,7 +70,7 @@ public class FeathersCommands extends BaseCommand {
         return entities.size();
     }
 
-    private void setMaxFeathersCommands(LiteralArgumentBuilder<CommandSourceStack> stack) {
+    private void maxFeathersCommands(LiteralArgumentBuilder<CommandSourceStack> stack) {
         stack.then(Commands.literal("setMaxFeathers")
                            .then(Commands.argument("entities", EntityArgument.entities())
                                          .then(Commands.argument("amount", IntegerArgumentType.integer()))
@@ -112,7 +109,7 @@ public class FeathersCommands extends BaseCommand {
         return entities.size();
     }
 
-    private void getFeatherRegenCommands(LiteralArgumentBuilder<CommandSourceStack> stack) {
+    private void regenCommands(LiteralArgumentBuilder<CommandSourceStack> stack) {
         stack.then(Commands.literal("getFeatherRegen")
                            .then(Commands.argument("entities", EntityArgument.entities())
                                          .executes(source ->
@@ -148,6 +145,7 @@ public class FeathersCommands extends BaseCommand {
         }
         return entities.size();
     }
+
 
     private @Nullable Integer checkError(CommandSourceStack source, Collection<? extends Entity> entities) {
         if (entities.stream().noneMatch(entity -> entity instanceof Player)) {
