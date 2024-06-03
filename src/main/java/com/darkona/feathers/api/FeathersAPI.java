@@ -26,9 +26,14 @@ import static net.minecraftforge.eventbus.api.Event.Result.DEFAULT;
 public class FeathersAPI {
 
     public static int getFeathers(Player player) {
-        return player.getCapability(Capabilities.PLAYER_FEATHERS).map(IFeathers::getFeathers).orElse(0);
+        return player.getCapability(Capabilities.PLAYER_FEATHERS).map(IFeathers::getFeathers)
+                     .orElse(0);
     }
 
+    public static int getAvailableFeathers(Player player) {
+        return player.getCapability(Capabilities.PLAYER_FEATHERS).map(IFeathers::getAvailableFeathers)
+                     .orElse(0);
+    }
     /**
      * Sets the player's feathers to the specified amount. For tick-based operations, use staminaDeltaModifiers;
      *

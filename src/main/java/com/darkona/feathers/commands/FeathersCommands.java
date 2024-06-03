@@ -52,8 +52,12 @@ public class FeathersCommands extends BaseCommand {
         Integer x = checkError(source, entities);
         for (Entity entity : entities) {
             if (entity instanceof ServerPlayer player) {
-                int maxFeathers = FeathersAPI.getPlayerMaxFeathers(player);
-                source.sendSuccess(() -> Component.literal(String.format("%s has %d feathers", player.getName(), maxFeathers)), true);
+                source.sendSuccess(() -> Component.literal(
+                        String.format("%s has %d feathers, %d available.",
+                                player.getName().getString(),
+                                FeathersAPI.getFeathers(player),
+                                FeathersAPI.getAvailableFeathers(player))),
+                        true);
             }
         }
         return entities.size();
@@ -63,8 +67,8 @@ public class FeathersCommands extends BaseCommand {
         if (x != null) return x;
         for (Entity entity : entities) {
             if (entity instanceof ServerPlayer player) {
-                FeathersAPI.setFeathers(player, amount);
-                source.sendSuccess(() -> Component.literal(String.format("Set feathers to %d feathers for %s", amount, player.getName())), true);
+                source.sendSuccess(() -> Component.literal(
+                        String.format("Set %s feathers to %d", player.getName().getString(), FeathersAPI.setFeathers(player, amount))),true);
             }
         }
         return entities.size();
@@ -91,8 +95,11 @@ public class FeathersCommands extends BaseCommand {
 
         for (Entity entity : entities) {
             if (entity instanceof ServerPlayer player) {
-                int maxFeathers = FeathersAPI.getPlayerMaxFeathers(player);
-                source.sendSuccess(() -> Component.literal(String.format("%s has a maximum of %d feathers", player.getName(), maxFeathers)), true);
+                source.sendSuccess(() -> Component.literal(
+                        String.format("%s has a maximum of %d feathers",
+                                player.getName(),
+                                FeathersAPI.getPlayerMaxFeathers(player))),
+                        true);
             }
         }
         return entities.size();
@@ -103,7 +110,8 @@ public class FeathersCommands extends BaseCommand {
         for (Entity entity : entities) {
             if (entity instanceof ServerPlayer player) {
                 FeathersAPI.setMaxFeathers(player, amount);
-                source.sendSuccess(() -> Component.literal(String.format("Set maximum feathers to %d feathers for %s", amount, player.getName())), true);
+                source.sendSuccess(() -> Component.literal(
+                        String.format("Set maximum feathers to %d feathers for %s",FeathersAPI.getPlayerMaxFeathers(player),player.getName().getString())),true);
             }
         }
         return entities.size();
