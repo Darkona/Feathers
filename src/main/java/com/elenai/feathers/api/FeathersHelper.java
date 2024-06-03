@@ -1,7 +1,8 @@
 package com.elenai.feathers.api;
 
-import com.elenai.feathers.networking.FeathersMessages;
-import com.elenai.feathers.networking.packet.ClientFeatherSpendPacket;
+import com.darkona.feathers.api.FeathersAPI;
+import com.darkona.feathers.networking.FeathersMessages;
+import com.darkona.feathers.networking.packet.ClientFeatherSpendPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
