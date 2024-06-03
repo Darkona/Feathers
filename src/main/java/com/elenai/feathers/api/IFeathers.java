@@ -23,7 +23,7 @@ public interface IFeathers {
 
     void removeDeltaModifier(IModifier modifier);
 
-    void recalculateStaminaDelta(Player player);
+    int getAvailableFeathers();
 
     void addUsageModifier(IModifier modifier);
 
@@ -32,6 +32,8 @@ public interface IFeathers {
     int getMaxStamina();
 
     void setMaxStamina(int maxStamina);
+
+    int getAvailableStamina();
 
     boolean gainFeathers(int feathers);
 
@@ -42,11 +44,15 @@ public interface IFeathers {
      * @param feathers the amount of feathers to spend
      * @return true if the player has enough feathers to spend, false otherwise
      */
-    boolean useFeathers(Player player, int feathers);
+    boolean useFeathers(Player player, int feathers, int cooldown);
 
     int getCooldown();
 
     void setCooldown(int cooldown);
+
+    int getWeight();
+
+    void setWeight(int weight);
 
     int getStrainFeathers();
 

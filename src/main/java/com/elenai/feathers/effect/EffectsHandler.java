@@ -12,7 +12,6 @@ import com.elenai.feathers.effect.effects.StrainEffect;
 import com.elenai.feathers.event.FeatherAmountEvent;
 import com.elenai.feathers.event.FeatherEvent;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.TickEvent;
@@ -20,9 +19,6 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-
-import static net.minecraftforge.eventbus.api.Event.Result.ALLOW;
-import static net.minecraftforge.eventbus.api.Event.Result.DENY;
 
 @Mod.EventBusSubscriber(modid = Feathers.MODID)
 public class EffectsHandler implements ICapabilityPlugin {
@@ -82,6 +78,7 @@ public class EffectsHandler implements ICapabilityPlugin {
             player.addEffect(new MobEffectInstance(FeathersEffects.COLD.get(), FeathersCommonConfig.COLD_LINGER.get(), 0, false, true));
         }
     }
+
     public static boolean isInColdSituation(Player player) {
 
         if (FeathersColdSweatConfig.isColdSweatEnabled() && FeathersColdSweatConfig.BEING_COLD_ADDS_COLD_EFFECT.get()) {
@@ -115,6 +112,7 @@ public class EffectsHandler implements ICapabilityPlugin {
             player.addEffect(new MobEffectInstance(FeathersEffects.HOT.get(), FeathersCommonConfig.COLD_LINGER.get(), 0, false, true));
         }
     }
+
     public static boolean isInHotSituation(Player player) {
 
         boolean isBurning = player.wasOnFire || player.isOnFire() || player.isInLava();
@@ -143,7 +141,7 @@ public class EffectsHandler implements ICapabilityPlugin {
 
     @Override
     public void onPlayerTickAfter(TickEvent.PlayerTickEvent event) {
-        if(event.player.level().isClientSide()) return;
+        if (event.player.level().isClientSide()) return;
         event.player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
             checkStrain(event.player, f);
         });
@@ -159,7 +157,7 @@ public class EffectsHandler implements ICapabilityPlugin {
             if (strain <= 0) {
                 player.removeEffect(FeathersEffects.STRAINED.get());
                 feathers.markDirty();
-            }else{
+            } else {
                 player.addEffect(new MobEffectInstance(FeathersEffects.STRAINED.get(), -1, 0, false, false, false));
                 feathers.markDirty();
             }

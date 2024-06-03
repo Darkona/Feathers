@@ -30,6 +30,7 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
@@ -193,5 +194,17 @@ public class FeathersManager {
 
     }
 
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onPlayerWearArmor(LivingEquipmentChangeEvent event) {
+        if (event.getEntity() instanceof Player player &&
+                event.getSlot().getType() == EquipmentSlot.Type.ARMOR) {
+            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+
+                f.setWeight(FeathersAPI.getPlayerWeight(player));
+                FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
+
+            });
+        }
+    }
 
 }

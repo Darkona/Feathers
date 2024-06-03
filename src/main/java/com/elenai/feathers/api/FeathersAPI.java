@@ -1,6 +1,5 @@
 package com.elenai.feathers.api;
 
-import com.elenai.feathers.Feathers;
 import com.elenai.feathers.attributes.FeathersAttributes;
 import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.config.FeathersCommonConfig;
@@ -98,7 +97,7 @@ public class FeathersAPI {
             throw new UnsupportedOperationException("Cannot spend negative feathers");
         }
         var result = new AtomicBoolean(false);
-        if (player.isCreative() || player.isSpectator()) return false;
+        if (player.isCreative() || player.isSpectator()) return true;
 
         player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
@@ -109,20 +108,18 @@ public class FeathersAPI {
                   if (!cancelled && useFeatherEvent.getResult() == DEFAULT) {
 
                       var prev = f.getFeathers();
-                      var used = f.useFeathers(player, useFeatherEvent.amount);
+                      var used = f.useFeathers(player, useFeatherEvent.amount, cooldownTicks);
 
                       MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, prev, used));
                       result.set(used);
 
                       if (used) FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
-
-                      if (cooldownTicks > 0) f.setCooldown(cooldownTicks);
                   }
               });
         return result.get();
     }
 
-    public static int getPlayerWeight(ServerPlayer player) {
+    public static int getPlayerWeight(Player player) {
         if (!FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
             return 0;
         }
@@ -141,7 +138,6 @@ public class FeathersAPI {
         } else if (itemStack.getItem() == Items.AIR) {
             return 0;
         }
-        Feathers.logger.warn("Attempted to calculate weight of non armor item: " + itemStack.getDescriptionId());
         return 0;
     }
 

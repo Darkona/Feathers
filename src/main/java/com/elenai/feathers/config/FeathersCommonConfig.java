@@ -121,15 +121,13 @@ public class FeathersCommonConfig {
 
         ENABLE_STRAIN = BUILDER
                 .comment("Whether the Strain mechanic is enabled.. " +
-                        "Strain is applied when the player is out of feathers, and goes to negative stamina. " +
+                        "Strain is applied when the player is out of feathers, and goes to negative feathers. " +
                         "Regeneration is much slower when strained.")
                 .define("Enable Strain Effect", true);
 
         MAX_STRAIN = BUILDER
-                .comment("Maximum strain the player can have. " +
-                        "When the player has no feathers, the player will enter a negative stamina state. " +
-                        "This value determines how many feathers can be added to the negative stamina state.")
-                .define("Max Strain", 6000);
+                .comment("Maximum strained feathers the player can have. ")
+                .define("Max Strain", 7);
 
         BUILDER.pop();
 

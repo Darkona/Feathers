@@ -1,6 +1,5 @@
 package com.elenai.feathers.effect.effects;
 
-import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.compatibility.coldsweat.ColdSweatManager;
@@ -84,7 +83,7 @@ public class HotEffect extends FeathersEffects {
 
     @Override
     public boolean canApply(Player player) {
-        if(FeathersCommonConfig.ENABLE_HOT_EFFECTS.get() && super.canApply(player)){
+        if (FeathersCommonConfig.ENABLE_HOT_EFFECTS.get() && super.canApply(player)) {
             if (FeathersColdSweatConfig.isColdSweatEnabled()) {
                 return ColdSweatManager.canApplyHotEffect(player);
             }

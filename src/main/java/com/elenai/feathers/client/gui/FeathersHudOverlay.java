@@ -32,7 +32,6 @@ public class FeathersHudOverlay {
         int fadeCooldown = FeathersClientConfig.FADE_COOLDOWN.get();
         int fadeIn = FeathersClientConfig.FADE_IN_COOLDOWN.get();
         int fadeOut = FeathersClientConfig.FADE_OUT_COOLDOWN.get();
-        int xOffset = FeathersClientConfig.X_OFFSET.get();
         int yOffset = FeathersClientConfig.Y_OFFSET.get();
 
         int x = screenWidth / 2;
@@ -52,36 +51,36 @@ public class FeathersHudOverlay {
 
         if (alpha <= 0) return;
 
-        double halfFeathers = Math.ceil(clientData.getFeathers() / 2.0d);
+
         Icons.Set icons = getIconSet();
 
         /*
          * Always render the background up to the maximum feather amount
          */
-        drawBackground(guiGraphics, screenHeight, halfFeathers, x, xOffset, rightOffset, yOffset, icons);
+        drawBackground(guiGraphics, screenHeight, x, rightOffset, icons);
+
 
         if (clientData.hasFeathers()) {
-            drawFeathers(guiGraphics, screenHeight, halfFeathers, icons, x, xOffset, rightOffset, yOffset, clientData.getFeathers());
-        } else if (clientData.isStrained()) {
-            var halfStrainedFeathers = Math.ceil((double) clientData.getStrainFeathers() / 2.0d);
-            drawFeathers(guiGraphics, screenHeight, halfStrainedFeathers, STRAINED, x, xOffset, rightOffset, yOffset, clientData.getStrainFeathers());
+            int totalIcons = (int) (Math.ceil(clientData.getFeathers() / 2.0d));
+            drawFeathers(guiGraphics, screenHeight, totalIcons, icons, x, rightOffset, clientData.getFeathers());
         }
-
-
-        /*
-         * Only render the currently worn armor
-         */
-        drawWeight(guiGraphics, screenHeight, halfFeathers, x, xOffset, rightOffset, yOffset);
+        if (clientData.isStrained()) {
+            int halfStrainedFeathers = (int) Math.ceil(clientData.getStrainFeathers() / 2.0d);
+            drawFeathers(guiGraphics, screenHeight, halfStrainedFeathers, STRAINED, x, rightOffset, clientData.getStrainFeathers());
+        }
 
         /*
          * Render feathers past 20 in a different color
          */
-        drawOverflow(guiGraphics, screenHeight, x, xOffset, rightOffset, yOffset);
-
+        drawOverflow(guiGraphics, screenHeight, x, rightOffset);
+        /*
+         * Only render the currently worn armor
+         */
+        drawWeight(guiGraphics, screenHeight, x, rightOffset);
         /*
          * Render the Regeneration effect
          */
-        drawOverlay(guiGraphics, screenHeight, x, xOffset, rightOffset, yOffset);
+        drawOverlay(guiGraphics, screenHeight, x, rightOffset);
 
         energizedK();
 
@@ -90,25 +89,111 @@ public class FeathersHudOverlay {
         }
 
         int lines = 0;
-
         /*
          * Only render the currently active endurance feathers by line
          */
-        lines = drawEndurance(guiGraphics, screenHeight, lines, x, xOffset, rightOffset, yOffset);
-
+        lines = drawEndurance(guiGraphics, screenHeight, lines, x, rightOffset);
 
         if (FeathersClientConfig.AFFECTED_BY_RIGHT_HEIGHT.get()) {
             gui.rightHeight += ICONS_PER_ROW + lines;
         }
 
         if (Feathers.OB_LOADED) {
-            RowCountRenderer.drawBarRowCount(guiGraphics, x + 100 + xOffset, screenHeight - rightOffset + ICONS_PER_ROW + yOffset,
+            RowCountRenderer.drawBarRowCount(guiGraphics, x + 100 + FeathersClientConfig.X_OFFSET.get(), screenHeight - rightOffset + ICONS_PER_ROW + yOffset,
                     clientData.getFeathers(), true, Minecraft.getInstance().font);
         }
 
         RenderSystem.disableBlend();
     };
 
+    private static void drawBackground(GuiGraphics guiGraphics, int screenHeight, int x, int rightOffset, Set icons) {
+        for (int i = 0; i < Math.min(ICONS_PER_ROW, clientData.getMaxFeathers() / 2); i++) {
+            int xPos = getXPos(x, i);
+            int yPos = getYPos(screenHeight, rightOffset, getHeight(i));
+            draw(guiGraphics, xPos, yPos, icons.background());
+        }
+
+    }
+
+    private static void drawFeathers(GuiGraphics guiGraphics, int screenHeight, int totalIcons, Set icons, int x, int rightOffset, int feathers) {
+        for (int i = 0; i < Math.min(ICONS_PER_ROW, totalIcons); i++) {
+            if (i + 1 <= totalIcons) {
+                var icon = getHalfOrFull(icons, (i + 1 == totalIcons) && !isEven(feathers));
+                var xPos = getXPos(x, i);
+                var yPos = getYPos(screenHeight, rightOffset, getHeight(i));
+                draw(guiGraphics, xPos, yPos, icon);
+            } else {
+                break;
+            }
+        }
+    }
+
+    private static void drawOverflow(GuiGraphics guiGraphics, int screenHeight, int x, int rightOffset) {
+        var halfFeathers = Math.ceil((double) clientData.getFeathers() / 2.0d);
+        if (halfFeathers > ICONS_PER_ROW) {
+            for (int i = 0; i < ICONS_PER_ROW; i++) {
+                if (i + 1 <= halfFeathers - 10) {
+                    GuiIcon icon = getHalfOrFull(Icons.OVERFLOW, (i + 1 == halfFeathers) && isEven(clientData.getStamina()));
+                    var xPos = getXPos(x, i);
+                    var yPos = getYPos(screenHeight, rightOffset, getHeight(i));
+                    draw(guiGraphics, xPos, yPos, icon);
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    private static void drawWeight(GuiGraphics guiGraphics, int screenHeight, int x, int rightOffset) {
+        if (clientData.hasWeight()) {
+            var halfWeight = Math.ceil((double) clientData.getWeight() / 2.0d);
+            for (int i = 0; i < Math.min(ICONS_PER_ROW, halfWeight); i++) {
+                if (i + 1 <= halfWeight) {
+
+                    var icon = getHalfOrFull(Icons.ARMOR, (i + 1 == halfWeight) && !isEven(clientData.getWeight()));
+                    var xPos = getXPos(x, i);
+                    var yPos = getYPos(screenHeight, rightOffset, getHeight(i));
+                    draw(guiGraphics, xPos, yPos, icon);
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    private static void drawOverlay(GuiGraphics guiGraphics, int screenHeight, int x, int rightOffset) {
+        for (int i = 0; i < ICONS_PER_ROW; i++) {
+            if (clientData.getAnimationCooldown() >= 18 || clientData.getAnimationCooldown() == ICONS_PER_ROW) {
+                if ((i + 1 <= Math.ceil((double) clientData.getMaxStamina() / FeathersConstants.STAMINA_PER_FEATHER))) {
+                    var xPos = getXPos(x, i);
+                    var yPos = screenHeight - rightOffset;
+                    draw(guiGraphics, xPos, yPos, REGEN_OVERLAY);
+                }
+            }
+        }
+    }
+
+    private static int drawEndurance(GuiGraphics guiGraphics, int screenHeight, int lines, int x, int rightOffset) {
+        if (clientData.isEndurance()) {
+            var halfEndurance = Math.ceil((double) clientData.getEnduranceFeathers() / 2.0d);
+
+            for (int i = 0; i < halfEndurance / 10; i++) {
+                lines += ICONS_PER_ROW;
+                for (int j = 0; j < halfEndurance; j++) {
+                    var idk = i * 10.0d + j + 1;
+                    if (idk <= halfEndurance) {
+                        GuiIcon icon = getHalfOrFull(Icons.ENDURANCE, idk == halfEndurance && !isEven(clientData.getEnduranceFeathers()));
+                        var xPos = getXPos(x, j);
+                        var yPos = getYPos(screenHeight, rightOffset, getHeight(j));
+                        draw(guiGraphics, xPos, yPos - (i * ICONS_PER_ROW), icon);
+
+                    }
+                }
+            }
+
+        }
+        return lines;
+    }
 
     private static void energizedK() {
         if (clientData.isEnergized()) {
@@ -134,147 +219,35 @@ public class FeathersHudOverlay {
         }
     }
 
-    private static int drawEndurance(GuiGraphics guiGraphics, int screenHeight, int lines, int x, int xOffset, int rightOffset, int yOffset) {
-        if (clientData.isEndurance()) {
-            var halfEndurance = Math.ceil((double) clientData.getEnduranceFeathers() / 2.0d);
-
-            for (int i = 0; i < halfEndurance / 10; i++) {
-                lines += ICONS_PER_ROW;
-                for (int j = 0; j < halfEndurance; j++) {
-                    var idk = i * 10.0d + j + 1;
-                    if (idk <= halfEndurance) {
-                        GuiIcon icon = getHalfOrFull(Icons.ENDURANCE, i, idk == halfEndurance && !isEven(clientData.getEnduranceFeathers()));
-                        var xPos = getXPos(x, j, xOffset);
-                        var yPos = getYPos(screenHeight, rightOffset, getHeight(j), yOffset);
-                        draw(guiGraphics, xPos, screenHeight - rightOffset + yOffset - (i * ICONS_PER_ROW), icon);
-
-                    }
-                }
-            }
-
-        }
-        return lines;
-    }
-
-    private static void drawOverlay(GuiGraphics guiGraphics, int screenHeight, int x, int xOffset, int rightOffset, int yOffset) {
-        for (int i = 0; i < ICONS_PER_ROW; i++) {
-            if (clientData.getAnimationCooldown() >= 18 || clientData.getAnimationCooldown() == ICONS_PER_ROW) {
-                if ((i + 1 <= Math.ceil((double) clientData.getMaxStamina() / FeathersConstants.STAMINA_PER_FEATHER))) {
-                    draw(guiGraphics, getXPos(x, i, xOffset), screenHeight - rightOffset + yOffset, REGEN_OVERLAY);
-                }
-            }
-        }
-    }
-
-    private static void drawOverflow(GuiGraphics guiGraphics, int screenHeight, int x, int xOffset, int rightOffset, int yOffset) {
-        if (clientData.getFeathers() > 2 * ICONS_PER_ROW) {
-            var excessFeathers = (double) (clientData.getFeathers() - clientData.getMaxFeathers());
-            for (int i = 0; i < ICONS_PER_ROW; i++) {
-                if (i + 1 <= excessFeathers) {
-
-                    GuiIcon icon = getHalfOrFull(Icons.OVERFLOW, i, (i + 1 == excessFeathers) && isEven(clientData.getStamina()));
-                    draw(guiGraphics, getXPos(x, i, xOffset), getYPos(screenHeight, rightOffset, getHeight(i), yOffset), icon);
-
-                } else {
-                    break;
-                }
-            }
-        }
-    }
-
-    private static void drawWeight(GuiGraphics guiGraphics, int screenHeight, double halfFeathers, int x, int xOffset, int rightOffset, int yOffset) {
-        if (clientData.hasWeight()) {
-            for (int i = 0; i < ICONS_PER_ROW; i++) {
-                var halfWeight = Math.ceil((double) clientData.getWeight() / 2.0d);
-                if ((i + 1 <= halfWeight) && (i + 1 <= halfFeathers)) {
-
-                    var icon = getHalfOrFull(Icons.ARMOR, i, (i + 1 == halfWeight) && isEven(clientData.getWeight()));
-
-                    draw(guiGraphics, getXPos(x, i, xOffset), getYPos(screenHeight, rightOffset, getHeight(i), yOffset), icon);
-                } else {
-                    break;
-                }
-            }
-        }
-    }
-
-    private static void drawFeathers(GuiGraphics guiGraphics, int screenHeight, double halfFeathers, Set icons, int x, int xOffset, int rightOffset, int yOffset, int feathers) {
-
-        for (int i = 0; i < Math.min(ICONS_PER_ROW, halfFeathers); i++) {
-            if (i + 1 <= halfFeathers) {
-
-                var icon = getHalfOrFull(icons, i, (i + 1 == halfFeathers) && !isEven(feathers));
-
-                var xPos = getXPos(x, i, xOffset);
-                var yPos = getYPos(screenHeight, rightOffset, getHeight(i), yOffset);
-
-                draw(guiGraphics, xPos, yPos, icon);
-            }
-        }
-
-    }
-
-    private static void drawBackground(GuiGraphics guiGraphics, int screenHeight, double halfFeathers, int x, int xOffset, int rightOffset, int yOffset, Set icons) {
-
-        // Loop through each feather up to a maximum of 10
-        for (int i = 0; i < Math.min(ICONS_PER_ROW, clientData.getMaxFeathers() / 2); i++) {
-
-            // Get the position coordinates for drawing
-            int xPos = getXPos(x, i, xOffset);
-            int yPos = getYPos(screenHeight, rightOffset, getHeight(i), yOffset);
-
-            // Draw the feather background at the calculated position
-            draw(guiGraphics, xPos, yPos, icons.background());
-        }
-
-    }
-
     private static boolean isEven(int i) {
         return i % 2 == 0;
     }
-
 
     private static void draw(GuiGraphics guiGraphics, int xPos, int yPos, GuiIcon icon) {
         guiGraphics.blit(ICONS, xPos, yPos, icon.x(), icon.y(), icon.width(), icon.height(), 256, 256);
     }
 
-    private static int getYPos(int y, int rightOffset, int height, int yOffset) {
-        return y - rightOffset - height + yOffset;
+    private static int getYPos(int y, int rightOffset, int height) {
+        return y - rightOffset - height + FeathersClientConfig.X_OFFSET.get();
     }
 
-    private static int getXPos(int x, int i, int xOffset) {
-        return x + 81 - (i * 8) + xOffset;
+    private static int getXPos(int x, int i) {
+        return x + 81 - (i * 8) + FeathersClientConfig.X_OFFSET.get();
     }
 
     private static int getHeight(int i) {
         return (k > i * ICONS_PER_ROW && k < (i + 1) * ICONS_PER_ROW) ? 2 : 0;
     }
 
-    private static GuiIcon getHalfOrFull(Icons.Set set, int i, boolean isHalf) {
+    private static GuiIcon getHalfOrFull(Icons.Set set, boolean isHalf) {
         return isHalf ? set.half() : set.full();
     }
 
     private static Icons.Set getIconSet() {
-
-        if (clientData.isCold()) {
-            return COLD;
-        }
-        if (clientData.isHot()) {
-            return HOT;
-        }
-
-        if (clientData.isEnergized()) {
-            return ENERGY;
-        }
-
-        if (clientData.isMomentum()) {
-            return MOMENTUM;
-        }
-
-        if (clientData.isFatigued()) {
-            return STRAINED;
-        }
-
+        if (clientData.isCold()) return COLD;
+        if (clientData.isHot()) return HOT;
+        if (clientData.isEnergized()) return ENERGY;
+        if (clientData.isMomentum()) return MOMENTUM;
         return FeathersClientConfig.ALTERNATIVE_FEATHER_COLOR.get() ? GREEN : NORMAL;
     }
 

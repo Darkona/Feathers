@@ -8,7 +8,6 @@ import com.elenai.feathers.effect.effects.EnduranceEffect;
 import com.elenai.feathers.effect.effects.StrainEffect;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -39,6 +38,7 @@ public class ClientFeathersData {
     private boolean fatigued = false;
     private boolean endurance = false;
     private boolean strained = false;
+
     private ClientFeathersData() {}
 
     public static ClientFeathersData getInstance() {
@@ -57,6 +57,7 @@ public class ClientFeathersData {
         enduranceFeathers = f.getCounter(EnduranceEffect.ENDURANCE_COUNTER).orElse(0);
         strainFeathers = f.getCounter(StrainEffect.STRAIN_COUNTER).orElse(0);
         endurance = FeathersAPI.isEnduring(player);
+        weight = f.getWeight();
         hot = FeathersAPI.isHot(player);
         cold = FeathersAPI.isCold(player);
         energized = FeathersAPI.isEnergized(player);
@@ -77,7 +78,7 @@ public class ClientFeathersData {
     }
 
     public boolean hasWeight() {
-        return false;
+        return weight > 0;
     }
 
     public boolean isOverflowing() {
@@ -107,4 +108,7 @@ public class ClientFeathersData {
         return strainFeathers > 0 ? strainFeathers / FeathersConstants.STAMINA_PER_FEATHER : 0;
     }
 
+    public int getAvailableFeathers() {
+        return feathers - weight;
+    }
 }

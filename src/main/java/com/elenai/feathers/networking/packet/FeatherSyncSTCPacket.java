@@ -20,9 +20,9 @@ public class FeatherSyncSTCPacket {
     private final int feathers;
     private final int maxFeathers;
     private final int staminaDelta;
-
+    private final int cooldown;
     private final int counterAmount;
-
+    private final int weight;
     private final Map<String, Integer> counters;
 
     public FeatherSyncSTCPacket(IFeathers f) {
@@ -33,17 +33,24 @@ public class FeatherSyncSTCPacket {
         staminaDelta = f.getStaminaDelta();
         counterAmount = f.getCounters().size();
         counters = f.getCounters();
-
+        cooldown = f.getCooldown();
+        weight = f.getWeight();
     }
 
     public FeatherSyncSTCPacket(FriendlyByteBuf buf) {
+        counters = new HashMap<>();
+
         stamina = buf.readInt();
         maxStamina = buf.readInt();
         feathers = buf.readInt();
         maxFeathers = buf.readInt();
         staminaDelta = buf.readInt();
+
+        cooldown = buf.readInt();
+        weight = buf.readInt();
+
+
         counterAmount = buf.readInt();
-        counters = new HashMap<>();
         for (int i = 0; i < counterAmount; i++) {
             var k = buf.readUtf(512);
             var v = buf.readInt();
@@ -57,6 +64,9 @@ public class FeatherSyncSTCPacket {
         buf.writeInt(feathers);
         buf.writeInt(maxFeathers);
         buf.writeInt(staminaDelta);
+        buf.writeInt(cooldown);
+        buf.writeInt(weight);
+
         buf.writeInt(counterAmount);
         counters.forEach((k, v) -> {
             buf.writeUtf(k);
@@ -73,7 +83,9 @@ public class FeatherSyncSTCPacket {
                     f.setStamina(stamina);
                     f.setMaxStamina(maxStamina);
                     f.setFeathers(feathers);
-                    f.setStaminaDelta(this.staminaDelta);
+                    f.setStaminaDelta(staminaDelta);
+                    f.setCooldown(cooldown);
+                    f.setWeight(weight);
                     counters.forEach(f::setCounter);
                     ClientFeathersData.getInstance().update(clientPlayer, f);
                 });

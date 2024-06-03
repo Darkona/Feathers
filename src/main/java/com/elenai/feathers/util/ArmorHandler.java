@@ -3,11 +3,14 @@ package com.elenai.feathers.util;
 import com.elenai.feathers.Feathers;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 
 import java.util.HashMap;
+
+import static com.elenai.feathers.api.FeathersAPI.getArmorWeightByStack;
 
 public class ArmorHandler {
     private static final HashMap<String, Integer> map = new HashMap<>();
@@ -36,6 +39,23 @@ public class ArmorHandler {
     }
 
     /**
+     * Gets the total weight of the inputted player based on the armor they are wearing
+     *
+     * @param player
+     * @return
+     */
+    public static int getPlayerWeight(Player player) {
+        if (!FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
+            return 0;
+        }
+        int weight = 0;
+        for (ItemStack i : player.getArmorSlots()) {
+            weight += getArmorWeightByStack(i);
+        }
+        return weight;
+    }
+
+    /**
      * Returns the cumulative total of an equipped enchantment type.
      *
      * @param enchantment
@@ -45,16 +65,12 @@ public class ArmorHandler {
      */
     public static int getTotalEnchantmentLevel(Enchantment enchantment, LivingEntity entity) {
         Iterable<ItemStack> iterable = enchantment.getSlotItems(entity).values();
-        if (iterable == null) {
-            return 0;
-        } else {
-            int i = 0;
-            for (ItemStack itemstack : iterable) {
-                int j = itemstack.getEnchantmentLevel(enchantment);
-                i += j;
-            }
-            return i;
+        int i = 0;
+        for (ItemStack itemstack : iterable) {
+            int j = itemstack.getEnchantmentLevel(enchantment);
+            i += j;
         }
+        return i;
     }
 
     /**

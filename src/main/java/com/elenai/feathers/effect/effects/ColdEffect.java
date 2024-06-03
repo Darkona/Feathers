@@ -1,7 +1,5 @@
 package com.elenai.feathers.effect.effects;
 
-import com.elenai.feathers.api.IFeathers;
-import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.compatibility.coldsweat.ColdSweatManager;
 import com.elenai.feathers.compatibility.coldsweat.FeathersColdSweatConfig;
 import com.elenai.feathers.config.FeathersCommonConfig;
@@ -38,7 +36,7 @@ public class ColdEffect extends FeathersEffects {
 
     @Override
     public boolean canApply(Player player) {
-        if(FeathersCommonConfig.ENABLE_COLD_EFFECTS.get() && super.canApply(player)){
+        if (FeathersCommonConfig.ENABLE_COLD_EFFECTS.get() && super.canApply(player)) {
             if (FeathersColdSweatConfig.isColdSweatEnabled()) {
                 return ColdSweatManager.canApplyColdEffect(player);
             }

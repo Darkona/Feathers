@@ -3,8 +3,6 @@ package com.elenai.feathers.networking;
 import com.elenai.feathers.Feathers;
 import com.elenai.feathers.networking.packet.ClientFeatherSpendPacket;
 import com.elenai.feathers.networking.packet.FeatherSyncSTCPacket;
-import com.elenai.feathers.networking.packet.ReplyWithWeightSTCPacket;
-import com.elenai.feathers.networking.packet.RequestWeightCTSPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -36,29 +34,12 @@ public class FeathersMessages {
                .consumerMainThread(ClientFeatherSpendPacket::handle)
                .add();
 
-        network.messageBuilder(RequestWeightCTSPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-               .decoder(RequestWeightCTSPacket::new)
-               .encoder(RequestWeightCTSPacket::toBytes)
-               .consumerMainThread(RequestWeightCTSPacket::handle)
-               .add();
-
-        network.messageBuilder(ReplyWithWeightSTCPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-               .decoder(ReplyWithWeightSTCPacket::new)
-               .encoder(ReplyWithWeightSTCPacket::toBytes)
-               .consumerMainThread(ReplyWithWeightSTCPacket::handle)
-               .add();
 
         network.messageBuilder(FeatherSyncSTCPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                .decoder(FeatherSyncSTCPacket::new)
                .encoder(FeatherSyncSTCPacket::toBytes)
                .consumerMainThread(FeatherSyncSTCPacket::handle)
                .add();
-
-        /*network.messageBuilder(EffectChangeSTCPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-               .decoder(EffectChangeSTCPacket::new)
-               .encoder(EffectChangeSTCPacket::toBytes)
-               .consumerMainThread(EffectChangeSTCPacket::handle)
-               .add();*/
 
     }
 

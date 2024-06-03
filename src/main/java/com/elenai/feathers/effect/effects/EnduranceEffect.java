@@ -63,7 +63,7 @@ public class EnduranceEffect extends FeathersEffects {
 
         private void resetEndurance(Player player, PlayerFeathers iFeathers, AtomicInteger staminaToUse, int remainingStamina) {
             iFeathers.setCounter(ENDURANCE_COUNTER, 0);
-            staminaToUse.addAndGet(-1 * remainingStamina);
+            staminaToUse.addAndGet(-remainingStamina);
             player.removeEffect(FeathersEffects.ENDURANCE.get());
         }
 

@@ -38,7 +38,7 @@ public class FeathersClientConfig {
                                    .define("Fade-out Duration", 40);
 
         REGEN_EFFECT = BUILDER.comment("Whether the feathers flash white when regenerating.")
-                              .define("Regeneration Effect", true);
+                              .define("Regeneration Effect", false);
 
         FROST_SOUND = BUILDER.comment("Whether a sound is played when feathers freeze in cold biomes")
                              .define("Cold Sound Effect", true);
@@ -60,8 +60,8 @@ public class FeathersClientConfig {
                 .define("HUD Y Offset", 0);
 
         ALTERNATIVE_FEATHER_COLOR = BUILDER
-                .comment("Whether the feathers UI color should be changed to a green color.")
-                .define("Alternative Feather Color", false);
+                .comment("Use Green Feathers color for the feathers (true) or the original Elenai's Blue feathers (false)  ")
+                .define("Alternative Feather Color", true);
         BUILDER.pop();
         SPEC = BUILDER.build();
     }

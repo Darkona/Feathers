@@ -1,7 +1,6 @@
 package com.elenai.feathers.effect;
 
 import com.elenai.feathers.Feathers;
-import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.effect.effects.*;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -54,5 +53,5 @@ public class FeathersEffects extends MobEffect {
 
     }
 
-    public boolean canApply(Player player) { return !(player.isCreative() || player.getAbilities().invulnerable); }
+    public boolean canApply(Player player) {return !(player.isCreative() || player.getAbilities().invulnerable);}
 }

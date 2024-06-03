@@ -1,8 +1,8 @@
 package com.elenai.feathers.effect.effects;
 
+import com.elenai.feathers.Feathers;
 import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.api.IModifier;
-import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.effect.FeathersEffects;
@@ -20,26 +20,6 @@ import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operati
 
 public class StrainEffect extends FeathersEffects {
     public static final String STRAIN_COUNTER = "strain";
-
-    private static final String MODIFIER_UUID = "735f6a64-a3f9-4a0b-bee8-51a243097c07";
-    private static final double BASE_STRENGTH = 0.5D;
-
-
-    public StrainEffect(MobEffectCategory p_19451_, int p_19452_) {
-        super(p_19451_, p_19452_);
-        addAttributeModifier(FEATHERS_PER_SECOND.get(), MODIFIER_UUID, BASE_STRENGTH, MULTIPLY_TOTAL);
-    }
-
-    @Override
-    public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        super.addAttributeModifiers(target, map, strength);
-    }
-
-    @Override
-    public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        super.addAttributeModifiers(target, map, strength);
-    }
-
     /**
      * This modifier is used to over-spend feathers when no more feathers are available.
      * While strained, the player will enter a negative stamina state.
@@ -76,13 +56,17 @@ public class StrainEffect extends FeathersEffects {
         @Override
         public void applyToUsage(Player player, PlayerFeathers f, AtomicInteger staminaToUse, AtomicBoolean approve) {
             if (approve.get()) return;
-            int use = f.getStamina() - staminaToUse.get();
+            int use = f.getAvailableStamina() - staminaToUse.get();
             int strain = f.getCounter(STRAIN_COUNTER).orElse(0);
+            int maxStrainStamina = FeathersCommonConfig.MAX_STRAIN.get() * FeathersConstants.STAMINA_PER_FEATHER;
 
-            if (use < 0 && (strain - use <= FeathersCommonConfig.MAX_STRAIN.get() * FeathersConstants.STAMINA_PER_FEATHER)) {
+            if (use < 0 && (strain - use <= maxStrainStamina)) {
                 f.setCounter(STRAIN_COUNTER, strain - use);
-                staminaToUse.set(staminaToUse.get() - f.getStamina());
                 approve.set(true);
+                staminaToUse.set(f.getAvailableStamina());
+                if (FeathersCommonConfig.DEBUG_MODE.get() && !player.level().isClientSide()) {
+                    Feathers.logger.info("Used " + staminaToUse.get() + " stamina, generated " + -use + " strain stamina.");
+                }
             }
         }
 
@@ -101,5 +85,22 @@ public class StrainEffect extends FeathersEffects {
             return "strain";
         }
     };
+    private static final String MODIFIER_UUID = "735f6a64-a3f9-4a0b-bee8-51a243097c07";
+    private static final double BASE_STRENGTH = 0.1D;
+
+    public StrainEffect(MobEffectCategory p_19451_, int p_19452_) {
+        super(p_19451_, p_19452_);
+        addAttributeModifier(FEATHERS_PER_SECOND.get(), MODIFIER_UUID, BASE_STRENGTH, MULTIPLY_TOTAL);
+    }
+
+    @Override
+    public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
+        super.addAttributeModifiers(target, map, strength);
+    }
+
+    @Override
+    public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
+        super.addAttributeModifiers(target, map, strength);
+    }
 
 }

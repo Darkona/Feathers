@@ -20,36 +20,22 @@ public interface IModifier {
      * 1 to 9 are available.
      **/
     int[] ordinals = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
-
-    void onAdd(PlayerFeathers iFeathers);
-
-    void onRemove(PlayerFeathers iFeathers);
-
-    void applyToDelta(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta);
-
-    void applyToUsage(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result);
-
-    int getUsageOrdinal();
-
-    int getDeltaOrdinal();
-    String getName();
-
-
-
     /**
      * This modifier is used to make the regeneration effect non-linear.
      * Regeneration is faster at the start and slower at the end.
      * Available for modders as an example, but not used in this mod.
      */
     IModifier NON_LINEAR_REGENERATION = new IModifier() {
-          @Override
+        @Override
         public void onAdd(PlayerFeathers iFeathers) {
 
         }
+
         @Override
         public void onRemove(PlayerFeathers iFeathers) {
 
         }
+
         @Override
         public void applyToDelta(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta) {
 
@@ -59,15 +45,19 @@ public interface IModifier {
             staminaDelta.set(value);
 
         }
+
         @Override
         public void applyToUsage(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
 
         }
+
         @Override
         public int getUsageOrdinal() {
             return 0;
         }
+
         public int getDeltaOrdinal() {return 0;}
+
         @Override
         public String getName() {
             return "non_linear_regeneration";
@@ -78,7 +68,6 @@ public interface IModifier {
      * Available for modders as an example, but not used in this mod.
      */
     IModifier INVERSE_REGENERATION = new IModifier() {
-
 
 
         @Override
@@ -180,8 +169,8 @@ public interface IModifier {
 
         @Override
         public void applyToUsage(Player player, PlayerFeathers f, AtomicInteger staminaToUse, AtomicBoolean approve) {
-            if(approve.get())return;
-            approve.set(f.getStamina() >= staminaToUse.get());
+            if (approve.get()) return;
+            approve.set(f.getAvailableStamina() - staminaToUse.get() >= 0);
         }
 
         @Override
@@ -199,4 +188,18 @@ public interface IModifier {
             return "default";
         }
     };
+
+    void onAdd(PlayerFeathers iFeathers);
+
+    void onRemove(PlayerFeathers iFeathers);
+
+    void applyToDelta(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta);
+
+    void applyToUsage(Player player, PlayerFeathers iFeathers, AtomicInteger staminaToUse, AtomicBoolean result);
+
+    int getUsageOrdinal();
+
+    int getDeltaOrdinal();
+
+    String getName();
 }
