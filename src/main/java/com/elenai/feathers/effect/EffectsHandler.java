@@ -1,14 +1,16 @@
 package com.elenai.feathers.effect;
 
 import com.elenai.feathers.Feathers;
+import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.api.ICapabilityPlugin;
-import com.elenai.feathers.api.StaminaAPI;
+import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.compatibility.coldsweat.ColdSweatManager;
 import com.elenai.feathers.compatibility.coldsweat.FeathersColdSweatConfig;
 import com.elenai.feathers.config.FeathersCommonConfig;
-import com.elenai.feathers.effect.effects.EnduranceEffect;
+import com.elenai.feathers.effect.effects.StrainEffect;
 import com.elenai.feathers.event.FeatherAmountEvent;
+import com.elenai.feathers.event.FeatherEvent;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
@@ -37,90 +39,25 @@ public class EffectsHandler implements ICapabilityPlugin {
     @SubscribeEvent
     public static void onEffectAdded(MobEffectEvent.Added event) {
         if (event.getEntity() instanceof Player player &&
-                event.getEffectInstance().getEffect() instanceof FeathersEffects effect) {
+                event.getEffectInstance().getEffect() instanceof FeathersEffects effect &&
+                effect.canApply(player)) {
             effect.applyEffect(player, event.getEffectInstance());
         }
     }
 
+    public static void onFeathersUsed(FeatherEvent.Use event) {
 
-
-    @SubscribeEvent
-    public static void onEffectRemoved(MobEffectEvent.Remove event) {
-        if (event.getEntity() instanceof Player player &&
-                event.getEffect() instanceof FeathersEffects effect &&
-                player.hasEffect(effect)) {
-            effect.removeEffect(player, event.getEffectInstance());
-        }
     }
 
     @SubscribeEvent
-    public static void canApplyEffect(MobEffectEvent.Applicable event) {
+    public static void onEffectRemoved(MobEffectEvent.Remove event) {
 
-        if (event.getEntity() instanceof Player player &&
-                event.getEffectInstance().getEffect() instanceof FeathersEffects effect) {
-
-            if (!FeathersCommonConfig.ENABLE_COLD_EFFECTS.get() ||
-                    player.getAbilities().invulnerable ||
-                    player.isCreative()) return;
-
-            if (effect == FeathersEffects.HOT.get()) {
-                event.setResult(canApplyHotEffect(player) ? ALLOW : DENY);
-            }
-
-            if (effect == FeathersEffects.COLD.get()) {
-                event.setResult(canApplyColdEffect(player) ? ALLOW : DENY);
-            }
-
-            if (effect == FeathersEffects.ENDURANCE.get()) {
-                event.setResult(FeathersCommonConfig.ENABLE_ENDURANCE.get() ? ALLOW : DENY);
-            }
-        }
     }
 
     @SubscribeEvent
     public static void onFeathersEmpty(FeatherAmountEvent.Empty event) {
-        event.getEntity().getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
 
-            if (FeathersCommonConfig.ENABLE_STRAIN.get()) {
-
-                if (event.prevStamina > 0) {
-
-                    event.getEntity().addEffect(new MobEffectInstance(FeathersEffects.STRAINED.get()));
-                } else {
-
-                    event.getEntity().removeEffect(FeathersEffects.STRAINED.get());
-                }
-            }
-        });
     }
-
-
-    public static boolean canApplyColdEffect(Player player) {
-       /* if (!FeathersCommonConfig.ENABLE_HOT_EFFECTS.get() ||
-                player.getAbilities().invulnerable ||
-                player.isCreative()) return false;*/
-
-        if (FeathersColdSweatConfig.isColdSweatEnabled()) {
-            return ColdSweatManager.canApplyColdEffect(player);
-        }
-
-        return !player.hasEffect(FeathersEffects.ENERGIZED.get());
-    }
-
-    public static boolean canApplyHotEffect(Player player) {
-
-       /* if (!FeathersCommonConfig.ENABLE_HOT_EFFECTS.get() ||
-                player.getAbilities().invulnerable ||
-                player.isCreative()) return false;
-*/
-
-        if (FeathersColdSweatConfig.isColdSweatEnabled()) {
-            return ColdSweatManager.canApplyHotEffect(player);
-        }
-
-        return !player.hasEffect(MobEffects.FIRE_RESISTANCE);
-    }
-
 
     /**
      * Handle the cold mechanic here.
@@ -128,13 +65,7 @@ public class EffectsHandler implements ICapabilityPlugin {
     public static void autoApplyColdEffect(Player player) {
         if (!FeathersCommonConfig.ENABLE_COLD_EFFECTS.get()) return;
 
-
-        var hasCold = player.hasEffect(FeathersEffects.COLD.get());
-        var coldDuration = hasCold ? player.getActiveEffectsMap().get(FeathersEffects.COLD.get()).getDuration() : 0;
-        var coldLingerDuration = FeathersCommonConfig.COLD_LINGER.get();
-
-        var hasHot = player.hasEffect(FeathersEffects.HOT.get());
-        var hotDuration = hasHot ? player.getActiveEffectsMap().get(FeathersEffects.HOT.get()).getDuration() : 0;
+        var hasCold = FeathersAPI.isCold(player) && player.getActiveEffectsMap().get(FeathersEffects.COLD.get()).getDuration() == -1;
 
         if (player.isCreative() && player.hasEffect(FeathersEffects.COLD.get())) {
             player.removeEffect(FeathersEffects.COLD.get());
@@ -142,59 +73,15 @@ public class EffectsHandler implements ICapabilityPlugin {
         }
 
         if (isInColdSituation(player)) {
-
-            if (hotDuration != 0) {
-
-                player.removeEffect(FeathersEffects.HOT.get());
-            } else if (!hasCold) {
-
+            player.removeEffect(FeathersEffects.HOT.get());
+            if (!hasCold) {
                 player.addEffect(new MobEffectInstance(FeathersEffects.COLD.get(), -1, 0, false, true));
             }
-
-        } else if (coldDuration > coldLingerDuration || coldDuration == -1) {
-
+        } else if (hasCold) {
             player.removeEffect(FeathersEffects.COLD.get());
-            player.addEffect(new MobEffectInstance(FeathersEffects.COLD.get(), coldLingerDuration, 0, false, true));
+            player.addEffect(new MobEffectInstance(FeathersEffects.COLD.get(), FeathersCommonConfig.COLD_LINGER.get(), 0, false, true));
         }
     }
-
-
-    /**
-     * Handles the hot mechanic here.
-     */
-    public static void autoApplyHotEffect(Player player) {
-        if (!FeathersCommonConfig.ENABLE_HOT_EFFECTS.get()) return;
-
-        var hasCold = player.hasEffect(FeathersEffects.COLD.get());
-        var coldDuration = hasCold ? player.getActiveEffectsMap().get(FeathersEffects.COLD.get()).getDuration() : 0;
-
-        var hasHot = player.hasEffect(FeathersEffects.HOT.get());
-        var hotDuration = hasHot ? player.getActiveEffectsMap().get(FeathersEffects.HOT.get()).getDuration() : 0;
-
-        if (player.isCreative() && hasHot) {
-            player.removeEffect(FeathersEffects.HOT.get());
-            return;
-        }
-
-        if (isInHotSituation(player)) {
-
-            if (coldDuration != 0) {
-
-                player.removeEffect(FeathersEffects.COLD.get());
-
-            } else if (!hasHot) {
-
-                player.addEffect(new MobEffectInstance(FeathersEffects.HOT.get(), -1, 0, false, true));
-            }
-
-        } else if (hotDuration > FeathersCommonConfig.COLD_LINGER.get() || hotDuration == -1) {
-
-            player.removeEffect(FeathersEffects.HOT.get());
-            player.addEffect(new MobEffectInstance(FeathersEffects.HOT.get(), FeathersCommonConfig.COLD_LINGER.get(), 0, false, true));
-        }
-    }
-
-
     public static boolean isInColdSituation(Player player) {
 
         if (FeathersColdSweatConfig.isColdSweatEnabled() && FeathersColdSweatConfig.BEING_COLD_ADDS_COLD_EFFECT.get()) {
@@ -209,7 +96,25 @@ public class EffectsHandler implements ICapabilityPlugin {
         return (isInColdBiome && isExposedToWeather) || player.isFreezing();
     }
 
+    /**
+     * Handles the hot mechanic here.
+     */
+    public static void autoApplyHotEffect(Player player) {
+        if (!FeathersCommonConfig.ENABLE_HOT_EFFECTS.get()) return;
+        var hasHot = FeathersAPI.isHot(player) && player.getActiveEffectsMap().get(FeathersEffects.HOT.get()).getDuration() == -1;
 
+        if (isInHotSituation(player)) {
+            player.removeEffect(FeathersEffects.COLD.get());
+            if (!hasHot) {
+                player.addEffect(new MobEffectInstance(FeathersEffects.HOT.get(), -1, 0, false, true));
+            }
+
+        } else if (hasHot) {
+
+            player.removeEffect(FeathersEffects.HOT.get());
+            player.addEffect(new MobEffectInstance(FeathersEffects.HOT.get(), FeathersCommonConfig.COLD_LINGER.get(), 0, false, true));
+        }
+    }
     public static boolean isInHotSituation(Player player) {
 
         boolean isBurning = player.wasOnFire || player.isOnFire() || player.isInLava();
@@ -238,7 +143,10 @@ public class EffectsHandler implements ICapabilityPlugin {
 
     @Override
     public void onPlayerTickAfter(TickEvent.PlayerTickEvent event) {
-
+        if(event.player.level().isClientSide()) return;
+        event.player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+            checkStrain(event.player, f);
+        });
     }
 
     @Override
@@ -246,5 +154,15 @@ public class EffectsHandler implements ICapabilityPlugin {
 
     }
 
-
+    private void checkStrain(Player player, IFeathers feathers) {
+        feathers.getCounter(StrainEffect.STRAIN_COUNTER).ifPresent(strain -> {
+            if (strain <= 0) {
+                player.removeEffect(FeathersEffects.STRAINED.get());
+                feathers.markDirty();
+            }else{
+                player.addEffect(new MobEffectInstance(FeathersEffects.STRAINED.get(), -1, 0, false, false, false));
+                feathers.markDirty();
+            }
+        });
+    }
 }

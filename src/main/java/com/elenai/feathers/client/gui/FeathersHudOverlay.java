@@ -60,10 +60,13 @@ public class FeathersHudOverlay {
          */
         drawBackground(guiGraphics, screenHeight, halfFeathers, x, xOffset, rightOffset, yOffset, icons);
 
-        /*
-         * Render the currently active feathers
-         */
-        drawFeathers(guiGraphics, screenHeight, halfFeathers, icons, x, xOffset, rightOffset, yOffset);
+        if (clientData.hasFeathers()) {
+            drawFeathers(guiGraphics, screenHeight, halfFeathers, icons, x, xOffset, rightOffset, yOffset, clientData.getFeathers());
+        } else if (clientData.isStrained()) {
+            var halfStrainedFeathers = Math.ceil((double) clientData.getStrainFeathers() / 2.0d);
+            drawFeathers(guiGraphics, screenHeight, halfStrainedFeathers, STRAINED, x, xOffset, rightOffset, yOffset, clientData.getStrainFeathers());
+        }
+
 
         /*
          * Only render the currently worn armor
@@ -105,6 +108,7 @@ public class FeathersHudOverlay {
 
         RenderSystem.disableBlend();
     };
+
 
     private static void energizedK() {
         if (clientData.isEnergized()) {
@@ -194,27 +198,26 @@ public class FeathersHudOverlay {
         }
     }
 
-    private static void drawFeathers(GuiGraphics guiGraphics, int screenHeight, double halfFeathers, Set icons, int x, int xOffset, int rightOffset, int yOffset) {
-        if (clientData.hasFeathers()) {
+    private static void drawFeathers(GuiGraphics guiGraphics, int screenHeight, double halfFeathers, Set icons, int x, int xOffset, int rightOffset, int yOffset, int feathers) {
 
-            for (int i = 0; i < ICONS_PER_ROW; i++) {
-                if (i + 1 <= halfFeathers) {
+        for (int i = 0; i < Math.min(ICONS_PER_ROW, halfFeathers); i++) {
+            if (i + 1 <= halfFeathers) {
 
-                    var icon = getHalfOrFull(icons, i, (i + 1 == halfFeathers) && !isEven(clientData.getFeathers()));
+                var icon = getHalfOrFull(icons, i, (i + 1 == halfFeathers) && !isEven(feathers));
 
-                    var xPos = getXPos(x, i, xOffset);
-                    var yPos = getYPos(screenHeight, rightOffset, getHeight(i), yOffset);
+                var xPos = getXPos(x, i, xOffset);
+                var yPos = getYPos(screenHeight, rightOffset, getHeight(i), yOffset);
 
-                    draw(guiGraphics, xPos, yPos, icon);
-                }
+                draw(guiGraphics, xPos, yPos, icon);
             }
         }
+
     }
 
     private static void drawBackground(GuiGraphics guiGraphics, int screenHeight, double halfFeathers, int x, int xOffset, int rightOffset, int yOffset, Set icons) {
 
         // Loop through each feather up to a maximum of 10
-        for (int i = 0; i < ICONS_PER_ROW; i++) {
+        for (int i = 0; i < Math.min(ICONS_PER_ROW, clientData.getMaxFeathers() / 2); i++) {
 
             // Get the position coordinates for drawing
             int xPos = getXPos(x, i, xOffset);

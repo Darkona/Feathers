@@ -42,8 +42,8 @@ public class ThirstManager implements ICapabilityPlugin {
         if (event.getEntity() instanceof Player player) {
             player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
                 player.getCapability(PLAYER_THIRST).ifPresent(iThirst -> {
-                    f.addCounter(LAST_THIRST_LEVEL, iThirst.getThirst());
-                    f.addCounter(LAST_QUENCH_LEVEL, iThirst.getQuenched());
+                    f.setCounter(LAST_THIRST_LEVEL, iThirst.getThirst());
+                    f.setCounter(LAST_QUENCH_LEVEL, iThirst.getQuenched());
                 });
             });
         }

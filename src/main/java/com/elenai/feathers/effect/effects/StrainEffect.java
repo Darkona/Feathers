@@ -1,11 +1,11 @@
 package com.elenai.feathers.effect.effects;
 
+import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.capability.PlayerFeathers;
 import com.elenai.feathers.config.FeathersCommonConfig;
 import com.elenai.feathers.effect.FeathersEffects;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
@@ -15,32 +15,85 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.elenai.feathers.attributes.FeathersAttributes.FEATHERS_PER_SECOND;
+import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.MULTIPLY_TOTAL;
+
 public class StrainEffect extends FeathersEffects {
+    public static final String STRAIN_COUNTER = "strain";
+
+    private static final String MODIFIER_UUID = "735f6a64-a3f9-4a0b-bee8-51a243097c07";
+    private static final double BASE_STRENGTH = 0.5D;
+
+
+    public StrainEffect(MobEffectCategory p_19451_, int p_19452_) {
+        super(p_19451_, p_19452_);
+        addAttributeModifier(FEATHERS_PER_SECOND.get(), MODIFIER_UUID, BASE_STRENGTH, MULTIPLY_TOTAL);
+    }
+
+    @Override
+    public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
+        super.addAttributeModifiers(target, map, strength);
+    }
+
+    @Override
+    public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
+        super.addAttributeModifiers(target, map, strength);
+    }
+
     /**
      * This modifier is used to over-spend feathers when no more feathers are available.
      * While strained, the player will enter a negative stamina state.
      * This modifier adds Strained Feathers up to Max_strain when stamina is 0.
      * While strained, regeneration is much, much slower.
      */
-    public static final IModifier STRAIN_USAGE = new IModifier() {
+    public static final IModifier STRAIN_MODIFIER = new IModifier() {
+
         @Override
-        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger feathers) {
-            if (iFeathers.getFeathers() == 0) {
-                int strain = iFeathers.getStrainFeathers();
-                if (strain + feathers.get() <= iFeathers.getMaxStrained()) {
-                    iFeathers.setStrainFeathers(strain + feathers.get());
+        public void onAdd(PlayerFeathers iFeathers) {
+            iFeathers.setCounter(STRAIN_COUNTER, 0);
+        }
+
+        @Override
+        public void onRemove(PlayerFeathers iFeathers) {
+            iFeathers.removeCounter(STRAIN_COUNTER);
+        }
+
+        @Override
+        public void applyToDelta(Player player, PlayerFeathers f, AtomicInteger staminaDelta) {
+            int currentStrain = f.getCounter(STRAIN_COUNTER).orElse(0);
+            if (currentStrain > 0) {
+                int recover = currentStrain - staminaDelta.get();
+                if (recover <= 0) {
+                    f.setCounter(STRAIN_COUNTER, 0);
+                    staminaDelta.set(-recover);
+                } else {
+                    f.setCounter(STRAIN_COUNTER, recover);
+                    staminaDelta.set(0);
                 }
             }
         }
 
         @Override
-        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+        public void applyToUsage(Player player, PlayerFeathers f, AtomicInteger staminaToUse, AtomicBoolean approve) {
+            if (approve.get()) return;
+            int use = f.getStamina() - staminaToUse.get();
+            int strain = f.getCounter(STRAIN_COUNTER).orElse(0);
 
+            if (use < 0 && (strain - use <= FeathersCommonConfig.MAX_STRAIN.get() * FeathersConstants.STAMINA_PER_FEATHER)) {
+                f.setCounter(STRAIN_COUNTER, strain - use);
+                staminaToUse.set(staminaToUse.get() - f.getStamina());
+                approve.set(true);
+            }
         }
 
         @Override
-        public int getOrdinal() {
-            return 20;
+        public int getUsageOrdinal() {
+            return ordinals[5];
+        }
+
+        @Override
+        public int getDeltaOrdinal() {
+            return ordinals[15];
         }
 
         @Override
@@ -48,61 +101,5 @@ public class StrainEffect extends FeathersEffects {
             return "strain";
         }
     };
-    public static final IModifier STRAIN_RECOVERY = new IModifier() {
-        @Override
-        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta) {
-            if (iFeathers.getStrainFeathers() > 0) {
-                staminaDelta.set(staminaDelta.get() + (int) (FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get() * 0.4));
-            }
-        }
-
-        @Override
-        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
-
-        }
-
-        @Override
-        public int getOrdinal() {
-            return 0;
-        }
-
-        @Override
-        public String getName() {
-            return "strain_recovery";
-        }
-    };
-
-    public StrainEffect(MobEffectCategory p_19451_, int p_19452_) {
-        super(p_19451_, p_19452_);
-    }
-
-    @Override
-    public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        if (!FeathersCommonConfig.ENABLE_STRAIN.get()) return;
-        if (target instanceof ServerPlayer player) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-
-
-            });
-        }
-        super.addAttributeModifiers(target, map, strength);
-    }
-
-    @Override
-    public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        if (!FeathersCommonConfig.ENABLE_STRAIN.get()) return;
-        if (target instanceof ServerPlayer player) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-
-            });
-        }
-        super.removeAttributeModifiers(target, map, strength);
-    }
-
-    public void applyEffect(LivingEntity entity) {
-        entity.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-            f.addCounter("Strain", 0);
-        });
-    }
 
 }

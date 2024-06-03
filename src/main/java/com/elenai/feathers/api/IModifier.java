@@ -8,15 +8,50 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public interface IModifier {
 
+
+    /**
+     * Usage Modifier Ordinals reference.
+     * 0 = Hot effect / Momentum effect;
+     * they will be applied first. If you are going to spend more/less feathers, these need to be applied first.
+     * <p>
+     * 10 = Endurance/Strain effect;
+     * If you're going to overspend feathers, or spend endurance feathers this will be applied after knowing how many will be spent.
+     * <p>
+     * 1 to 9 are available.
+     **/
+    int[] ordinals = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
+
+    void onAdd(PlayerFeathers iFeathers);
+
+    void onRemove(PlayerFeathers iFeathers);
+
+    void applyToDelta(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta);
+
+    void applyToUsage(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result);
+
+    int getUsageOrdinal();
+
+    int getDeltaOrdinal();
+    String getName();
+
+
+
     /**
      * This modifier is used to make the regeneration effect non-linear.
      * Regeneration is faster at the start and slower at the end.
      * Available for modders as an example, but not used in this mod.
      */
     IModifier NON_LINEAR_REGENERATION = new IModifier() {
+          @Override
+        public void onAdd(PlayerFeathers iFeathers) {
 
+        }
         @Override
-        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta) {
+        public void onRemove(PlayerFeathers iFeathers) {
+
+        }
+        @Override
+        public void applyToDelta(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta) {
 
             var staminaPerSecond = FeathersAPI.getPlayerStaminaRegenerationPerTick(player);
             var maxStamina = iFeathers.getMaxStamina();
@@ -24,17 +59,15 @@ public interface IModifier {
             staminaDelta.set(value);
 
         }
-
         @Override
-        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+        public void applyToUsage(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
 
         }
-
         @Override
-        public int getOrdinal() {
+        public int getUsageOrdinal() {
             return 0;
         }
-
+        public int getDeltaOrdinal() {return 0;}
         @Override
         public String getName() {
             return "non_linear_regeneration";
@@ -46,18 +79,35 @@ public interface IModifier {
      */
     IModifier INVERSE_REGENERATION = new IModifier() {
 
+
+
         @Override
-        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta) {
+        public void onAdd(PlayerFeathers iFeathers) {
+
+        }
+
+        @Override
+        public void onRemove(PlayerFeathers iFeathers) {
+
+        }
+
+        @Override
+        public void applyToDelta(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta) {
             staminaDelta.set(staminaDelta.get() - FeathersAPI.getPlayerStaminaRegenerationPerTick(player));
         }
 
         @Override
-        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+        public void applyToUsage(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
 
         }
 
         @Override
-        public int getOrdinal() {
+        public int getUsageOrdinal() {
+            return 0;
+        }
+
+        @Override
+        public int getDeltaOrdinal() {
             return 0;
         }
 
@@ -73,18 +123,34 @@ public interface IModifier {
      * This modifier is applied once per tick.
      */
     IModifier REGENERATION = new IModifier() {
+
         @Override
-        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta) {
+        public void onAdd(PlayerFeathers iFeathers) {
+
+        }
+
+        @Override
+        public void onRemove(PlayerFeathers iFeathers) {
+
+        }
+
+        @Override
+        public void applyToDelta(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta) {
             staminaDelta.set(staminaDelta.get() + FeathersAPI.getPlayerStaminaRegenerationPerTick(player));
         }
 
         @Override
-        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+        public void applyToUsage(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
 
         }
 
         @Override
-        public int getOrdinal() {
+        public int getUsageOrdinal() {
+            return 0;
+        }
+
+        @Override
+        public int getDeltaOrdinal() {
             return 0;
         }
 
@@ -95,19 +161,37 @@ public interface IModifier {
 
     };
     IModifier DEFAULT_USAGE = new IModifier() {
+
+
         @Override
-        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger usingFeathers) {
+        public void onAdd(PlayerFeathers iFeathers) {
+
+        }
+
+        @Override
+        public void onRemove(PlayerFeathers iFeathers) {
+
+        }
+
+        @Override
+        public void applyToDelta(Player player, PlayerFeathers f, AtomicInteger usingFeathers) {
             //Do nothing
         }
 
         @Override
-        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
-            result.set(true);
+        public void applyToUsage(Player player, PlayerFeathers f, AtomicInteger staminaToUse, AtomicBoolean approve) {
+            if(approve.get())return;
+            approve.set(f.getStamina() >= staminaToUse.get());
         }
 
         @Override
-        public int getOrdinal() {
-            return 0;
+        public int getUsageOrdinal() {
+            return ordinals[20];
+        }
+
+        @Override
+        public int getDeltaOrdinal() {
+            return ordinals[0];
         }
 
         @Override
@@ -115,26 +199,4 @@ public interface IModifier {
             return "default";
         }
     };
-
-    /**
-     * Usage Modifier Ordinals reference.
-     * 0 = Hot effect / Momentum effect;
-     * they will be applied first. If you are going to spend more/less feathers, these need to be applied first.
-     * <p>
-     * 10 = Endurance/Strain effect;
-     * If you're going to overspend feathers, or spend endurance feathers this will be applied after knowing how many will be spent.
-     * <p>
-     * 1 to 9 are available.
-     **/
-    int[] ordinals = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-
-    void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta);
-
-    void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result);
-
-    int getOrdinal();
-
-    String getName();
-
-
 }

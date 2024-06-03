@@ -38,6 +38,7 @@ public class FeathersAttributes {
             "d9caa995-9dc5-46e9-8559-6c4542ba89bc"
     );
 
+
     public static RegistryObject<Attribute> registerAttribute(
             String name, Function<String, Attribute> attribute, String uuid
     ) {

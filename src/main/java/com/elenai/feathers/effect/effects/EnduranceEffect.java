@@ -28,13 +28,23 @@ public class EnduranceEffect extends FeathersEffects {
      */
     public static final IModifier ENDURANCE = new IModifier() {
         @Override
-        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaToUse) {
+        public void onAdd(PlayerFeathers iFeathers) {
+
+        }
+
+        @Override
+        public void onRemove(PlayerFeathers iFeathers) {
+
+        }
+
+        @Override
+        public void applyToDelta(Player player, PlayerFeathers iFeathers, AtomicInteger staminaToUse) {
 
 
         }
 
         @Override
-        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger staminaToUse, AtomicBoolean result) {
+        public void applyToUsage(Player player, PlayerFeathers iFeathers, AtomicInteger staminaToUse, AtomicBoolean result) {
             if (player.hasEffect(FeathersEffects.ENDURANCE.get())) {
                 iFeathers.getCounter(ENDURANCE_COUNTER).ifPresent(enduranceFeathers -> {
 
@@ -63,8 +73,13 @@ public class EnduranceEffect extends FeathersEffects {
         }
 
         @Override
-        public int getOrdinal() {
+        public int getUsageOrdinal() {
             return 10;
+        }
+
+        @Override
+        public int getDeltaOrdinal() {
+            return 0;
         }
 
         @Override
@@ -91,7 +106,7 @@ public class EnduranceEffect extends FeathersEffects {
 
     public void applyEffect(LivingEntity entity, MobEffectInstance effect) {
         entity.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-            f.addCounter(EnduranceEffect.ENDURANCE_COUNTER, (effect.getAmplifier() + 1) * 8);
+            f.setCounter(EnduranceEffect.ENDURANCE_COUNTER, (effect.getAmplifier() + 1) * 8);
             StaminaAPI.addStaminaUsageModifier((Player) entity, EnduranceEffect.ENDURANCE);
         });
 

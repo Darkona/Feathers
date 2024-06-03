@@ -18,18 +18,33 @@ public class MomentumEffect extends FeathersEffects {
     public static final IModifier MOMENTUM = new IModifier() {
 
         @Override
-        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger feathersToUse) {
+        public void onAdd(PlayerFeathers iFeathers) {
 
         }
 
         @Override
-        public void apply(Player player, PlayerFeathers iFeathers, AtomicInteger feathersToUse, AtomicBoolean result) {
+        public void onRemove(PlayerFeathers iFeathers) {
+
+        }
+
+        @Override
+        public void applyToDelta(Player player, PlayerFeathers iFeathers, AtomicInteger feathersToUse) {
+
+        }
+
+        @Override
+        public void applyToUsage(Player player, PlayerFeathers iFeathers, AtomicInteger feathersToUse, AtomicBoolean result) {
             feathersToUse.set((feathersToUse.get() * FeathersConstants.STAMINA_PER_FEATHER) / 2);
         }
 
         @Override
-        public int getOrdinal() {
+        public int getUsageOrdinal() {
             return 11;
+        }
+
+        @Override
+        public int getDeltaOrdinal() {
+            return 0;
         }
 
         @Override

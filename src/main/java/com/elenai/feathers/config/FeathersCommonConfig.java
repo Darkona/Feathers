@@ -53,7 +53,7 @@ public class FeathersCommonConfig {
 
         REGEN_FEATHERS_PER_SECOND = BUILDER
                 .comment("How many feathers the player will regenerate every second. This will be modified by effects.")
-                .defineInRange("Base Feather Regeneration", 0.33D, -40.0D, 40.0D);
+                .defineInRange("Base Feather Regeneration", 0.4D, -40.0D, 40.0D);
 
 
         MAX_FEATHERS = BUILDER.comment("Maximum Feathers the player can have.")
@@ -129,7 +129,7 @@ public class FeathersCommonConfig {
                 .comment("Maximum strain the player can have. " +
                         "When the player has no feathers, the player will enter a negative stamina state. " +
                         "This value determines how many feathers can be added to the negative stamina state.")
-                .define("Max Strain", 6);
+                .define("Max Strain", 6000);
 
         BUILDER.pop();
 

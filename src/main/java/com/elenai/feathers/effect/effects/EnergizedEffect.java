@@ -23,14 +23,14 @@ public class EnergizedEffect extends MobEffect {
 
     @Override
     public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        target.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(IFeathers::shouldRecalculate);
+        target.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(IFeathers::isDirty);
         super.addAttributeModifiers(target, map, strength);
     }
 
     @Override
     public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
         super.removeAttributeModifiers(target, map, strength);
-        target.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(IFeathers::shouldRecalculate);
+        target.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(IFeathers::isDirty);
 
     }
 

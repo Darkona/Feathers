@@ -2,10 +2,11 @@ package com.elenai.feathers.capability;
 
 import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.api.FeathersConstants;
+import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.api.IModifier;
 import com.elenai.feathers.client.ClientFeathersData;
 import com.elenai.feathers.config.FeathersCommonConfig;
-import com.elenai.feathers.effect.FeathersEffects;
+import com.elenai.feathers.effect.effects.StrainEffect;
 import com.elenai.feathers.event.FeatherAmountEvent;
 import com.elenai.feathers.event.FeatherEvent;
 import com.elenai.feathers.event.StaminaChangeEvent;
@@ -17,7 +18,6 @@ import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.LiteralContents;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
 @Setter
-public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
+public class PlayerFeathers implements IFeathers {
 
     private static final int ZERO = 0;
     private int stamina;
@@ -39,21 +39,23 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
     private int maxStrained;
     private boolean desynced;
 
-    //Stamina delta calculation
-    private int staminaDelta;
-    @Getter(AccessLevel.NONE)
-    private boolean shouldRecalculate;
 
-    //Checks
+    private int staminaDelta;
+
+    @Setter(AccessLevel.NONE)
+    private boolean dirty;
+
+
     private Map<String, Integer> counters = new HashMap<>();
 
-    //Modifiers
+
     private Map<String, IModifier> staminaDeltaModifiers = new HashMap<>();
     private List<IModifier> staminaDeltaModifierList = new ArrayList<>();
 
     private Map<String, IModifier> staminaUsageModifiers = new HashMap<>();
     private List<IModifier> staminaUsageModifiersList = new ArrayList<>();
 
+    /* Initialization */
 
     public PlayerFeathers() {
         maxStamina = (int) (FeathersCommonConfig.MAX_FEATHERS.get() * FeathersConstants.STAMINA_PER_FEATHER);
@@ -69,12 +71,54 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
 
         synchronizeFeathers();
 
-        shouldRecalculate = true;
+        dirty = true;
     }
 
-    public void addCounter(String name, int value) {
-        counters.put(name, value);
+    private void attachDefaultDeltaModifiers() {
+
+        var modifiers = new ArrayList<IModifier>();
+        var event = new FeatherEvent.AttachDefaultDeltaModifiers(modifiers);
+
+        if (MinecraftForge.EVENT_BUS.post(event) || event.getResult() == Event.Result.DENY) return;
+
+        if (event.getResult() == Event.Result.DEFAULT) {
+            modifiers.add(IModifier.REGENERATION);
+            if (FeathersCommonConfig.ENABLE_STRAIN.get()) {
+                modifiers.add(StrainEffect.STRAIN_MODIFIER);
+            }
+        }
+
+        event.modifiers.forEach(m -> {
+            staminaDeltaModifiers.put(m.getName(), m);
+            m.onAdd(this);
+        });
+
+
+        sortDeltaModifiers();
     }
+
+    private void attachDefaultUsageModifiers() {
+
+        var event = new FeatherEvent.AttachDefaultUsageModifiers(new ArrayList<>());
+
+        if (MinecraftForge.EVENT_BUS.post(event) || event.getResult() == Event.Result.DENY) return;
+
+        if (event.getResult() == Event.Result.DEFAULT) {
+            event.modifiers.add(IModifier.DEFAULT_USAGE);
+
+            if (FeathersCommonConfig.ENABLE_STRAIN.get()) {
+                event.modifiers.add(StrainEffect.STRAIN_MODIFIER);
+            }
+        }
+
+        event.modifiers.forEach(m -> {
+            staminaUsageModifiers.put(m.getName(), m);
+            m.onAdd(this);
+        });
+        sortUsageModifiers();
+    }
+
+    /* Counters*/
 
     public void removeCounter(String name) {
         counters.remove(name);
@@ -92,53 +136,27 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
         counters.put(name, value);
     }
 
-    private void attachDefaultDeltaModifiers() {
 
-        var modifiers = new ArrayList<IModifier>();
-        var event = new FeatherEvent.AttachDefaultDeltaModifiers(modifiers);
-        modifiers.add(IModifier.REGENERATION);
-        if (MinecraftForge.EVENT_BUS.post(event)) return;
-
-        if (event.getResult() == Event.Result.DEFAULT) {
-            event.modifiers.forEach(this::addDeltaModifier);
-        }
-
-    }
-
-    private void attachDefaultUsageModifiers() {
-
-        var event = new FeatherEvent.AttachDefaultUsageModifiers(new ArrayList<>());
-
-        if (!MinecraftForge.EVENT_BUS.post(event)) return;
-
-        if (event.getResult() == Event.Result.DEFAULT) {
-            event.modifiers.add(IModifier.DEFAULT_USAGE);
-            event.modifiers.forEach(m -> staminaUsageModifiers.put(m.getName(), m));
-        }
-
-    }
-
+    /* Markers */
     @Override
     public int getMaxFeathers() {
         return maxStamina / FeathersConstants.STAMINA_PER_FEATHER;
     }
 
-    public boolean shouldRecalculate() {
-        return shouldRecalculate;
+    public void markDirty() {
+        dirty = true;
     }
 
-    public void setShouldRecalculate() {
-        shouldRecalculate = true;
-    }
 
+    /* Normal getters and setters */
     @Override
     public int getFeathers() {
-        return stamina / FeathersConstants.STAMINA_PER_FEATHER;
+        return feathers;
     }
 
     @Override
     public void setFeathers(int feathers) {
-        this.stamina = feathers * FeathersConstants.STAMINA_PER_FEATHER;
+        setStamina(feathers * FeathersConstants.STAMINA_PER_FEATHER);
     }
 
     @Override
@@ -147,43 +165,63 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
         synchronizeFeathers();
     }
 
+    private void synchronizeFeathers() {
+        feathers = stamina / FeathersConstants.STAMINA_PER_FEATHER;
+
+    }
+
+
+    /* Delta and usage modifiers*/
     @Override
     public void addDeltaModifier(IModifier modifier) {
 
-        var prev = staminaDeltaModifiers.put(modifier.getName(), modifier);
-        if (prev != modifier) {
-            shouldRecalculate = true;
-        }
+        staminaDeltaModifiers.put(modifier.getName(), modifier);
+        modifier.onAdd(this);
+        dirty = true;
+        sortDeltaModifiers();
+
     }
 
     @Override
     public void removeDeltaModifier(IModifier modifier) {
         if (staminaDeltaModifiers.remove(modifier.getName()) != null) {
-            shouldRecalculate = true;
+            modifier.onRemove(this);
+            sortDeltaModifiers();
         }
     }
 
     private void sortDeltaModifiers() {
         staminaDeltaModifierList = new ArrayList<>(staminaDeltaModifiers.values());
-        staminaDeltaModifierList.sort(Comparator.comparingInt(IModifier::getOrdinal));
+        staminaDeltaModifierList.sort(Comparator.comparingInt(IModifier::getDeltaOrdinal));
     }
-
 
     @Override
-    public void recalculateStaminaDelta(Player player) {
-        if (!shouldRecalculate) return;
-
-        final AtomicInteger delta = new AtomicInteger(ZERO);
-
-        sortDeltaModifiers();
-
-        staminaDeltaModifierList.forEach(m -> m.apply(player, this, delta));
-
-        staminaDelta = delta.get();
-
-        shouldRecalculate = false;
+    public void addUsageModifier(IModifier modifier) {
+        staminaUsageModifiers.put(modifier.getName(), modifier);
+        modifier.onAdd(this);
+        sortUsageModifiers();
     }
 
+    @Override
+    public void removeUsageModifier(IModifier modifier) {
+        if (staminaDeltaModifiers.remove(modifier.getName()) != null) {
+            modifier.onRemove(this);
+            sortUsageModifiers();
+        }
+
+    }
+
+    private void sortUsageModifiers() {
+        staminaUsageModifiersList = new ArrayList<>(staminaUsageModifiers.values());
+        staminaUsageModifiersList.sort(Comparator.comparingInt(IModifier::getUsageOrdinal));
+    }
+
+
+    /*Stamina delta calculations*/
+    @Override
+    public void recalculateStaminaDelta(Player player) {
+
+    }
 
     public void applyStaminaDelta() {
 
@@ -196,30 +234,8 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
         synchronizeFeathers();
     }
 
-    @Override
-    public void addUsageModifier(IModifier modifier) {
-        staminaUsageModifiers.put(modifier.getName(), modifier);
-        sortUsageModifiers();
 
-    }
-
-    @Override
-    public void removeUsageModifier(IModifier modifier) {
-        staminaUsageModifiers.remove(modifier.getName());
-        sortUsageModifiers();
-
-    }
-
-    public void sortUsageModifiers() {
-        staminaUsageModifiersList = new ArrayList<>(staminaUsageModifiers.values());
-        staminaUsageModifiersList.sort(Comparator.comparingInt(IModifier::getOrdinal));
-    }
-
-    private void synchronizeFeathers() {
-        feathers = stamina / FeathersConstants.STAMINA_PER_FEATHER;
-
-    }
-
+    /* Usage */
     @Override
     public boolean gainFeathers(int feathers) {
         var prev = this.feathers;
@@ -229,15 +245,22 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
 
     @Override
     public boolean useFeathers(Player player, int feathers) {
+        if (staminaUsageModifiers.isEmpty()) attachDefaultUsageModifiers();
         var prev = this.feathers;
         var multiplier = FeathersAPI.getPlayerStaminaUsageMultiplier(player);
         var staminaToUse = new AtomicInteger((int) (feathers * FeathersConstants.STAMINA_PER_FEATHER * multiplier));
         var approve = new AtomicBoolean(false);
-        staminaUsageModifiersList.forEach(m -> m.apply(player, this, staminaToUse, approve));
 
-        if (staminaToUse.get() <= 0) return true;
-        subtractStamina(staminaToUse.get());
-        synchronizeFeathers();
+        for (IModifier m : staminaUsageModifiersList) {
+            m.applyToUsage(player, this, staminaToUse, approve);
+        }
+
+        if (approve.get()) {
+            subtractStamina(staminaToUse.get());
+            cooldown += 40;
+            synchronizeFeathers();
+        }
+        ;
         return approve.get();
     }
 
@@ -245,44 +268,23 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
         this.stamina = Math.min(this.stamina + stamina, maxStamina);
     }
 
-    private void subtractStamina(int stamina) {
-        this.stamina = Math.max(this.stamina - stamina, ZERO);
+    private void subtractStamina(int subtraction) {
+        stamina = Math.max(stamina - subtraction, ZERO);
     }
 
-    public void copyFrom(com.elenai.feathers.api.IFeathers source) {
-        this.maxStamina = source.getMaxStamina();
-        this.staminaDelta = source.getStaminaDelta();
-        this.stamina = source.getStamina();
-        this.shouldRecalculate = true;
-        this.counters.putAll(source.getCounters());
-        this.staminaUsageModifiers.putAll(source.getStaminaUsageModifiers());
-        this.staminaDeltaModifiers.putAll(source.getStaminaDeltaModifiers());
-    }
+    /* Tick */
+    public void tick(Player player) {
 
-    public CompoundTag saveNBTData() {
-        CompoundTag nbt = new CompoundTag();
-        nbt.putInt("stamina", this.stamina);
-        nbt.putInt("max_stamina", this.maxStamina);
-        nbt.putInt("stamina_delta", this.staminaDelta);
-        var countersTag = new CompoundTag();
-        this.counters.forEach(countersTag::putInt);
-        nbt.put("counters", countersTag);
 
-        return nbt;
-    }
+        if (canDoStaminaChange()) {
+            doStaminaChange(player);
+        }
 
-    public void loadNBTData(CompoundTag nbt) {
-
-        this.stamina = nbt.getInt("stamina");
-        this.maxStamina = nbt.getInt("max_stamina");
-        this.staminaDelta = nbt.getInt("stamina_delta");
-        CompoundTag tagCounters = nbt.getCompound("counters");
-        tagCounters.getAllKeys().forEach(key -> counters.put(key, tagCounters.getInt(key)));
-
-        synchronizeFeathers();
+        if (player.tickCount % 2 == 0 && player.level().isClientSide) ClientFeathersData.getInstance().update(player, this);
     }
 
     private boolean canDoStaminaChange() {
+        if (staminaDeltaModifiers.isEmpty()) attachDefaultDeltaModifiers();
         if (cooldown > 0) {
             cooldown--;
             return false;
@@ -290,9 +292,15 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
         return true;
     }
 
+    private void calculateStaminaDelta(Player player) {
+        final AtomicInteger delta = new AtomicInteger(ZERO);
+        staminaDeltaModifierList.forEach(m -> m.applyToDelta(player, this, delta));
+        staminaDelta = delta.get();
+    }
+
     private void doStaminaChange(Player player) {
 
-        recalculateStaminaDelta(player);
+        calculateStaminaDelta(player);
 
         int prevStamina = stamina;
         int prevFeathers = feathers;
@@ -300,8 +308,10 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
         if (MinecraftForge.EVENT_BUS.post(preChangeEvent)) return;
 
         if (preChangeEvent.getResult() != Event.Result.DEFAULT) return;
+
         staminaDelta = preChangeEvent.staminaDelta;
         stamina = preChangeEvent.stamina;
+
 
         if (staminaDelta == ZERO) return;
 
@@ -339,30 +349,40 @@ public class PlayerFeathers implements com.elenai.feathers.api.IFeathers {
             FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(this), player);
         }
 
-        if (stamina < 0) {
-
-            if (FeathersCommonConfig.DEBUG_MODE.get()) {
-                player.sendSystemMessage(MutableComponent.create(new LiteralContents("You are out of stamina!")));
-            }
-
-            if (FeathersCommonConfig.ENABLE_STRAIN.get()) {
-                player.addEffect(new MobEffectInstance(FeathersEffects.STRAINED.get(), -1, 0, false, true));
-            }
-
-        }
-
     }
 
-    public void tick(Player player) {
 
-        if (shouldRecalculate)
-            recalculateStaminaDelta(player);
-
-        if (canDoStaminaChange()) {
-            doStaminaChange(player);
-        }
-
-        if (player.tickCount % 2 == 0 && player.level().isClientSide) ClientFeathersData.getInstance().update(player, this);
+    /* Save and load */
+    public void copyFrom(com.elenai.feathers.api.IFeathers source) {
+        this.maxStamina = source.getMaxStamina();
+        this.staminaDelta = source.getStaminaDelta();
+        this.stamina = source.getStamina();
+        this.dirty = true;
+        this.counters.putAll(source.getCounters());
+        this.staminaUsageModifiers.putAll(source.getStaminaUsageModifiers());
+        this.staminaDeltaModifiers.putAll(source.getStaminaDeltaModifiers());
     }
 
+    public CompoundTag saveNBTData() {
+        CompoundTag nbt = new CompoundTag();
+        nbt.putInt("stamina", this.stamina);
+        nbt.putInt("max_stamina", this.maxStamina);
+        nbt.putInt("stamina_delta", this.staminaDelta);
+        var countersTag = new CompoundTag();
+        this.counters.forEach(countersTag::putInt);
+        nbt.put("counters", countersTag);
+
+        return nbt;
+    }
+
+    public void loadNBTData(CompoundTag nbt) {
+
+        this.stamina = nbt.getInt("stamina");
+        this.maxStamina = nbt.getInt("max_stamina");
+        this.staminaDelta = nbt.getInt("stamina_delta");
+        CompoundTag tagCounters = nbt.getCompound("counters");
+        tagCounters.getAllKeys().forEach(key -> counters.put(key, tagCounters.getInt(key)));
+
+        synchronizeFeathers();
+    }
 }

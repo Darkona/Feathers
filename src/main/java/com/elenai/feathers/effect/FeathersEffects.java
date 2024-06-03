@@ -54,4 +54,5 @@ public class FeathersEffects extends MobEffect {
 
     }
 
+    public boolean canApply(Player player) { return !(player.isCreative() || player.getAbilities().invulnerable); }
 }

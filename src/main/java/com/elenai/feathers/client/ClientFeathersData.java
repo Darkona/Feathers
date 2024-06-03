@@ -1,9 +1,11 @@
 package com.elenai.feathers.client;
 
 import com.elenai.feathers.api.FeathersAPI;
+import com.elenai.feathers.api.FeathersConstants;
 import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.config.FeathersClientConfig;
 import com.elenai.feathers.effect.effects.EnduranceEffect;
+import com.elenai.feathers.effect.effects.StrainEffect;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
@@ -28,6 +30,7 @@ public class ClientFeathersData {
     private int weight = 0;
     private int animationCooldown = 0;
     private int fadeCooldown = 0;
+    private int strainFeathers = 0;
     private boolean hot = false;
     private boolean cold = false;
     private boolean energized = false;
@@ -35,6 +38,7 @@ public class ClientFeathersData {
     private boolean momentum = false;
     private boolean fatigued = false;
     private boolean endurance = false;
+    private boolean strained = false;
     private ClientFeathersData() {}
 
     public static ClientFeathersData getInstance() {
@@ -51,11 +55,13 @@ public class ClientFeathersData {
         maxFeathers = f.getMaxFeathers();
         staminaDelta = f.getStaminaDelta();
         enduranceFeathers = f.getCounter(EnduranceEffect.ENDURANCE_COUNTER).orElse(0);
+        strainFeathers = f.getCounter(StrainEffect.STRAIN_COUNTER).orElse(0);
         endurance = FeathersAPI.isEnduring(player);
         hot = FeathersAPI.isHot(player);
         cold = FeathersAPI.isCold(player);
         energized = FeathersAPI.isEnergized(player);
         fatigued = FeathersAPI.isFatigued(player);
+        strained = FeathersAPI.isStrained(player);
     }
 
     public boolean hasFullStamina() {
@@ -96,4 +102,9 @@ public class ClientFeathersData {
             }
         }
     }
+
+    public int getStrainFeathers() {
+        return strainFeathers > 0 ? strainFeathers / FeathersConstants.STAMINA_PER_FEATHER : 0;
+    }
+
 }

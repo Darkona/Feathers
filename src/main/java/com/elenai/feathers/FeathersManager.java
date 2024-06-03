@@ -2,6 +2,7 @@ package com.elenai.feathers;
 
 import com.elenai.feathers.api.FeathersAPI;
 import com.elenai.feathers.api.ICapabilityPlugin;
+import com.elenai.feathers.api.IFeathers;
 import com.elenai.feathers.attributes.FeathersAttributes;
 import com.elenai.feathers.capability.Capabilities;
 import com.elenai.feathers.capability.PlayerFeathers;
@@ -71,8 +72,8 @@ public class FeathersManager {
         final Capability<com.elenai.feathers.api.IFeathers> capability = Capabilities.PLAYER_FEATHERS;
         return new ICapabilitySerializable<CompoundTag>() {
 
-            final com.elenai.feathers.api.IFeathers feathersCapability = new PlayerFeathers();
-            final LazyOptional<com.elenai.feathers.api.IFeathers> capOptional = LazyOptional.of(() -> feathersCapability);
+            final IFeathers feathersCapability = new PlayerFeathers();
+            final LazyOptional<IFeathers> capOptional = LazyOptional.of(() -> feathersCapability);
 
             @Nonnull
             public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction direction) {
@@ -114,14 +115,12 @@ public class FeathersManager {
             assignFeathersAttributes(player);
 
             player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-                f.setShouldRecalculate();
+                f.markDirty();
                 FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
             });
 
             plugins.forEach(p -> p.onPlayerJoin(event));
         }
-
-
     }
 
     @SubscribeEvent
@@ -153,16 +152,7 @@ public class FeathersManager {
     public static void onConfig(ModConfigEvent event) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server == null) return;
-
-        server.getPlayerList().getPlayers().forEach(player -> {
-
-            assignFeathersAttributes(player);
-
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-                f.setShouldRecalculate();
-                f.recalculateStaminaDelta(player);
-            });
-        });
+        server.getPlayerList().getPlayers().forEach(FeathersManager::assignFeathersAttributes);
     }
 
     public static void assignFeathersAttributes(Player player) {

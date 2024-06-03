@@ -60,13 +60,11 @@ public interface IFeathers {
 
     void setStaminaDelta(int staminaDelta);
 
-    boolean shouldRecalculate();
+    boolean isDirty();
 
     Map<String, IModifier> getStaminaDeltaModifiers();
 
     Map<String, IModifier> getStaminaUsageModifiers();
-
-    void addCounter(String name, int value);
 
     void removeCounter(String name);
 
@@ -74,7 +72,7 @@ public interface IFeathers {
 
     void setCounter(String name, int value);
 
-    void setShouldRecalculate();
+    void markDirty();
 
     int getMaxFeathers();
 
@@ -90,5 +88,4 @@ public interface IFeathers {
 
     Map<String, Integer> getCounters();
 
-    void sortUsageModifiers();
 }

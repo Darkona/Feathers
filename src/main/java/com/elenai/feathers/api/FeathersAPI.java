@@ -109,18 +109,15 @@ public class FeathersAPI {
                   if (!cancelled && useFeatherEvent.getResult() == DEFAULT) {
 
                       var prev = f.getFeathers();
-                      var post = f.useFeathers(player, useFeatherEvent.amount);
+                      var used = f.useFeathers(player, useFeatherEvent.amount);
 
-                      MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, prev, post));
-                      result.set(true);
+                      MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, prev, used));
+                      result.set(used);
 
-                      if (post) FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
+                      if (used) FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
 
                       if (cooldownTicks > 0) f.setCooldown(cooldownTicks);
-                  } else {
-                      result.set(true);
                   }
-
               });
         return result.get();
     }
@@ -156,14 +153,6 @@ public class FeathersAPI {
     public static int getCooldown(ServerPlayer player) {
         return player.getCapability(Capabilities.PLAYER_FEATHERS)
                      .map(IFeathers::getCooldown).orElse(0);
-    }
-
-    public static void markForDeltaRecalculation(Player player) {
-        player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(IFeathers::setShouldRecalculate);
-    }
-
-    public static void markForUsageRecalculation(Player player) {
-        player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(IFeathers::sortUsageModifiers);
     }
 
     public static boolean isCold(Player player) {

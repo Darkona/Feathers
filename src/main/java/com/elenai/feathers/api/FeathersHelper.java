@@ -21,14 +21,7 @@ public class FeathersHelper {
 
     @Deprecated
     public static boolean spendFeathers(int amount) {
-
-        Player player = Minecraft.getInstance().player;
-        assert player != null;
-
-        var spent = player.isCreative() ||
-                player.isSpectator() ||
-                FeathersAPI.spendFeathers(player, amount, 20);
-
+        var spent = FeathersAPI.spendFeathers(Minecraft.getInstance().player, amount, 20);
         if (spent) {
             FeathersMessages.sendToServer(new ClientFeatherSpendPacket(amount));
         }
