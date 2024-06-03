@@ -97,11 +97,7 @@ public class FeathersManager {
             Player oldPlayer = event.getOriginal();
             oldPlayer.reviveCaps();
 
-            event.getOriginal().getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(oldStore -> {
-                event.getOriginal().getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(newStore -> {
-                    newStore.copyFrom(oldStore);
-                });
-            });
+            event.getOriginal().getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(oldStore -> event.getOriginal().getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(newStore -> newStore.copyFrom(oldStore)));
 
             oldPlayer.invalidateCaps();
         }
@@ -142,10 +138,7 @@ public class FeathersManager {
     @SubscribeEvent
     public static void onPlayerChangeArmor(LivingEquipmentChangeEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && event.getSlot().getType() == EquipmentSlot.Type.ARMOR) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-
-                FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
-            });
+            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player));
         }
     }
 

@@ -1,8 +1,7 @@
 package com.darkona.feathers.commands;
 
-import com.darkona.feathers.api.StaminaAPI;
-import com.darkona.feathers.effect.FeathersEffects;
-import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.darkona.feathers.api.FeathersAPI;
+import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
@@ -10,152 +9,153 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
 public class FeathersCommands extends BaseCommand {
 
 
+    public static final String FAILURE_EXECUTING_COMMAND = "Failure executing command.";
+
     public FeathersCommands(String name, int permissionLevel, boolean enabled) {
         super(name, permissionLevel, enabled);
     }
 
     public LiteralArgumentBuilder<CommandSourceStack> setExecution() {
-        return builder.then(Commands.literal("setStamina")
-                                    .then(Commands.argument("entities", EntityArgument.entities())
-                                                  .then(Commands.argument("amount", IntegerArgumentType.integer(0, 2000))
-                                                                .executes(source ->
-                                                                        executeSetStamina(
-                                                                                source.getSource(), EntityArgument.getEntities(source, "entities"),
-                                                                                IntegerArgumentType.getInteger(source, "amount"))
-                                                                ))))
-                      .then(Commands.literal("setCold")
-                                    .then(Commands.argument("entities", EntityArgument.entities())
-                                                  .then(Commands
-                                                          .argument("status", BoolArgumentType.bool())
-                                                          .executes(source ->
-                                                                  executeSetStamina(
-                                                                          source.getSource(), EntityArgument.getEntities(source, "entities"),
-                                                                          BoolArgumentType.getBool(source, "status"), "feathers")
-                                                          ))))
-                      .then(Commands.literal("getStamina")
-                                    .then(Commands.argument("entities", EntityArgument.entities())
-                                                  .executes(source ->
-                                                          executeGetStamina(source.getSource(), EntityArgument.getEntities(source, "entities"))
-                                                  )))
-                      .then(Commands.literal("getMaxStamina")
-                                    .then(Commands.argument("entities", EntityArgument.entities())
-                                                  .executes(source ->
-                                                          executeGetMaxStamina(source.getSource(), EntityArgument.getEntities(source, "entities"))
-                                                  )))
-                      .then(Commands.literal("setMaxStamina")
-                                    .then(Commands.argument("entities", EntityArgument.entities())
-                                                  .then(Commands.argument("amount", IntegerArgumentType.integer(0, 2000))
-                                                                .executes(source ->
-                                                                        executeSetMaxStamina(
-                                                                                source.getSource(), EntityArgument.getEntities(source, "entities"),
-                                                                                IntegerArgumentType.getInteger(source, "amount"))
-                                                                ))));
+
+        setFeathersCommands(builder);
+
+        setMaxFeathersCommands(builder);
+
+
+
+        return builder;
     }
 
-    private int executeGetMaxStamina(CommandSourceStack source, Collection<? extends Entity> entities) {
-
-        if (entities.stream().anyMatch(entity -> !(entity instanceof Player))) {
-            source.sendFailure(Component.translatable("No sirve"));
-            return 0;
-        }
+    private void setFeathersCommands(LiteralArgumentBuilder<CommandSourceStack> stack) {
+        stack
+                .then(Commands.literal("getFeathers")
+                              .then(Commands.argument("entities", EntityArgument.entities())
+                                            .executes(source ->
+                                                    executeGetFeathers(source.getSource(), EntityArgument.getEntities(source, "entities"))
+                                            )))
+                .then(Commands.literal("setFeathers")
+                              .then(Commands.argument("entities", EntityArgument.entities())
+                                            .then(Commands.argument("amount", IntegerArgumentType.integer()))
+                                            .executes(source ->
+                                                    executeSetFeathers(source.getSource(),
+                                                            EntityArgument.getEntities(source, "entities"),
+                                                            IntegerArgumentType.getInteger(source, "amount"))
+                                            )));
+    }
+    private int executeGetFeathers(CommandSourceStack source, Collection<? extends Entity> entities) {
+        Integer x = checkError(source, entities);
         for (Entity entity : entities) {
             if (entity instanceof ServerPlayer player) {
-                int maxStamina = StaminaAPI.getMaxStamina(player);
-                source.sendSuccess(() -> Component.literal("Max Stamina is: " + maxStamina), true);
+                int maxFeathers = FeathersAPI.getPlayerMaxFeathers(player);
+                source.sendSuccess(() -> Component.literal(String.format("%s has %d feathers", player.getName(), maxFeathers)), true);
             }
         }
         return entities.size();
-
     }
-
-    private int executeSetMaxStamina(CommandSourceStack source, Collection<? extends Entity> entities, int amount) {
-        if (entities.stream().anyMatch(entity -> !(entity instanceof Player))) {
-            source.sendFailure(Component.translatable("No sirve"));
-            return 0;
-        }
+    private int executeSetFeathers(CommandSourceStack source, Collection<? extends Entity> entities, int amount) {
+        Integer x = checkError(source, entities);
+        if (x != null) return x;
         for (Entity entity : entities) {
             if (entity instanceof ServerPlayer player) {
-                StaminaAPI.setMaxStamina(player, amount);
-            }
-        }
-
-        //Compose & send message
-        if (entities.size() == 1) {
-            Entity target = entities.iterator().next();
-            source.sendSuccess(() -> Component.translatable("Set the max stamina of %d to %d", target.getName().getString(), amount), true);
-        } else {
-            source.sendSuccess(() -> Component.translatable("Whatever", entities.size(), amount), true);
-        }
-        return entities.size();
-    }
-
-    private int executeGetStamina(CommandSourceStack source, Collection<? extends Entity> entities) {
-        if (entities.stream().anyMatch(entity -> !(entity instanceof Player))) {
-            source.sendFailure(Component.translatable("No sirve"));
-            return 0;
-        }
-        for (Entity entity : entities) {
-            if (entity instanceof ServerPlayer player) {
-                int stamina = StaminaAPI.getStamina(player);
-                source.sendSuccess(() -> Component.literal("Stamina is: " + stamina), true);
+                FeathersAPI.setFeathers(player, amount);
+                source.sendSuccess(() -> Component.literal(String.format("Set feathers to %d feathers for %s", amount, player.getName())), true);
             }
         }
         return entities.size();
     }
 
-    private int executeSetStamina(CommandSourceStack source, Collection<? extends Entity> entities, boolean status, String type) {
-        if (entities.stream().anyMatch(entity -> !(entity instanceof Player))) {
-            source.sendFailure(Component.translatable("No sirve"));
-            return 0;
-        }
+    private void setMaxFeathersCommands(LiteralArgumentBuilder<CommandSourceStack> stack) {
+        stack.then(Commands.literal("setMaxFeathers")
+                           .then(Commands.argument("entities", EntityArgument.entities())
+                                         .then(Commands.argument("amount", IntegerArgumentType.integer()))
+                                         .executes(source ->
+                                                 executeSetMaxFeathers(source.getSource(),
+                                                         EntityArgument.getEntities(source, "entities"),
+                                                         IntegerArgumentType.getInteger(source, "amount"))
+                                         )))
+             .then(Commands.literal("getMaxFeathers")
+                           .then(Commands.argument("entities", EntityArgument.entities())
+                                         .executes(source ->
+                                                 executeGetMaxFeathers(source.getSource(), EntityArgument.getEntities(source, "entities"))
+                                         )));
+    }
+    private int executeGetMaxFeathers(CommandSourceStack source, Collection<? extends Entity> entities) {
+
+        Integer x = checkError(source, entities);
+
         for (Entity entity : entities) {
             if (entity instanceof ServerPlayer player) {
-                if (status) {
-                    player.addEffect(new MobEffectInstance(FeathersEffects.COLD.get(), 1200, 0, false, true));
-                } else {
-                    if (player.hasEffect(FeathersEffects.COLD.get())) {
-                        player.removeEffect(FeathersEffects.COLD.get());
-                    }
-                }
+                int maxFeathers = FeathersAPI.getPlayerMaxFeathers(player);
+                source.sendSuccess(() -> Component.literal(String.format("%s has a maximum of %d feathers", player.getName(), maxFeathers)), true);
             }
         }
-
-        //Compose & send message
-        if (entities.size() == 1) {
-            Entity target = entities.iterator().next();
-            source.sendSuccess(() -> Component.translatable("Set the coldness effect to %d to %d", target.getName().getString(), status), true);
-        } else {
-            source.sendSuccess(() -> Component.translatable("Whatever", entities.size(), status), true);
+        return entities.size();
+    }
+    private int executeSetMaxFeathers(CommandSourceStack source, Collection<? extends Entity> entities, int amount) {
+        Integer x = checkError(source, entities);
+        if (x != null) return x;
+        for (Entity entity : entities) {
+            if (entity instanceof ServerPlayer player) {
+                FeathersAPI.setMaxFeathers(player, amount);
+                source.sendSuccess(() -> Component.literal(String.format("Set maximum feathers to %d feathers for %s", amount, player.getName())), true);
+            }
         }
         return entities.size();
     }
 
-    private int executeSetStamina(CommandSourceStack source, Collection<? extends Entity> entities, int amount) {
-        if (entities.stream().anyMatch(entity -> !(entity instanceof Player))) {
-            source.sendFailure(Component.translatable("No sirve"));
-            return 0;
-        }
+    private void getFeatherRegenCommands(LiteralArgumentBuilder<CommandSourceStack> stack) {
+        stack.then(Commands.literal("getFeatherRegen")
+                           .then(Commands.argument("entities", EntityArgument.entities())
+                                         .executes(source ->
+                                                 executeGetFeatherRegen(source.getSource(), EntityArgument.getEntities(source, "entities"))
+                                         )))
+             .then(Commands.literal("setFeatherRegen")
+                           .then(Commands.argument("entities", EntityArgument.entities())
+                                         .then(Commands.argument("amount", DoubleArgumentType.doubleArg()))
+                                         .executes(source ->
+                                                 executeSetFeatherRegen(source.getSource(),
+                                                         EntityArgument.getEntities(source, "entities"),
+                                                         DoubleArgumentType.getDouble(source, "amount"))
+                                         )));
+    }
+    private int executeGetFeatherRegen(CommandSourceStack source, Collection<? extends Entity> entities) {
+        Integer x = checkError(source, entities);
         for (Entity entity : entities) {
             if (entity instanceof ServerPlayer player) {
-                StaminaAPI.setStamina(player, amount);
+                double regen = FeathersAPI.getPlayerFeatherRegenerationPerSecond(player);
+                source.sendSuccess(() -> Component.literal(String.format("%s has a regeneration of %.2f feathers per second", player.getName(), regen)), true);
             }
-        }
-
-        if (entities.size() == 1) {
-            Entity target = entities.iterator().next();
-            source.sendSuccess(() -> Component.literal("Set the stamina of " + target.getName().getString() + " to " + amount), true);
-        } else {
-            source.sendSuccess(() -> Component.translatable("Whatever", entities.size(), amount), true);
         }
         return entities.size();
     }
+    private int executeSetFeatherRegen(CommandSourceStack source, Collection<? extends Entity> entities, double amount) {
+        Integer x = checkError(source, entities);
+        if (x != null) return x;
+        for (Entity entity : entities) {
+            if (entity instanceof ServerPlayer player) {
+                FeathersAPI.setFeatherRegen(player, amount);
+                source.sendSuccess(() -> Component.literal(String.format("Set base feather regeneration to %.2f feathers per second for %s", amount, player.getName())), true);
+            }
+        }
+        return entities.size();
+    }
+
+    private @Nullable Integer checkError(CommandSourceStack source, Collection<? extends Entity> entities) {
+        if (entities.stream().noneMatch(entity -> entity instanceof Player)) {
+            source.sendFailure(Component.literal(FAILURE_EXECUTING_COMMAND));
+            return 0;
+        }
+        return null;
+    }
+
+
 }

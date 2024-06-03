@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.minecraftforge.eventbus.api.Event.Result.DEFAULT;
 
-@SuppressWarnings("UnusedReturnValue")
+@SuppressWarnings({"UnusedReturnValue", "DataFlowIssue"})
 public class FeathersAPI {
 
     public static int getFeathers(Player player) {
@@ -65,7 +65,7 @@ public class FeathersAPI {
      *
      * @param player the player
      * @param amount the amount of feathers to gain
-     * @return the amount of feathers gained
+     * @return true if the player has gained feathers, false otherwise
      */
     public static boolean gainFeathers(Player player, int amount) {
         var result = new AtomicBoolean(false);
@@ -89,7 +89,7 @@ public class FeathersAPI {
      *
      * @param player the player
      * @param amount the amount of feathers to spend
-     * @return the amount of feathers spent
+     * @return true if the player has enough feathers to spend, false otherwise
      * @throws UnsupportedOperationException if the amount is negative
      */
     public static boolean spendFeathers(Player player, int amount, int cooldownTicks) throws UnsupportedOperationException {
@@ -195,5 +195,7 @@ public class FeathersAPI {
         return multiplier != null ? multiplier.getValue() : 1.0D;
     }
 
-
+    public static void setFeatherRegen(ServerPlayer player, double amount) {
+        player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get()).setBaseValue(amount);
+    }
 }

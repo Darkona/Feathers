@@ -40,12 +40,10 @@ public class ThirstManager implements ICapabilityPlugin {
     @Override
     public void onPlayerJoin(EntityJoinLevelEvent event) {
         if (event.getEntity() instanceof Player player) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-                player.getCapability(PLAYER_THIRST).ifPresent(iThirst -> {
-                    f.setCounter(LAST_THIRST_LEVEL, iThirst.getThirst());
-                    f.setCounter(LAST_QUENCH_LEVEL, iThirst.getQuenched());
-                });
-            });
+            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> player.getCapability(PLAYER_THIRST).ifPresent(iThirst -> {
+                f.setCounter(LAST_THIRST_LEVEL, iThirst.getThirst());
+                f.setCounter(LAST_QUENCH_LEVEL, iThirst.getQuenched());
+            }));
         }
     }
 
@@ -100,24 +98,22 @@ public class ThirstManager implements ICapabilityPlugin {
 
         if (!FeathersThirstConfig.isThirstOn()) return;
         if (!(event.player.tickCount % 20 == 0)) return;
-        event.player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-            event.player.getCapability(PLAYER_THIRST).ifPresent(t -> {
+        event.player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> event.player.getCapability(PLAYER_THIRST).ifPresent(t -> {
 
-                f.getCounter(LAST_THIRST_LEVEL).ifPresent(lastThirst -> {
-                    if (lastThirst != t.getThirst()) {
-                        f.setCounter(LAST_THIRST_LEVEL, t.getThirst());
-                        recalculateThirst(event.player, f);
-                    }
-                });
-
-                f.getCounter(LAST_QUENCH_LEVEL).ifPresent(lastQuench -> {
-                    if (lastQuench != t.getQuenched()) {
-                        f.setCounter(LAST_QUENCH_LEVEL, t.getQuenched());
-                        recalculateQuench(event.player, f);
-                    }
-                });
+            f.getCounter(LAST_THIRST_LEVEL).ifPresent(lastThirst -> {
+                if (lastThirst != t.getThirst()) {
+                    f.setCounter(LAST_THIRST_LEVEL, t.getThirst());
+                    recalculateThirst(event.player, f);
+                }
             });
-        });
+
+            f.getCounter(LAST_QUENCH_LEVEL).ifPresent(lastQuench -> {
+                if (lastQuench != t.getQuenched()) {
+                    f.setCounter(LAST_QUENCH_LEVEL, t.getQuenched());
+                    recalculateQuench(event.player, f);
+                }
+            });
+        }));
 
 
     }

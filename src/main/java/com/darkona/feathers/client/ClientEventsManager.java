@@ -67,7 +67,7 @@ public class ClientEventsManager {
                             tooltip.add(Component.literal(s.toString())
                                                  .withStyle(Style.EMPTY.withFont(new ResourceLocation(Feathers.MODID, "feather_font"))));
                         } else {
-                            tooltip.add(Component.translatable("text.feathers.tooltip", currentWeight).withStyle(ChatFormatting.BLUE));
+                            tooltip.add(Component.translatable("text.green_feathers.tooltip", currentWeight).withStyle(ChatFormatting.BLUE));
                         }
                     }
                 }
