@@ -38,12 +38,6 @@ public class ArmorHandler {
         return getWeights().getOrDefault(armor.getDescriptionId(), armor.getDefense());
     }
 
-    /**
-     * Gets the total weight of the inputted player based on the armor they are wearing
-     *
-     * @param player
-     * @return
-     */
     public static int getPlayerWeight(Player player) {
         if (!FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
             return 0;
@@ -55,14 +49,7 @@ public class ArmorHandler {
         return weight;
     }
 
-    /**
-     * Returns the cumulative total of an equipped enchantment type.
-     *
-     * @param enchantment
-     * @param entity
-     * @return
-     * @author Diesieben07
-     */
+
     public static int getTotalEnchantmentLevel(Enchantment enchantment, LivingEntity entity) {
         Iterable<ItemStack> iterable = enchantment.getSlotItems(entity).values();
         int i = 0;
@@ -72,15 +59,6 @@ public class ArmorHandler {
         }
         return i;
     }
-
-    /**
-     * Returns the total of an item enchantment type.
-     *
-     * @param enchantment
-     * @param entity
-     * @return
-     * @author Elenai
-     */
     public static int getItemEnchantmentLevel(Enchantment enchantment, ItemStack itemstack) {
         return itemstack.getEnchantmentLevel(enchantment);
     }

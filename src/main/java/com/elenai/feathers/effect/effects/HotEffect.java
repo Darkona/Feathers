@@ -18,51 +18,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.elenai.feathers.attributes.FeathersAttributes.STAMINA_USAGE_MULTIPLIER;
 import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADDITION;
+import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.MULTIPLY_BASE;
 
 public class HotEffect extends FeathersEffects {
 
-    public static final double BASE_STRENGTH = 2.0d;
+    public static final double BASE_STRENGTH = 1.0d;
     /**
      * Doubles the amount of feathers used.
      */
-    public static final IModifier HOT = new IModifier() {
 
-        @Override
-        public void onAdd(PlayerFeathers iFeathers) {
-
-        }
-
-        @Override
-        public void onRemove(PlayerFeathers iFeathers) {
-
-        }
-
-        @Override
-        public void applyToDelta(Player player, PlayerFeathers iFeathers, AtomicInteger feathersToUse) {
-
-        }
-
-        @Override
-        public void applyToUsage(Player player, PlayerFeathers iFeathers, AtomicInteger staminaToUse, AtomicBoolean result) {
-            staminaToUse.set(staminaToUse.get() * 2);
-            result.set(true);
-        }
-
-        @Override
-        public int getUsageOrdinal() {
-            return ordinals[0];
-        }
-
-        @Override
-        public int getDeltaOrdinal() {
-            return 0;
-        }
-
-        @Override
-        public String getName() {
-            return "hot";
-        }
-    };
     private static final String MODIFIER_UUID = "2a513b45-8047-472b-b5f1-c833440c0134";
 
 
@@ -72,23 +36,14 @@ public class HotEffect extends FeathersEffects {
     }
 
     @Override
-    public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        super.addAttributeModifiers(target, map, strength);
-    }
-
-    @Override
-    public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        super.removeAttributeModifiers(target, map, strength);
-    }
-
-    @Override
     public boolean canApply(Player player) {
         if (FeathersCommonConfig.ENABLE_HOT_EFFECTS.get() && super.canApply(player)) {
             if (FeathersColdSweatConfig.isColdSweatEnabled()) {
                 return ColdSweatManager.canApplyHotEffect(player);
             }
-            return !player.hasEffect(MobEffects.FIRE_RESISTANCE);
+            return !(player.hasEffect(MobEffects.FIRE_RESISTANCE) || player.hasEffect(FeathersEffects.MOMENTUM.get()));
         }
         return false;
     }
+
 }

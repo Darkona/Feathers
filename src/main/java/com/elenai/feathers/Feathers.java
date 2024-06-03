@@ -86,6 +86,11 @@ public class Feathers {
         PotionBrewing.addMix(FeathersPotions.ENDURANCE_POTION.get(), Items.REDSTONE, FeathersPotions.LONG_ENDURANCE_POTION.get());
         PotionBrewing.addMix(FeathersPotions.ENDURANCE_POTION.get(), Items.GLOWSTONE_DUST, FeathersPotions.STRONG_ENDURANCE_POTION.get());
 
+        // Momentum
+        PotionBrewing.addMix(Potions.AWKWARD, Items.BASALT, FeathersPotions.MOMENTUM_POTION.get());
+        PotionBrewing.addMix(FeathersPotions.MOMENTUM_POTION.get(), Items.REDSTONE, FeathersPotions.LONG_MOMENTUM_POTION.get());
+        PotionBrewing.addMix(FeathersPotions.MOMENTUM_POTION.get(), Items.GLOWSTONE_DUST, FeathersPotions.STRONG_MOMENTUM_POTION.get());
+
         // Energized
         PotionBrewing.addMix(Potions.AWKWARD, Items.RAW_COPPER, FeathersPotions.ENERGIZED_POTION.get());
         PotionBrewing.addMix(FeathersPotions.ENERGIZED_POTION.get(), Items.REDSTONE, FeathersPotions.LONG_ENERGIZED_POTION.get());

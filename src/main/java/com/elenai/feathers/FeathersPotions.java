@@ -16,6 +16,10 @@ public class FeathersPotions {
     public static final RegistryObject<Potion> STRONG_ENDURANCE_POTION = POTIONS.register("strong_endurance_potion", () -> new Potion(new MobEffectInstance(FeathersEffects.ENDURANCE.get(), 2000, 1)));
     public static final RegistryObject<Potion> LONG_ENDURANCE_POTION = POTIONS.register("long_endurance_potion", () -> new Potion(new MobEffectInstance(FeathersEffects.ENDURANCE.get(), 4200, 0)));
 
+    public static final RegistryObject<Potion> MOMENTUM_POTION = POTIONS.register("momentum_potion", () -> new Potion(new MobEffectInstance(FeathersEffects.MOMENTUM.get(), 2600, 0)));
+    public static final RegistryObject<Potion> STRONG_MOMENTUM_POTION = POTIONS.register("strong_momentum_potion", () -> new Potion(new MobEffectInstance(FeathersEffects.MOMENTUM.get(), 2000, 1)));
+    public static final RegistryObject<Potion> LONG_MOMENTUM_POTION = POTIONS.register("long_momentum_potion", () -> new Potion(new MobEffectInstance(FeathersEffects.MOMENTUM.get(), 4200, 0)));
+
     public static final RegistryObject<Potion> COLD_POTION = POTIONS.register("cold_potion", () -> new Potion(new MobEffectInstance(FeathersEffects.COLD.get(), 6000, 0)));
     public static final RegistryObject<Potion> STRONG_COLD_POTION = POTIONS.register("strong_cold_potion", () -> new Potion(new MobEffectInstance(FeathersEffects.COLD.get(), 3000, 1)));
 
