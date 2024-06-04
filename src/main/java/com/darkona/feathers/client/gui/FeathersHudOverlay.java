@@ -1,7 +1,7 @@
 package com.darkona.feathers.client.gui;
 
 import com.darkona.feathers.Feathers;
-import com.darkona.feathers.api.FeathersConstants;
+import com.darkona.feathers.api.Constants;
 import com.darkona.feathers.client.ClientFeathersData;
 import com.darkona.feathers.config.FeathersClientConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -164,7 +164,7 @@ public class FeathersHudOverlay {
     private static void drawOverlay(GuiGraphics guiGraphics, int screenHeight, int x, int rightOffset) {
         for (int i = 0; i < ICONS_PER_ROW; i++) {
             if (clientData.getAnimationCooldown() >= 18 || clientData.getAnimationCooldown() == ICONS_PER_ROW) {
-                if ((i + 1 <= Math.ceil((double) clientData.getMaxStamina() / FeathersConstants.STAMINA_PER_FEATHER))) {
+                if ((i + 1 <= Math.ceil((double) clientData.getMaxStamina() / Constants.STAMINA_PER_FEATHER))) {
                     var xPos = getXPos(x, i);
                     var yPos = screenHeight - rightOffset;
                     draw(guiGraphics, xPos, yPos, REGEN_OVERLAY);

@@ -2,7 +2,7 @@ package com.darkona.feathers.capability;
 
 import com.darkona.feathers.Feathers;
 import com.darkona.feathers.api.FeathersAPI;
-import com.darkona.feathers.api.FeathersConstants;
+import com.darkona.feathers.api.Constants;
 import com.darkona.feathers.api.IFeathers;
 import com.darkona.feathers.api.IModifier;
 import com.darkona.feathers.client.ClientFeathersData;
@@ -28,13 +28,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PlayerFeathers implements IFeathers {
 
     private static final int ZERO = 0;
-    private int stamina;
     private int maxStamina;
+    private int stamina;
+    private int prevStamina;
     private int feathers;
+    private int prevFeathers;
     private int cooldown;
     private int strainFeathers;
     private int maxStrained;
-    private boolean desynced;
     private int weight;
 
     private int staminaDelta;
@@ -43,7 +44,7 @@ public class PlayerFeathers implements IFeathers {
     private boolean dirty;
 
 
-    private Map<String, Integer> counters = new HashMap<>();
+    private Map<String, Double> counters = new HashMap<>();
 
 
     private Map<String, IModifier> staminaDeltaModifiers = new HashMap<>();
@@ -55,7 +56,7 @@ public class PlayerFeathers implements IFeathers {
     /* Initialization */
 
     public PlayerFeathers() {
-        maxStamina = (int) (FeathersCommonConfig.MAX_FEATHERS.get() * FeathersConstants.STAMINA_PER_FEATHER);
+        maxStamina = (int) (FeathersCommonConfig.MAX_FEATHERS.get() * Constants.STAMINA_PER_FEATHER);
         stamina = maxStamina;
 
         cooldown = ZERO;
@@ -124,19 +125,25 @@ public class PlayerFeathers implements IFeathers {
         return counters.containsKey(name);
     }
 
-    public Optional<Integer> getCounter(String name) {
+    public Optional<Double> getCounter(String name) {
         return Optional.ofNullable(counters.get(name));
     }
 
-    public void setCounter(String name, int value) {
+    public void setCounter(String name, double value) {
         counters.put(name, value);
     }
 
+    public void incrementCounterBy(String name, double amount){
+        counters.computeIfPresent(name, (k,v) -> v + amount);
+    }
 
+    public void multiplyCounterBy(String name, double amount){
+        counters.computeIfPresent(name, (k,v) -> v * amount);
+    }
     /* Markers */
     @Override
     public int getMaxFeathers() {
-        return maxStamina / FeathersConstants.STAMINA_PER_FEATHER;
+        return maxStamina / Constants.STAMINA_PER_FEATHER;
     }
 
     public void markDirty() {
@@ -153,7 +160,7 @@ public class PlayerFeathers implements IFeathers {
 
     @Override
     public void setFeathers(int feathers) {
-        setStamina(feathers * FeathersConstants.STAMINA_PER_FEATHER);
+        setStamina(feathers * Constants.STAMINA_PER_FEATHER);
     }
 
     @Override
@@ -166,7 +173,7 @@ public class PlayerFeathers implements IFeathers {
 
     public int getAvailableStamina() {
         if (FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
-            return Math.max(stamina - (weight * FeathersConstants.STAMINA_PER_FEATHER), ZERO);
+            return Math.max(stamina - (weight * Constants.STAMINA_PER_FEATHER), ZERO);
         }
         return stamina;
     }
@@ -178,7 +185,7 @@ public class PlayerFeathers implements IFeathers {
     }
 
     private void synchronizeFeathers() {
-        feathers = stamina / FeathersConstants.STAMINA_PER_FEATHER;
+        feathers = stamina / Constants.STAMINA_PER_FEATHER;
     }
 
     /* Delta and usage modifiers*/
@@ -243,7 +250,7 @@ public class PlayerFeathers implements IFeathers {
     @Override
     public boolean gainFeathers(int feathers) {
         var prev = this.feathers;
-        addStamina(feathers * FeathersConstants.STAMINA_PER_FEATHER);
+        addStamina(feathers * Constants.STAMINA_PER_FEATHER);
         return feathers != prev;
     }
 
@@ -257,7 +264,7 @@ public class PlayerFeathers implements IFeathers {
         }
 
         var multiplier = FeathersAPI.getPlayerStaminaUsageMultiplier(player);
-        var staminaToUse = new AtomicInteger((int) (feathers * multiplier * FeathersConstants.STAMINA_PER_FEATHER));
+        var staminaToUse = new AtomicInteger((int) (feathers * multiplier * Constants.STAMINA_PER_FEATHER));
         var approve = new AtomicBoolean(false);
 
         for (IModifier m : featherUsageModifiersList) {
@@ -314,16 +321,14 @@ public class PlayerFeathers implements IFeathers {
 
         calculateStaminaDelta(player);
 
-        int prevStamina = stamina;
-        int prevFeathers = feathers;
         var preChangeEvent = new StaminaChangeEvent.Pre(player, staminaDelta, stamina);
         if (MinecraftForge.EVENT_BUS.post(preChangeEvent)) return;
 
-        if (preChangeEvent.getResult() != Event.Result.DEFAULT) return;
+        if (preChangeEvent.getResult() == Event.Result.DEFAULT){
 
-        staminaDelta = preChangeEvent.staminaDelta;
-        stamina = preChangeEvent.stamina;
-
+            staminaDelta = preChangeEvent.staminaDelta;
+            stamina = preChangeEvent.stamina;
+        }
 
         if (staminaDelta == ZERO) return;
 
@@ -331,26 +336,28 @@ public class PlayerFeathers implements IFeathers {
         if ((staminaDelta > ZERO && stamina < maxStamina) || (staminaDelta < ZERO && stamina > ZERO)) applyStaminaDelta();
 
 
-        if (stamina != prevStamina) postStaminaChange(player, prevStamina, prevFeathers);
+        if (stamina != prevStamina) postStaminaChange(player);
 
     }
 
-    private void postStaminaChange(Player player, int prevStamina, int prevFeather) {
+    private void postStaminaChange(Player player) {
 
 
-        MinecraftForge.EVENT_BUS.post(new StaminaChangeEvent.Post(player, prevStamina, stamina));
+        MinecraftForge.EVENT_BUS.post(new StaminaChangeEvent.Post(player, this));
         if (stamina <= ZERO) {
             MinecraftForge.EVENT_BUS.post(new FeatherAmountEvent.Empty(player, prevStamina));
         } else if (stamina == maxStamina) {
             MinecraftForge.EVENT_BUS.post(new FeatherAmountEvent.Full(player));
         }
 
-        if (prevFeather != feathers) {
+        if (prevFeathers != feathers) {
+            MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, this));
             if (FeathersCommonConfig.DEBUG_MODE.get() && player.level().isClientSide) {
                 Feathers.logger.info("Feathers: {}", feathers);
             }
         }
-
+        prevFeathers = feathers;
+        prevStamina = stamina;
 
     }
 
@@ -372,7 +379,7 @@ public class PlayerFeathers implements IFeathers {
         nbt.putInt("stamina_delta", this.staminaDelta);
         nbt.putInt("cooldown", this.cooldown);
         var countersTag = new CompoundTag();
-        this.counters.forEach(countersTag::putInt);
+        this.counters.forEach(countersTag::putDouble);
         nbt.put("counters", countersTag);
 
         return nbt;
@@ -385,7 +392,7 @@ public class PlayerFeathers implements IFeathers {
         this.staminaDelta = nbt.getInt("stamina_delta");
         this.cooldown = nbt.getInt("cooldown");
         CompoundTag tagCounters = nbt.getCompound("counters");
-        tagCounters.getAllKeys().forEach(key -> counters.put(key, tagCounters.getInt(key)));
+        tagCounters.getAllKeys().forEach(key -> counters.put(key, tagCounters.getDouble(key)));
 
         synchronizeFeathers();
     }

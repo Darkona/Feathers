@@ -1,7 +1,7 @@
 package com.darkona.feathers.effect.effects;
 
 import com.darkona.feathers.Feathers;
-import com.darkona.feathers.api.FeathersConstants;
+import com.darkona.feathers.api.Constants;
 import com.darkona.feathers.api.IModifier;
 import com.darkona.feathers.capability.PlayerFeathers;
 import com.darkona.feathers.config.FeathersCommonConfig;
@@ -58,7 +58,7 @@ public class StrainEffect extends FeathersEffects {
             if (approve.get()) return;
             int use = f.getAvailableStamina() - staminaToUse.get();
             int strain = f.getCounter(STRAIN_COUNTER).orElse(0);
-            int maxStrainStamina = FeathersCommonConfig.MAX_STRAIN.get() * FeathersConstants.STAMINA_PER_FEATHER;
+            int maxStrainStamina = FeathersCommonConfig.MAX_STRAIN.get() * Constants.STAMINA_PER_FEATHER;
 
             if (use < 0 && (strain - use <= maxStrainStamina)) {
                 f.setCounter(STRAIN_COUNTER, strain - use);

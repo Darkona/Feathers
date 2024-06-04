@@ -179,7 +179,7 @@ public class FeathersManager {
 
     private static void checkEffects(Player player) {
         player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-            if (FeathersAPI.isEnduring(player) && f.getCounter(EnduranceEffect.ENDURANCE_COUNTER).orElse(0) == 0) {
+            if (FeathersAPI.isEnduring(player) && f.getCounter(EnduranceEffect.ENDURANCE_COUNTER).orElse(0D) == 0) {
 
                 player.removeEffect(FeathersEffects.ENDURANCE.get());
             }

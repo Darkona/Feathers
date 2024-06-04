@@ -74,9 +74,9 @@ public interface IFeathers {
 
     void removeCounter(String name);
 
-    Optional<Integer> getCounter(String name);
+    Optional<Double> getCounter(String name);
 
-    void setCounter(String name, int value);
+    void setCounter(String name, double value);
 
     void markDirty();
 
@@ -92,6 +92,13 @@ public interface IFeathers {
 
     boolean hasCounter(String name);
 
-    Map<String, Integer> getCounters();
+    Map<String, Double> getCounters();
 
+    void incrementCounterBy(String name, double amount);
+
+    void multiplyCounterBy(String name, double amount);
+
+    int getPrevFeathers();
+
+    int getPrevStamina();
 }

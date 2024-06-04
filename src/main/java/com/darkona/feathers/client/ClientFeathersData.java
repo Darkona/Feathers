@@ -1,7 +1,7 @@
 package com.darkona.feathers.client;
 
 import com.darkona.feathers.api.FeathersAPI;
-import com.darkona.feathers.api.FeathersConstants;
+import com.darkona.feathers.api.Constants;
 import com.darkona.feathers.api.IFeathers;
 import com.darkona.feathers.config.FeathersClientConfig;
 import com.darkona.feathers.effect.effects.EnduranceEffect;
@@ -54,8 +54,8 @@ public class ClientFeathersData {
         feathers = f.getFeathers();
         maxFeathers = f.getMaxFeathers();
         staminaDelta = f.getStaminaDelta();
-        enduranceFeathers = f.getCounter(EnduranceEffect.ENDURANCE_COUNTER).orElse(0);
-        strainFeathers = f.getCounter(StrainEffect.STRAIN_COUNTER).orElse(0);
+        enduranceFeathers = (int) Math.ceil(f.getCounter(EnduranceEffect.ENDURANCE_COUNTER).orElse(0.0));
+        strainFeathers = (int) Math.ceil(f.getCounter(StrainEffect.STRAIN_COUNTER).orElse(0.0));
         endurance = FeathersAPI.isEnduring(player);
         weight = f.getWeight();
         hot = FeathersAPI.isHot(player);
@@ -105,7 +105,7 @@ public class ClientFeathersData {
     }
 
     public int getStrainFeathers() {
-        return strainFeathers > 0 ? strainFeathers / FeathersConstants.STAMINA_PER_FEATHER : 0;
+        return strainFeathers > 0 ? strainFeathers / Constants.STAMINA_PER_FEATHER : 0;
     }
 
     public int getAvailableFeathers() {

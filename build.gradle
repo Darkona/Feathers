@@ -114,15 +114,12 @@ dependencies {
 
     implementation fg.deobf("curse.maven:configured-457570:${configured_file_id}")
     implementation fg.deobf("curse.maven:serene-seasons-291874:${serene_seasons_file_id}")
-
     implementation fg.deobf("curse.maven:cold-sweat-506194:${cold_sweat_file_id}-sources-5011470")
-    //implementation "curse.maven:cold-sweat-506194:${cold_sweat_file_id}-sources-5011470"
-
     implementation fg.deobf("curse.maven:thirst-was-taken-679270:${thirst_was_taken_file_id}")
 
-    compileOnly("curse.maven:overflowing-bars-852662:4578581")
-    implementation fg.deobf("curse.maven:player-animator-658587:${player_animator_file_id}")
-    implementation fg.deobf("curse.maven:elenai-dodge-442962:${elenai_dodge_file_id}")
+    compileOnly ("curse.maven:overflowing-bars-852662:4578581")
+    runtimeOnly ("curse.maven:player-animator-658587:${player_animator_file_id}")
+    runtimeOnly ("curse.maven:elenai-dodge-442962:${elenai_dodge_file_id}")
     compileOnly 'org.projectlombok:lombok:1.18.20'
 
     annotationProcessor 'org.projectlombok:lombok:1.18.20'

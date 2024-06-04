@@ -1,5 +1,6 @@
 package com.darkona.feathers.event;
 
+import com.darkona.feathers.api.IFeathers;
 import com.darkona.feathers.api.IModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -47,13 +48,11 @@ public abstract class FeatherEvent extends PlayerEvent {
 
     public static class Changed extends FeatherEvent {
 
-        public int prev;
-        public boolean post;
+        public final IFeathers feathers;
 
-        public Changed(Player player, int prev, boolean post) {
+        public Changed(Player player, IFeathers feathers) {
             super(player);
-            this.prev = prev;
-            this.post = post;
+            this.feathers = feathers;
         }
     }
 

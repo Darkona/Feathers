@@ -1,6 +1,6 @@
 package com.darkona.feathers.effect.effects;
 
-import com.darkona.feathers.api.FeathersConstants;
+import com.darkona.feathers.api.Constants;
 import com.darkona.feathers.api.IModifier;
 import com.darkona.feathers.api.StaminaAPI;
 import com.darkona.feathers.capability.Capabilities;
@@ -48,7 +48,7 @@ public class EnduranceEffect extends FeathersEffects {
             if (player.hasEffect(FeathersEffects.ENDURANCE.get())) {
                 iFeathers.getCounter(ENDURANCE_COUNTER).ifPresent(enduranceFeathers -> {
 
-                    int availableEnduranceStamina = enduranceFeathers * FeathersConstants.STAMINA_PER_FEATHER;
+                    int availableEnduranceStamina = enduranceFeathers * Constants.STAMINA_PER_FEATHER;
 
                     int remaining = availableEnduranceStamina - staminaToUse.get();
 
@@ -68,7 +68,7 @@ public class EnduranceEffect extends FeathersEffects {
         }
 
         private void updateEndurance(PlayerFeathers iFeathers, AtomicInteger staminaToUse, int remainingStamina) {
-            iFeathers.setCounter(ENDURANCE_COUNTER, remainingStamina / FeathersConstants.STAMINA_PER_FEATHER);
+            iFeathers.setCounter(ENDURANCE_COUNTER, remainingStamina / Constants.STAMINA_PER_FEATHER);
             staminaToUse.set(0);
         }
 

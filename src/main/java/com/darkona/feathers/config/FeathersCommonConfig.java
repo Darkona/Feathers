@@ -15,119 +15,136 @@ public class FeathersCommonConfig {
     public static final ForgeConfigSpec SPEC;
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> DEBUG_MODE;
+
+
+    public static final ForgeConfigSpec.ConfigValue<Integer> MAX_FEATHERS;
     public static final ForgeConfigSpec.ConfigValue<Double> REGEN_FEATHERS_PER_SECOND;
-    public static final ForgeConfigSpec.ConfigValue<Double> MAX_FEATHERS;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> SLEEPING_ALWAYS_RESTORES_FEATHERS;
+
+
+    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_COLD;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_HEAT;
+    public static final ForgeConfigSpec.ConfigValue<Integer> EFFECT_LINGER;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_ENDURANCE;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_STRAIN;
+    public static final ForgeConfigSpec.ConfigValue<Integer> MAX_STRAIN;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_MOMENTUM;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_FATIGUE;
 
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_ARMOR_WEIGHTS;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ARMOR_WEIGHTS;
 
-    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_COLD_EFFECTS;
-    public static final ForgeConfigSpec.ConfigValue<Integer> COLD_EFFECT_STRENGTH;
 
-    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_HOT_EFFECTS;
-    public static final ForgeConfigSpec.ConfigValue<Double> HOT_EFFECT_STRENGTH;
 
-    public static final ForgeConfigSpec.ConfigValue<Boolean> SLEEPING_ALWAYS_RESTORES_FEATHERS;
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_LIGHTWEIGHT_ENCHANTMENT;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_ENDURANCE;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> ENDURANCE_ENCHANTMENT_REGEN;
-
-    public static final ForgeConfigSpec.ConfigValue<Integer> COLD_LINGER;
 
 
-    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_STRAIN;
-    public static final ForgeConfigSpec.ConfigValue<Integer> MAX_STRAIN;
+
+
+
 
 
     public static List<String> armorWeightBuilder = new ArrayList<>();
 
     static {
 
-        BUILDER.push("Feathers' Config");
+        BUILDER.push("General");
 
         DEBUG_MODE = BUILDER
-                .comment("Whether debug mode is enabled. This will print debug messages to the console.")
+                .comment("Whether debug mode is enabled. This will print debug messages to the console. Useful only for developers or to submit issues. " +
+                        "Will vomit a log of spam to the logs so don't enable this unless you know what you're doing.")
                 .define("Debug Mode", false);
 
+        MAX_FEATHERS = BUILDER.comment("Maximum Feathers the player can have. Every two feathers is a full icon, just like hearts." +
+                                      "By default, 20 feathers means a full row of ten feathers." +
+                                      "Value type: Integer (Numbers without decimals. You can't have a fractional amount of feathers!)")
+                              .defineInRange("Max Feathers", 20, 0, 40);
+
         REGEN_FEATHERS_PER_SECOND = BUILDER
-                .comment("How many feathers the player will regenerate every second. This will be modified by effects.")
-                .defineInRange("Base Feather Regeneration", 0.4D, -40.0D, 40.0D);
+                .comment("How many feathers the player will regenerate every second. A value of 1 means one feather will be regenerated every second." +
+                        "By default, this will be modified by the Cold Effect which lowers regeneration speed, and the Energized Effect which increases it." +
+                        "Value type: Double (Numbers with decimals).")
+                .defineInRange("base_feather_per_second_regen", 0.4, -40.0, 40.0);
 
+        SLEEPING_ALWAYS_RESTORES_FEATHERS = BUILDER
+                .comment("Whether sleeping always restores feathers to the maximum amount." +
+                        "Value type: Boolean.")
+                .define("sleeping_restores_all_feathers", true);
 
-        MAX_FEATHERS = BUILDER.comment("Maximum Feathers the player can have.")
-                              .defineInRange("Max Feathers", 20.0D, 0D, 40.0D);
+        BUILDER.pop();
 
+        BUILDER.push("Effects");
 
+        ENABLE_COLD = BUILDER
+                .comment("Enable the Cold Effect. This effect halves the regeneration speed at Level I and completely negate it at Level II when its active." +
+                        "Value type: Boolean (Valid values are true and false.)")
+                .define("effect_cold_enabled", true);
+
+        ENABLE_HEAT = BUILDER
+                .comment("Enable the Heat Effect. This effect doubles the feather usage when its active." +
+                        "Value type: Boolean.")
+                .define("effect_hot_enabled", true);
+
+        EFFECT_LINGER = BUILDER
+                .comment("How long do the Cold and the Heat Effect linger after the player is no longer under the circumstances that provoke them." +
+                        "This number is in ticks, one second equals 20 ticks. Set to 0 to disable lingering effects." +
+                        "Value type: Integer.")
+                .define("effect_cold_lingering_ticks", 60);
+
+        ENABLE_ENDURANCE = BUILDER
+                .comment("Enable the Endurance Effect. This effect gives temporal golden feathers that can be consumed on top of normal feathers." +
+                        "Once all the extra feathers are consumed the effect ends." +
+                        "Value type: Boolean.")
+                .define("effect_endurance_enabled", true);
+
+        ENABLE_STRAIN = BUILDER
+                .comment("Enable the Strain Effect. This setting enables the player to overspend feathers beyond the normal amount. " +
+                        "When that happens the player will start to accumulate Strained Feathers and the effect will be applied" +
+                        "While strained, the feather regeneration is slowed greatly." +
+                        "Value type: Boolean.")
+                .define("effect_strain_enabled", true);
+
+        MAX_STRAIN = BUILDER
+                .comment("Maximum strained feathers the player can have." +
+                        "Value type: Integer.")
+                .defineInRange("max_strained_feathers", 6, 2, 20);
+
+        ENABLE_MOMENTUM = BUILDER
+                .comment("Enable the Momentum Effect. This effect halves the feather usage while it's active." +
+                        "Value type: Boolean.")
+                .define("effect_momentum_enabled", true);
+
+        ENABLE_FATIGUE = BUILDER
+                .comment("Enable the Fatigue Effect. This effect lowers the maximum feathers while it's active." +
+                        "Value type: Boolean.")
+                .define("effect_fatigue_enabled", true);
+        BUILDER.pop();
+
+        BUILDER.push("Armor weights");
         /*
          * Add all current armor types on config creation
          */
+
+
+        ENABLE_ARMOR_WEIGHTS = BUILDER
+                .comment("If enabled, armor items have weight, this reduces the amount of feathers you can use based on how heavy your armor is.")
+                .define("Enable Armor Weights", false);
+
+        ENABLE_LIGHTWEIGHT_ENCHANTMENT = BUILDER
+                .comment("Whether the Lightweight enchantment can be applied in an enchantment table, or if it is treasure only.")
+                .define("Enable Lightweight Enchantment in Table", true);
+
         ForgeRegistries.ITEMS.forEach(i -> {
             if (i.asItem() instanceof ArmorItem armor) {
                 int def = armor.getDefense();
                 FeathersCommonConfig.armorWeightBuilder.add(i.getDescriptionId() + ":" + def);
             }
         });
-
         ARMOR_WEIGHTS = BUILDER
                 .comment("How many half feathers each item weighs.")
                 .defineList("Armor Weights Override", Lists.newArrayList(armorWeightBuilder), o -> o instanceof String);
-
-        ENABLE_ARMOR_WEIGHTS = BUILDER
-                .comment("If enabled, armor types have weight, this reduces the amount of feathers you can use based on how heavy your armor is")
-                .define("Enable Armor Weights", false);
-
-        ENABLE_COLD_EFFECTS = BUILDER
-                .comment("Whether the Cold Effect is enabled. When the effect is active, feathers regenerate slower.")
-                .define("Enable Cold Effect", false);
-
-        COLD_EFFECT_STRENGTH = BUILDER
-                .comment("How many stamina is substracted from regenerating every tick. " +
-                        "The higher the value, the more stamina is substracted, the slower the regeneration. " +
-                        "A value of 0 means no stamina is substracted. " +
-                        "A value equal to the REGENERATION value means all stamina is substracted.")
-                .defineInRange("Cold Effect Strength", 21, 1, 21);
-
-        ENABLE_HOT_EFFECTS = BUILDER
-                .comment("Whether the Hot Effect is enabled. When the effect is active, feathers are reduced. Fatigue is applied when the player is hot or burning")
-                .define("Enable Hot Effect", true);
-
-        HOT_EFFECT_STRENGTH = BUILDER.
-                comment("Multiplier for the feather consumption when affected by heat. Values can range from 1 to 5." +
-                        "This value is multiplied by however many feathers are consumed to determine the final amount.")
-                .defineInRange("Fatigue Feather Reduction Multiplier", 1.5D, 0D, 5D);
-
-        ENABLE_LIGHTWEIGHT_ENCHANTMENT = BUILDER
-                .comment("Whether the Lightweight enchantment can be applied in an enchantment table, or if it is treasure only.")
-                .define("Enable Lightweight Enchantment in Table", true);
-
-        ENABLE_ENDURANCE = BUILDER
-                .comment("Whether the Endurance effect is enabled and the potions registered.")
-                .define("Enable Endurance effect", true);
-
-        ENDURANCE_ENCHANTMENT_REGEN = BUILDER
-                .comment("Whether the Endurance effect also regenerates the extra feathers while active. " +
-                        "If false, the effect only adds temporal extra feathers.")
-                .define("Endurance Enchantment Regeneration", true);
-
-        COLD_LINGER = BUILDER
-                .comment("How long does the Cold Effect linger after stopping being cold")
-                .define("Cold Lingering time in ticks", 60);
-
-        SLEEPING_ALWAYS_RESTORES_FEATHERS = BUILDER
-                .comment("Whether sleeping always restores feathers to the maximum amount.")
-                .define("Sleeping Always Restores Feathers", true);
-
-        ENABLE_STRAIN = BUILDER
-                .comment("Whether the Strain mechanic is enabled.. " +
-                        "Strain is applied when the player is out of feathers, and goes to negative feathers. " +
-                        "Regeneration is much slower when strained.")
-                .define("Enable Strain Effect", true);
-
-        MAX_STRAIN = BUILDER
-                .comment("Maximum strained feathers the player can have. ")
-                .define("Max Strain", 7);
 
         BUILDER.pop();
 

@@ -28,7 +28,7 @@ public class HotEffect extends FeathersEffects {
 
     @Override
     public boolean canApply(Player player) {
-        if (FeathersCommonConfig.ENABLE_HOT_EFFECTS.get() && super.canApply(player)) {
+        if (FeathersCommonConfig.ENABLE_HEAT.get() && super.canApply(player)) {
             if (FeathersColdSweatConfig.isColdSweatEnabled()) {
                 return ColdSweatManager.canApplyHotEffect(player);
             }

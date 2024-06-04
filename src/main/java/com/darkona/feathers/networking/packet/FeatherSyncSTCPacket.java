@@ -23,7 +23,7 @@ public class FeatherSyncSTCPacket {
     private final int cooldown;
     private final int counterAmount;
     private final int weight;
-    private final Map<String, Integer> counters;
+    private final Map<String, Double> counters;
 
     public FeatherSyncSTCPacket(IFeathers f) {
         stamina = f.getStamina();
@@ -53,7 +53,7 @@ public class FeatherSyncSTCPacket {
         counterAmount = buf.readInt();
         for (int i = 0; i < counterAmount; i++) {
             var k = buf.readUtf(512);
-            var v = buf.readInt();
+            var v = buf.readDouble();
             counters.put(k, v);
         }
     }
@@ -70,7 +70,7 @@ public class FeatherSyncSTCPacket {
         buf.writeInt(counterAmount);
         counters.forEach((k, v) -> {
             buf.writeUtf(k);
-            buf.writeInt(v);
+            buf.writeDouble(v);
         });
     }
 

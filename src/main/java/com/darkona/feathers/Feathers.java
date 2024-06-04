@@ -34,6 +34,7 @@ public class Feathers {
     public static final boolean OB_LOADED = ModList.get().isLoaded("overflowingbars");
     public static final boolean THIRST_LOADED = ModList.get().isLoaded("thirst");
     public static final boolean COLD_SWEAT_LOADED = ModList.get().isLoaded("cold_sweat");
+    public static final boolean SERENE_SEASONS_LOADED = ModList.get().isLoaded("sereneseasons");
 
     public Feathers() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -47,6 +48,9 @@ public class Feathers {
         }
         if (COLD_SWEAT_LOADED) {
             ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, FeathersColdSweatConfig.SPEC, "feathers//Feathers-ColdSweat.toml");
+        }
+        if (SERENE_SEASONS_LOADED) {
+            ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, FeathersColdSweatConfig.SPEC, "feathers//Feathers-SereneSeasons.toml");
         }
 
         FeathersAttributes.register(modEventBus);

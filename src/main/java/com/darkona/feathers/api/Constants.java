@@ -1,6 +1,6 @@
 package com.darkona.feathers.api;
 
-public class FeathersConstants {
+public class Constants {
 
     public static final int STAMINA_PER_FEATHER = 1000;
     public static final double DEFAULT_MAX_STAMINA = 20000.0d;

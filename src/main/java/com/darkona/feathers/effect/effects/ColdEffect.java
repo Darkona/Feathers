@@ -36,7 +36,7 @@ public class ColdEffect extends FeathersEffects {
 
     @Override
     public boolean canApply(Player player) {
-        if (FeathersCommonConfig.ENABLE_COLD_EFFECTS.get() && super.canApply(player)) {
+        if (FeathersCommonConfig.ENABLE_COLD.get() && super.canApply(player)) {
             if (FeathersColdSweatConfig.isColdSweatEnabled()) {
                 return ColdSweatManager.canApplyColdEffect(player);
             }

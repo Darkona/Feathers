@@ -55,7 +55,7 @@ public class FeathersAPI {
     public static void setMaxFeathers(Player player, int amount) {
         if (player.getAttributes().hasAttribute(FeathersAttributes.MAX_FEATHERS.get())) {
             player.getAttribute(FeathersAttributes.MAX_FEATHERS.get())
-                  .setBaseValue(amount * FeathersConstants.STAMINA_PER_FEATHER);
+                  .setBaseValue(amount * Constants.STAMINA_PER_FEATHER);
         }
         player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
