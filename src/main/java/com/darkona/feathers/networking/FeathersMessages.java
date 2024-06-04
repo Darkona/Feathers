@@ -1,6 +1,7 @@
 package com.darkona.feathers.networking;
 
 import com.darkona.feathers.Feathers;
+import com.darkona.feathers.networking.packet.FeatherGainCTSPacket;
 import com.darkona.feathers.networking.packet.FeatherSpendCTSPacket;
 import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -23,7 +24,8 @@ public class FeathersMessages {
     public static void register() {
         SimpleChannel network =
                 NetworkRegistry.ChannelBuilder.named(new ResourceLocation(Feathers.MODID, "messages"))
-                                              .networkProtocolVersion(() -> "1.0").clientAcceptedVersions(s -> true)
+                                              .networkProtocolVersion(() -> "1.0")
+                                              .clientAcceptedVersions(s -> true)
                                               .serverAcceptedVersions(s -> true)
                                               .simpleChannel();
         INSTANCE = network;
@@ -34,6 +36,11 @@ public class FeathersMessages {
                .consumerMainThread(FeatherSpendCTSPacket::handle)
                .add();
 
+        network.messageBuilder(FeatherGainCTSPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+               .decoder(FeatherGainCTSPacket::new)
+               .encoder(FeatherGainCTSPacket::toBytes)
+               .consumerMainThread(FeatherGainCTSPacket::handle)
+               .add();
 
         network.messageBuilder(FeatherSTCSyncPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                .decoder(FeatherSTCSyncPacket::new)

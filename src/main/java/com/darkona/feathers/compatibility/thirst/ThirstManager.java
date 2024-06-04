@@ -35,8 +35,8 @@ public class ThirstManager implements ICapabilityPlugin {
 
     private static final String LAST_THIRST_LEVEL = "lastThirst";
     private static final String LAST_QUENCH_LEVEL = "lastQuench";
-    private static final String THIRST_FEATHER_COUNTER = "thirst_feather";
-    private static final String THIRST_ACCUMULATOR = "thirst_accumulator";
+    private static final String THIRST_FEATHER_COUNTER = "thirstFeather";
+    private static final String THIRST_ACCUMULATOR = "thirstAcc";
 
     public static ICapabilityPlugin getInstance() {
         if (instance == null) {

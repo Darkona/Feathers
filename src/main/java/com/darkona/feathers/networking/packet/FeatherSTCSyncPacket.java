@@ -1,7 +1,6 @@
 package com.darkona.feathers.networking.packet;
 
 import com.darkona.feathers.api.IFeathers;
-import lombok.Getter;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -47,7 +46,7 @@ public class FeatherSTCSyncPacket {
         counters = new HashMap<>();
         counterAmount = buf.readInt();
         for (int i = 0; i < counterAmount; i++) {
-            var k = buf.readUtf(512);
+            var k = buf.readUtf();
             var v = buf.readDouble();
             counters.put(k, v);
         }
@@ -72,11 +71,7 @@ public class FeatherSTCSyncPacket {
     public static void handle(FeatherSTCSyncPacket message, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         if (context.getDirection().getReceptionSide().isClient()) {
-            context.enqueueWork(() -> {
-                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                    FeatherSTCSyncPacket.handle(message, contextSupplier);
-                });
-            });
+            context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> FeatherSTCSyncPacket.handle(message, contextSupplier)));
         }
     }
 }

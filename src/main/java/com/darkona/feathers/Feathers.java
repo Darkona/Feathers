@@ -29,7 +29,7 @@ import org.apache.logging.log4j.Logger;
 
 @Mod(Feathers.MODID)
 public class Feathers {
-    public static final String MODID = "green_feathers";
+    public static final String MODID = "greenfeathers";
     public static final Logger logger = LogManager.getLogger(MODID);
     public static final boolean OB_LOADED = ModList.get().isLoaded("overflowingbars");
     public static final boolean THIRST_LOADED = ModList.get().isLoaded("thirst");

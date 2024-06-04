@@ -8,8 +8,8 @@ import com.darkona.feathers.enchantment.FeathersEnchantments;
 import com.darkona.feathers.event.FeatherEvent;
 import com.darkona.feathers.networking.FeathersMessages;
 import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
+import com.darkona.feathers.networking.packet.FeatherSpendCTSPacket;
 import com.darkona.feathers.util.Calculations;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
@@ -97,30 +97,36 @@ public class FeathersAPI {
      * @return true if the player has enough feathers to spend, false otherwise
      * @throws UnsupportedOperationException if the amount is negative
      */
-    public static boolean spendFeathers(Player player, int amount, int cooldownTicks) throws UnsupportedOperationException {
+    public static boolean spendFeathers(Player player, int amount, int cooldown) throws UnsupportedOperationException {
         if (amount < 0) {
             throw new UnsupportedOperationException("Cannot spend negative feathers");
         }
+
         var result = new AtomicBoolean(false);
+
         if (player.isCreative() || player.isSpectator()) return true;
 
-        player.getCapability(Capabilities.PLAYER_FEATHERS)
-              .ifPresent(f -> {
+        player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
 
-                  var useFeatherEvent = new FeatherEvent.Use(player, amount);
-                  boolean cancelled = MinecraftForge.EVENT_BUS.post(useFeatherEvent);
+            var useFeatherEvent = new FeatherEvent.Use(player, amount);
+            boolean cancelled = MinecraftForge.EVENT_BUS.post(useFeatherEvent);
 
-                  if (!cancelled && useFeatherEvent.getResult() == DEFAULT) {
+            if (!cancelled && useFeatherEvent.getResult() == DEFAULT) {
 
-                      var prev = f.getFeathers();
-                      var used = f.useFeathers(player, useFeatherEvent.amount, cooldownTicks);
+                var prev = f.getFeathers();
+                var used = f.useFeathers(player, useFeatherEvent.amount, cooldown);
 
-                      MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, f));
-                      result.set(used);
+                MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, f));
+                result.set(used);
 
-                      if (used) FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-                  }
-              });
+                if (result.get() && !player.level().isClientSide) {
+                    FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
+                } else {
+                    FeathersMessages.sendToServer(new FeatherSpendCTSPacket(amount, cooldown));
+                }
+            }
+        });
+
         return result.get();
     }
 
@@ -150,6 +156,7 @@ public class FeathersAPI {
         player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> f.setCooldown(cooldownTicks));
     }
+
     public static int getCooldown(Player player) {
         return player.getCapability(Capabilities.PLAYER_FEATHERS)
                      .map(IFeathers::getCooldown).orElse(0);
@@ -158,21 +165,27 @@ public class FeathersAPI {
     public static boolean isCold(Player player) {
         return player != null && player.hasEffect(FeathersEffects.COLD.get());
     }
+
     public static boolean isHot(Player player) {
         return player != null && player.hasEffect(FeathersEffects.HOT.get());
     }
+
     public static boolean isEnergized(Player player) {
         return player != null && player.hasEffect(FeathersEffects.ENERGIZED.get());
     }
+
     public static boolean isStrained(Player player) {
         return player != null && player.hasEffect(FeathersEffects.STRAINED.get());
     }
+
     public static boolean isEnduring(Player player) {
         return player != null && player.hasEffect(FeathersEffects.ENDURANCE.get());
     }
+
     public static boolean isFatigued(Player player) {
         return player != null && player.hasEffect(FeathersEffects.FATIGUE.get());
     }
+
     public static boolean isMomentum(Player player) {
         return player != null && player.hasEffect(FeathersEffects.MOMENTUM.get());
     }
@@ -181,6 +194,7 @@ public class FeathersAPI {
         var regen = player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get());
         return regen != null ? regen.getValue() : CommonConfig.REGEN_FEATHERS_PER_SECOND.get();
     }
+
     public static void setPlayerFeatherRegenerationPerSecond(Player player, double amount) {
         player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get()).setBaseValue(amount);
     }
@@ -188,10 +202,12 @@ public class FeathersAPI {
     public static int getPlayerStaminaRegenerationPerTick(Player player) {
         return Calculations.calculateStaminaPerTick(getPlayerFeatherRegenerationPerSecond(player));
     }
+
     public static int getPlayerMaxFeathers(Player player) {
         var maxFeathers = player.getAttribute(FeathersAttributes.MAX_FEATHERS.get());
         return (int) Math.ceil((maxFeathers != null ? maxFeathers.getValue() : CommonConfig.MAX_FEATHERS.get()));
     }
+
     public static double getPlayerStaminaUsageMultiplier(Player player) {
         var multiplier = player.getAttribute(FeathersAttributes.STAMINA_USAGE_MULTIPLIER.get());
         return multiplier != null ? multiplier.getValue() : 1.0D;

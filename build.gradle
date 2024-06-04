@@ -114,12 +114,12 @@ dependencies {
 
     implementation fg.deobf("curse.maven:configured-457570:${configured_file_id}")
     implementation fg.deobf("curse.maven:serene-seasons-291874:${serene_seasons_file_id}")
-    implementation fg.deobf("curse.maven:cold-sweat-506194:${cold_sweat_file_id}-sources-5011470")
+    implementation fg.deobf("curse.maven:cold-sweat-506194:${cold_sweat_file_id}-sources-5387214")
     implementation fg.deobf("curse.maven:thirst-was-taken-679270:${thirst_was_taken_file_id}")
 
-    compileOnly ("curse.maven:overflowing-bars-852662:4578581")
-   /* runtimeOnly ("curse.maven:player-animator-658587:${player_animator_file_id}")
-    runtimeOnly ("curse.maven:elenai-dodge-442962:${elenai_dodge_file_id}")*/
+    compileOnly("curse.maven:overflowing-bars-852662:4578581")
+    implementation fg.deobf("curse.maven:player-animator-658587:${player_animator_file_id}")
+    implementation fg.deobf("curse.maven:elenai-dodge-442962:${elenai_dodge_file_id}")
     compileOnly 'org.projectlombok:lombok:1.18.20'
 
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
@@ -129,11 +129,11 @@ dependencies {
 
 def resourceTargets = ['META-INF/mods.toml', 'pack.mcmeta']
 def replaceProperties = [
-        minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
-        forge_version: forge_version, forge_version_range: forge_version_range,
+        minecraft_version   : minecraft_version, minecraft_version_range: minecraft_version_range,
+        forge_version       : forge_version, forge_version_range: forge_version_range,
         loader_version_range: loader_version_range,
-        mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
-        mod_authors: mod_authors, mod_description: mod_description
+        mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+        mod_authors         : mod_authors, mod_description: mod_description
 ]
 processResources {
     inputs.properties replaceProperties

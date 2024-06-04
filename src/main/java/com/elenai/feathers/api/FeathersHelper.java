@@ -1,8 +1,7 @@
 package com.elenai.feathers.api;
 
 import com.darkona.feathers.api.FeathersAPI;
-import com.darkona.feathers.networking.FeathersMessages;
-import com.darkona.feathers.networking.packet.FeatherSpendCTSPacket;
+import com.darkona.feathers.config.CommonConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -12,11 +11,14 @@ public class FeathersHelper {
 
     @Deprecated
     public static boolean spendFeathers(int amount) {
+        return spendFeathers(amount, CommonConfig.DEFAULT_USAGE_COOLDOWN.get());
+    }
 
-
-        FeathersMessages.sendToServer(new FeatherSpendCTSPacket(amount));
-
-        return FeathersAPI.spendFeathers(Minecraft.getInstance().player, amount, 20);
+    @Deprecated
+    public static boolean spendFeathers(int amount, int cooldown){
+        var player = Minecraft.getInstance().player;
+        if(player == null) return false;
+        return FeathersAPI.spendFeathers(player, amount, cooldown);
     }
 
 }

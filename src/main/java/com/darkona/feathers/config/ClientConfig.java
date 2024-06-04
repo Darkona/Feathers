@@ -60,7 +60,7 @@ public class ClientConfig {
                 .define("HUD Y Offset", 0);
 
         ALTERNATIVE_FEATHER_COLOR = BUILDER
-                .comment("Use Green Feathers color for the feathers (true) or the original darkona's Blue feathers (false)  ")
+                .comment("Use Green Feathers color for the feathers (true) or the original Elenai's Blue feathers (false)")
                 .define("Alternative Feather Color", true);
         BUILDER.pop();
         SPEC = BUILDER.build();

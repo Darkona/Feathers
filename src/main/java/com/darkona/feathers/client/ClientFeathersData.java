@@ -105,6 +105,10 @@ public class ClientFeathersData {
     }
 
     public void tick() {
+        var player = Minecraft.getInstance().player;
+
+        if(player != null)
+            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> update(player, f));
 
         if (animationCooldown > 0) animationCooldown--;
 

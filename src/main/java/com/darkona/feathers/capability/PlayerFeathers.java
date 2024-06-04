@@ -1,16 +1,17 @@
 package com.darkona.feathers.capability;
 
 import com.darkona.feathers.Feathers;
-import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.Constants;
+import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.IFeathers;
 import com.darkona.feathers.api.IModifier;
-import com.darkona.feathers.client.ClientFeathersData;
 import com.darkona.feathers.config.CommonConfig;
 import com.darkona.feathers.effect.effects.StrainEffect;
 import com.darkona.feathers.event.FeatherAmountEvent;
 import com.darkona.feathers.event.FeatherEvent;
 import com.darkona.feathers.event.StaminaChangeEvent;
+import com.darkona.feathers.networking.FeathersMessages;
+import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -130,6 +131,7 @@ public class PlayerFeathers implements IFeathers {
     }
 
     public void setCounter(String name, double value) {
+        if(name.length() > 16) name = name.substring(0, 16);
         counters.put(name, value);
     }
 
@@ -308,7 +310,9 @@ public class PlayerFeathers implements IFeathers {
             doStaminaChange(player);
         }
 
-        if (player.tickCount % 2 == 0) ClientFeathersData.getInstance().update(player, this);
+        if(player.tickCount % 10 == 0){
+            FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(this), player);
+        }
     }
 
     private void calculateStaminaDelta(Player player) {

@@ -20,6 +20,7 @@ public class CommonConfig {
     public static final ForgeConfigSpec.ConfigValue<Integer> MAX_FEATHERS;
     public static final ForgeConfigSpec.ConfigValue<Double> REGEN_FEATHERS_PER_SECOND;
     public static final ForgeConfigSpec.ConfigValue<Boolean> SLEEPING_ALWAYS_RESTORES_FEATHERS;
+    public static final ForgeConfigSpec.ConfigValue<Integer> DEFAULT_USAGE_COOLDOWN;
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_COLD;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_HEAT;
@@ -61,7 +62,10 @@ public class CommonConfig {
                 .comment("Whether sleeping always restores feathers to the maximum amount." +
                         "Value type: Boolean.")
                 .define("sleeping_restores_all_feathers", true);
-
+        DEFAULT_USAGE_COOLDOWN = BUILDER
+                .comment("How many ticks need to pass after using feathers for them to start regenerating again." +
+                        "Value type: Integer.")
+                .define("default_usage_cooldown", 30);
         BUILDER.pop();
 
         BUILDER.push("Effects");
