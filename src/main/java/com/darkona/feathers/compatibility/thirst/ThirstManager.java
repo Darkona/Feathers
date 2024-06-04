@@ -4,10 +4,8 @@ import com.darkona.feathers.Feathers;
 import com.darkona.feathers.api.Constants;
 import com.darkona.feathers.api.ICapabilityPlugin;
 import com.darkona.feathers.api.IFeathers;
-import com.darkona.feathers.api.IModifier;
 import com.darkona.feathers.attributes.FeathersAttributes;
 import com.darkona.feathers.capability.Capabilities;
-import com.darkona.feathers.capability.PlayerFeathers;
 import com.darkona.feathers.event.StaminaChangeEvent;
 import dev.ghen.thirst.foundation.common.capability.IThirst;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -22,8 +20,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.darkona.feathers.compatibility.thirst.FeathersThirstConfig.THIRST_FEATHER_REGEN_REDUCTION;
 import static dev.ghen.thirst.foundation.common.capability.ModCapabilities.PLAYER_THIRST;
@@ -141,9 +137,7 @@ public class ThirstManager implements ICapabilityPlugin {
 
             if(f.getCounter(THIRST_ACCUMULATOR).orElse(0.0) >= 1){
                 f.incrementCounterBy(THIRST_ACCUMULATOR, -1);
-                player.getCapability(PLAYER_THIRST).ifPresent(thirst -> {
-                    thirst.setThirst(thirst.getThirst() - 1);
-                });
+                player.getCapability(PLAYER_THIRST).ifPresent(thirst -> thirst.setThirst(thirst.getThirst() - 1));
             }
         }
     }

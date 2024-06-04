@@ -7,7 +7,7 @@ import com.darkona.feathers.api.IFeathers;
 import com.darkona.feathers.capability.Capabilities;
 import com.darkona.feathers.compatibility.coldsweat.ColdSweatManager;
 import com.darkona.feathers.compatibility.coldsweat.FeathersColdSweatConfig;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.CommonConfig;
 import com.darkona.feathers.effect.effects.StrainEffect;
 import com.darkona.feathers.event.FeatherAmountEvent;
 import com.darkona.feathers.event.FeatherEvent;
@@ -59,7 +59,7 @@ public class EffectsHandler implements ICapabilityPlugin {
      * Handle the cold mechanic here.
      */
     public static void autoApplyColdEffect(Player player) {
-        if (!FeathersCommonConfig.ENABLE_COLD.get()) return;
+        if (!CommonConfig.ENABLE_COLD.get()) return;
 
         var hasCold = FeathersAPI.isCold(player) && player.getActiveEffectsMap().get(FeathersEffects.COLD.get()).getDuration() == -1;
 
@@ -75,7 +75,7 @@ public class EffectsHandler implements ICapabilityPlugin {
             }
         } else if (hasCold) {
             player.removeEffect(FeathersEffects.COLD.get());
-            player.addEffect(new MobEffectInstance(FeathersEffects.COLD.get(), FeathersCommonConfig.EFFECT_LINGER.get(), 0, false, true));
+            player.addEffect(new MobEffectInstance(FeathersEffects.COLD.get(), CommonConfig.EFFECT_LINGER.get(), 0, false, true));
         }
     }
 
@@ -97,7 +97,7 @@ public class EffectsHandler implements ICapabilityPlugin {
      * Handles the hot mechanic here.
      */
     public static void autoApplyHotEffect(Player player) {
-        if (!FeathersCommonConfig.ENABLE_HEAT.get()) return;
+        if (!CommonConfig.ENABLE_HEAT.get()) return;
         var hasHot = FeathersAPI.isHot(player) && player.getActiveEffectsMap().get(FeathersEffects.HOT.get()).getDuration() == -1;
 
         if (isInHotSituation(player)) {
@@ -109,7 +109,7 @@ public class EffectsHandler implements ICapabilityPlugin {
         } else if (hasHot) {
 
             player.removeEffect(FeathersEffects.HOT.get());
-            player.addEffect(new MobEffectInstance(FeathersEffects.HOT.get(), FeathersCommonConfig.EFFECT_LINGER.get(), 0, false, true));
+            player.addEffect(new MobEffectInstance(FeathersEffects.HOT.get(), CommonConfig.EFFECT_LINGER.get(), 0, false, true));
         }
     }
 

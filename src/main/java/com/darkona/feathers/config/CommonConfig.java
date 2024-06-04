@@ -8,7 +8,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FeathersCommonConfig {
+public class CommonConfig {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
 
@@ -139,7 +139,7 @@ public class FeathersCommonConfig {
         ForgeRegistries.ITEMS.forEach(i -> {
             if (i.asItem() instanceof ArmorItem armor) {
                 int def = armor.getDefense();
-                FeathersCommonConfig.armorWeightBuilder.add(i.getDescriptionId() + ":" + def);
+                CommonConfig.armorWeightBuilder.add(i.getDescriptionId() + ":" + def);
             }
         });
         ARMOR_WEIGHTS = BUILDER

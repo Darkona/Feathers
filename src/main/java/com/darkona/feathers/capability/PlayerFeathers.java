@@ -6,7 +6,7 @@ import com.darkona.feathers.api.Constants;
 import com.darkona.feathers.api.IFeathers;
 import com.darkona.feathers.api.IModifier;
 import com.darkona.feathers.client.ClientFeathersData;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.CommonConfig;
 import com.darkona.feathers.effect.effects.StrainEffect;
 import com.darkona.feathers.event.FeatherAmountEvent;
 import com.darkona.feathers.event.FeatherEvent;
@@ -56,12 +56,12 @@ public class PlayerFeathers implements IFeathers {
     /* Initialization */
 
     public PlayerFeathers() {
-        maxStamina = (int) (FeathersCommonConfig.MAX_FEATHERS.get() * Constants.STAMINA_PER_FEATHER);
+        maxStamina = CommonConfig.MAX_FEATHERS.get() * Constants.STAMINA_PER_FEATHER;
         stamina = maxStamina;
 
         cooldown = ZERO;
         strainFeathers = ZERO;
-        maxStrained = FeathersCommonConfig.MAX_STRAIN.get();
+        maxStrained = CommonConfig.MAX_STRAIN.get();
 
         attachDefaultDeltaModifiers();
 
@@ -81,7 +81,7 @@ public class PlayerFeathers implements IFeathers {
 
         if (event.getResult() == Event.Result.DEFAULT) {
             modifiers.add(IModifier.REGENERATION);
-            if (FeathersCommonConfig.ENABLE_STRAIN.get()) {
+            if (CommonConfig.ENABLE_STRAIN.get()) {
                 modifiers.add(StrainEffect.STRAIN_MODIFIER);
             }
         }
@@ -104,7 +104,7 @@ public class PlayerFeathers implements IFeathers {
         if (event.getResult() == Event.Result.DEFAULT) {
             event.modifiers.add(IModifier.DEFAULT_USAGE);
 
-            if (FeathersCommonConfig.ENABLE_STRAIN.get()) {
+            if (CommonConfig.ENABLE_STRAIN.get()) {
                 event.modifiers.add(StrainEffect.STRAIN_MODIFIER);
             }
         }
@@ -165,14 +165,14 @@ public class PlayerFeathers implements IFeathers {
 
     @Override
     public int getAvailableFeathers() {
-        if (FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
+        if (CommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
             return Math.max(feathers - weight, ZERO);
         }
         return feathers;
     }
 
     public int getAvailableStamina() {
-        if (FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
+        if (CommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
             return Math.max(stamina - (weight * Constants.STAMINA_PER_FEATHER), ZERO);
         }
         return stamina;
@@ -259,7 +259,7 @@ public class PlayerFeathers implements IFeathers {
 
         if (staminaUsageModifiers.isEmpty()) attachDefaultUsageModifiers();
 
-        if (FeathersCommonConfig.DEBUG_MODE.get() && !player.level().isClientSide) {
+        if (CommonConfig.DEBUG_MODE.get() && !player.level().isClientSide) {
             Feathers.logger.info("Requested to use {} feathers.", feathers);
         }
 
@@ -272,7 +272,7 @@ public class PlayerFeathers implements IFeathers {
         }
 
         if (approve.get()) {
-            if (FeathersCommonConfig.DEBUG_MODE.get() && !player.level().isClientSide) {
+            if (CommonConfig.DEBUG_MODE.get() && !player.level().isClientSide) {
                 Feathers.logger.info("After modifiers will use {} stamina.", staminaToUse);
             }
             subtractStamina(staminaToUse.get());
@@ -288,12 +288,12 @@ public class PlayerFeathers implements IFeathers {
     }
 
     private void subtractStamina(int subtraction) {
-        if (FeathersCommonConfig.DEBUG_MODE.get()) {
+        if (CommonConfig.DEBUG_MODE.get()) {
             Feathers.logger.info("Before subtracting: Stamina: {}, Weight: {}, AvailableStamina: {}, StaminaToRemove: {}", stamina, weight, getAvailableStamina(), subtraction);
         }
         stamina = Math.max(stamina - subtraction, ZERO);
 
-        if (FeathersCommonConfig.DEBUG_MODE.get()) {
+        if (CommonConfig.DEBUG_MODE.get()) {
             Feathers.logger.info("Remaining stamina: {}", stamina);
         }
     }
@@ -352,7 +352,7 @@ public class PlayerFeathers implements IFeathers {
 
         if (prevFeathers != feathers) {
             MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, this));
-            if (FeathersCommonConfig.DEBUG_MODE.get() && player.level().isClientSide) {
+            if (CommonConfig.DEBUG_MODE.get() && player.level().isClientSide) {
                 Feathers.logger.info("Feathers: {}", feathers);
             }
         }

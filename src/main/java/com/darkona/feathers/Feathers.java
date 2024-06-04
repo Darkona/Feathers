@@ -7,7 +7,7 @@ import com.darkona.feathers.compatibility.coldsweat.FeathersColdSweatConfig;
 import com.darkona.feathers.compatibility.thirst.FeathersThirstConfig;
 import com.darkona.feathers.compatibility.thirst.ThirstManager;
 import com.darkona.feathers.config.FeathersClientConfig;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.CommonConfig;
 import com.darkona.feathers.effect.EffectsHandler;
 import com.darkona.feathers.effect.FeathersEffects;
 import com.darkona.feathers.enchantment.FeathersEnchantments;
@@ -41,7 +41,7 @@ public class Feathers {
         modEventBus.addListener(this::commonSetup);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, FeathersClientConfig.SPEC, "feathers//Feathers-Client.toml");
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, FeathersCommonConfig.SPEC, "feathers//Feathers-Common.toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfig.SPEC, "feathers//Feathers-Common.toml");
 
         if (THIRST_LOADED) {
             ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, FeathersThirstConfig.SPEC, "feathers//Feathers-Thirst.toml");

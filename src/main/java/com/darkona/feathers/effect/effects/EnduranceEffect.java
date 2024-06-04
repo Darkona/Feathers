@@ -5,7 +5,7 @@ import com.darkona.feathers.api.IModifier;
 import com.darkona.feathers.api.StaminaAPI;
 import com.darkona.feathers.capability.Capabilities;
 import com.darkona.feathers.capability.PlayerFeathers;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.CommonConfig;
 import com.darkona.feathers.effect.FeathersEffects;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -48,7 +48,7 @@ public class EnduranceEffect extends FeathersEffects {
             if (player.hasEffect(FeathersEffects.ENDURANCE.get())) {
                 iFeathers.getCounter(ENDURANCE_COUNTER).ifPresent(enduranceFeathers -> {
 
-                    int availableEnduranceStamina = enduranceFeathers * Constants.STAMINA_PER_FEATHER;
+                    int availableEnduranceStamina = (int)Math.ceil(enduranceFeathers * Constants.STAMINA_PER_FEATHER);
 
                     int remaining = availableEnduranceStamina - staminaToUse.get();
 
@@ -68,7 +68,7 @@ public class EnduranceEffect extends FeathersEffects {
         }
 
         private void updateEndurance(PlayerFeathers iFeathers, AtomicInteger staminaToUse, int remainingStamina) {
-            iFeathers.setCounter(ENDURANCE_COUNTER, remainingStamina / Constants.STAMINA_PER_FEATHER);
+            iFeathers.setCounter(ENDURANCE_COUNTER, (double) remainingStamina / Constants.STAMINA_PER_FEATHER);
             staminaToUse.set(0);
         }
 
@@ -94,13 +94,13 @@ public class EnduranceEffect extends FeathersEffects {
 
     @Override
     public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        if (!FeathersCommonConfig.ENABLE_ENDURANCE.get()) return;
+        if (!CommonConfig.ENABLE_ENDURANCE.get()) return;
         super.addAttributeModifiers(target, map, strength);
     }
 
     @Override
     public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        if (!FeathersCommonConfig.ENABLE_ENDURANCE.get()) return;
+        if (!CommonConfig.ENABLE_ENDURANCE.get()) return;
         super.addAttributeModifiers(target, map, strength);
     }
 

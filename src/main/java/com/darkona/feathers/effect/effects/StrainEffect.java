@@ -4,7 +4,7 @@ import com.darkona.feathers.Feathers;
 import com.darkona.feathers.api.Constants;
 import com.darkona.feathers.api.IModifier;
 import com.darkona.feathers.capability.PlayerFeathers;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.CommonConfig;
 import com.darkona.feathers.effect.FeathersEffects;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
@@ -40,7 +40,7 @@ public class StrainEffect extends FeathersEffects {
 
         @Override
         public void applyToDelta(Player player, PlayerFeathers f, AtomicInteger staminaDelta) {
-            int currentStrain = f.getCounter(STRAIN_COUNTER).orElse(0);
+            int currentStrain = (int)Math.ceil(f.getCounter(STRAIN_COUNTER).orElse(0D));
             if (currentStrain > 0) {
                 int recover = currentStrain - staminaDelta.get();
                 if (recover <= 0) {
@@ -57,14 +57,14 @@ public class StrainEffect extends FeathersEffects {
         public void applyToUsage(Player player, PlayerFeathers f, AtomicInteger staminaToUse, AtomicBoolean approve) {
             if (approve.get()) return;
             int use = f.getAvailableStamina() - staminaToUse.get();
-            int strain = f.getCounter(STRAIN_COUNTER).orElse(0);
-            int maxStrainStamina = FeathersCommonConfig.MAX_STRAIN.get() * Constants.STAMINA_PER_FEATHER;
+            int strain = (int)Math.ceil(f.getCounter(STRAIN_COUNTER).orElse(0D));
+            int maxStrainStamina = CommonConfig.MAX_STRAIN.get() * Constants.STAMINA_PER_FEATHER;
 
             if (use < 0 && (strain - use <= maxStrainStamina)) {
                 f.setCounter(STRAIN_COUNTER, strain - use);
                 approve.set(true);
                 staminaToUse.set(f.getAvailableStamina());
-                if (FeathersCommonConfig.DEBUG_MODE.get() && !player.level().isClientSide()) {
+                if (CommonConfig.DEBUG_MODE.get() && !player.level().isClientSide()) {
                     Feathers.logger.info("Used " + staminaToUse.get() + " stamina, generated " + -use + " strain stamina.");
                 }
             }

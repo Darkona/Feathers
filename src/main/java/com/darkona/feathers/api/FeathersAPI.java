@@ -2,7 +2,7 @@ package com.darkona.feathers.api;
 
 import com.darkona.feathers.attributes.FeathersAttributes;
 import com.darkona.feathers.capability.Capabilities;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.CommonConfig;
 import com.darkona.feathers.effect.FeathersEffects;
 import com.darkona.feathers.enchantment.FeathersEnchantments;
 import com.darkona.feathers.event.FeatherEvent;
@@ -81,7 +81,7 @@ public class FeathersAPI {
                   if (!cancelled && gainEvent.getResult() == DEFAULT) {
                       var prev = f.getFeathers();
                       var post = f.gainFeathers(gainEvent.amount);
-                      MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, prev, post));
+                      MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, f));
                       FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
                       result.set(post);
                   }
@@ -115,7 +115,7 @@ public class FeathersAPI {
                       var prev = f.getFeathers();
                       var used = f.useFeathers(player, useFeatherEvent.amount, cooldownTicks);
 
-                      MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, prev, used));
+                      MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, f));
                       result.set(used);
 
                       if (used) FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
@@ -125,7 +125,7 @@ public class FeathersAPI {
     }
 
     public static int getPlayerWeight(Player player) {
-        if (!FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
+        if (!CommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
             return 0;
         }
         int weight = 0;
@@ -183,7 +183,7 @@ public class FeathersAPI {
 
     public static double getPlayerFeatherRegenerationPerSecond(Player player) {
         var regen = player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get());
-        return regen != null ? regen.getValue() : FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get();
+        return regen != null ? regen.getValue() : CommonConfig.REGEN_FEATHERS_PER_SECOND.get();
     }
 
     public static int getPlayerStaminaRegenerationPerTick(Player player) {
@@ -192,7 +192,7 @@ public class FeathersAPI {
 
     public static int getPlayerMaxFeathers(Player player) {
         var maxFeathers = player.getAttribute(FeathersAttributes.MAX_FEATHERS.get());
-        return (int) Math.ceil((maxFeathers != null ? maxFeathers.getValue() : FeathersCommonConfig.MAX_FEATHERS.get()));
+        return (int) Math.ceil((maxFeathers != null ? maxFeathers.getValue() : CommonConfig.MAX_FEATHERS.get()));
     }
 
     public static double getPlayerStaminaUsageMultiplier(Player player) {
