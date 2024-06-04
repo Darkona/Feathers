@@ -29,13 +29,13 @@ public class FeathersEffects extends MobEffect {
             .register("hot", () -> new HotEffect(MobEffectCategory.HARMFUL, 0x7e5d48));
 
     public static final RegistryObject<MobEffect> FATIGUE = EFFECTS
-            .register("fatigued", () -> new FatiguedEffect(MobEffectCategory.HARMFUL, 0x7e0048));
+            .register("fatigued", () -> new FatiguedEffect(MobEffectCategory.HARMFUL, 0xff0048));
 
     public static final RegistryObject<MobEffect> MOMENTUM = EFFECTS
-            .register("momentum", () -> new MomentumEffect(MobEffectCategory.BENEFICIAL, 0x7e0048));
+            .register("momentum", () -> new MomentumEffect(MobEffectCategory.BENEFICIAL, 0x7e5684));
 
     public static final RegistryObject<MobEffect> STRAINED = EFFECTS
-            .register("strain", () -> new StrainEffect(MobEffectCategory.HARMFUL, 0x7e0048));
+            .register("strain", () -> new StrainEffect(MobEffectCategory.HARMFUL, 0x7e4488));
 
     protected FeathersEffects(MobEffectCategory p_19451_, int p_19452_) {
         super(p_19451_, p_19452_);

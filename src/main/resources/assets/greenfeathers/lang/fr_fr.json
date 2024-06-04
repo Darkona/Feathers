@@ -1,12 +1,12 @@
 {
-  "green_feathers.max_feathers": "Plumes Max",
-  "green_feathers.feather_regen": "Régénération de Plumes",
-  "effect.green_feathers.endurance": "Endurance",
-  "effect.green_feathers.strain": "Contrainte",
-  "effect.green_feathers.momentum": "Élan",
-  "effect.green_feathers.cold": "Froid",
-  "effect.green_feathers.hot": "Chaleur",
-  "effect.green_feathers.energized": "Énergisé",
+  "greenfeathers.max_feathers": "Plumes Max",
+  "greenfeathers.feather_regen": "Régénération de Plumes",
+  "effect.greenfeathers.endurance": "Endurance",
+  "effect.greenfeathers.strain": "Contrainte",
+  "effect.greenfeathers.momentum": "Élan",
+  "effect.greenfeathers.cold": "Froid",
+  "effect.greenfeathers.hot": "Chaleur",
+  "effect.greenfeathers.energized": "Énergisé",
   "item.minecraft.potion.effect.endurance_potion": "Potion d'Endurance",
   "item.minecraft.splash_potion.effect.endurance_potion": "Potion d'Endurance Éclaboussante",
   "item.minecraft.lingering_potion.effect.endurance_potion": "Potion d'Endurance Persistante",
@@ -51,7 +51,7 @@
   "item.minecraft.splash_potion.effect.long_energized_potion": "Potion Éclaboussante d'Énergie Longue",
   "item.minecraft.lingering_potion.effect.long_energized_potion": "Potion Persistante d'Énergie Longue",
   "item.minecraft.tipped_arrow.effect.long_energized_potion": "Flèche d'Énergie Longue",
-  "enchantment.green_feathers.lightweight": "Légèreté",
-  "enchantment.green_feathers.heavy": "Malédiction de Lourdeur",
-  "text.green_feathers.tooltip": "+%s de Poids"
+  "enchantment.greenfeathers.lightweight": "Légèreté",
+  "enchantment.greenfeathers.heavy": "Malédiction de Lourdeur",
+  "text.greenfeathers.tooltip": "+%s de Poids"
 }

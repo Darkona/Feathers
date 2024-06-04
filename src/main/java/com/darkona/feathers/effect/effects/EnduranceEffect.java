@@ -5,7 +5,7 @@ import com.darkona.feathers.api.IModifier;
 import com.darkona.feathers.api.StaminaAPI;
 import com.darkona.feathers.capability.Capabilities;
 import com.darkona.feathers.capability.PlayerFeathers;
-import com.darkona.feathers.config.CommonConfig;
+import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.effect.FeathersEffects;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -89,13 +89,13 @@ public class EnduranceEffect extends FeathersEffects {
 
     @Override
     public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        if (!CommonConfig.ENABLE_ENDURANCE.get()) return;
+        if (!FeathersCommonConfig.ENABLE_ENDURANCE.get()) return;
         super.addAttributeModifiers(target, map, strength);
     }
 
     @Override
     public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        if (!CommonConfig.ENABLE_ENDURANCE.get()) return;
+        if (!FeathersCommonConfig.ENABLE_ENDURANCE.get()) return;
         super.addAttributeModifiers(target, map, strength);
     }
 

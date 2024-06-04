@@ -6,12 +6,13 @@ import com.darkona.feathers.compatibility.coldsweat.ColdSweatManager;
 import com.darkona.feathers.compatibility.coldsweat.FeathersColdSweatConfig;
 import com.darkona.feathers.compatibility.thirst.FeathersThirstConfig;
 import com.darkona.feathers.compatibility.thirst.ThirstManager;
-import com.darkona.feathers.config.ClientConfig;
-import com.darkona.feathers.config.CommonConfig;
+import com.darkona.feathers.config.FeathersClientConfig;
+import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.effect.EffectsHandler;
 import com.darkona.feathers.effect.FeathersEffects;
 import com.darkona.feathers.enchantment.FeathersEnchantments;
 import com.darkona.feathers.networking.FeathersMessages;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.alchemy.Potions;
@@ -24,6 +25,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,8 +42,8 @@ public class Feathers {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::commonSetup);
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC, "feathers//Feathers-Client.toml");
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfig.SPEC, "feathers//Feathers-Common.toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, FeathersClientConfig.SPEC, "feathers//Feathers-Client.toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, FeathersCommonConfig.SPEC, "feathers//Feathers-Common.toml");
 
         if (THIRST_LOADED) {
             ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, FeathersThirstConfig.SPEC, "feathers//Feathers-Thirst.toml");
@@ -54,11 +56,24 @@ public class Feathers {
         }
 
         FeathersAttributes.register(modEventBus);
+
         FeathersEffects.register(modEventBus);
+
         FeathersPotions.register(modEventBus);
+
         FeathersEnchantments.register(modEventBus);
+
         CommandInit.ARGUMENTS.register(modEventBus);
+
         MinecraftForge.EVENT_BUS.register(this);
+
+        FeathersManager.registerPlugin(EffectsHandler.getInstance());
+        if (THIRST_LOADED) {
+            FeathersManager.registerPlugin(ThirstManager.getInstance());
+        }
+        if (COLD_SWEAT_LOADED) {
+            FeathersManager.registerPlugin(ColdSweatManager.getInstance());
+        }
 
     }
 
@@ -68,13 +83,13 @@ public class Feathers {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         event.enqueueWork(FeathersMessages::register);
         registerBrewingRecipes();
-        FeathersManager.registerPlugin(EffectsHandler.getInstance());
-        if (THIRST_LOADED) {
-            FeathersManager.registerPlugin(ThirstManager.getInstance());
-        }
-        if (COLD_SWEAT_LOADED) {
-            FeathersManager.registerPlugin(ColdSweatManager.getInstance());
-        }
+
+        ForgeRegistries.ITEMS.forEach(i -> {
+            if (i.asItem() instanceof ArmorItem armor) {
+                int def = armor.getDefense();
+                FeathersCommonConfig.armorWeightBuilder.add(i.getDescriptionId() + ":" + def);
+            }
+        });
     }
 
     private void registerBrewingRecipes() {

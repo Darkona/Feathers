@@ -1,12 +1,12 @@
 {
-  "green_feathers.max_feathers": "Plumas Máximas",
-  "green_feathers.feather_regen": "Regeneración de Plumas",
-  "effect.green_feathers.endurance": "Resistencia",
-  "effect.green_feathers.strain": "Tensión",
-  "effect.green_feathers.momentum": "Inercia",
-  "effect.green_feathers.cold": "Frío",
-  "effect.green_feathers.hot": "Calor",
-  "effect.green_feathers.energized": "Energizado",
+  "greenfeathers.max_feathers": "Plumas Máximas",
+  "greenfeathers.feather_regen": "Regeneración de Plumas",
+  "effect.greenfeathers.endurance": "Resistencia",
+  "effect.greenfeathers.strain": "Tensión",
+  "effect.greenfeathers.momentum": "Inercia",
+  "effect.greenfeathers.cold": "Frío",
+  "effect.greenfeathers.hot": "Calor",
+  "effect.greenfeathers.energized": "Energizado",
   "item.minecraft.potion.effect.endurance_potion": "Poción de Resistencia",
   "item.minecraft.splash_potion.effect.endurance_potion": "Poción Arrojadiza de Resistencia",
   "item.minecraft.lingering_potion.effect.endurance_potion": "Poción Persistente de Resistencia",
@@ -51,7 +51,7 @@
   "item.minecraft.splash_potion.effect.long_energized_potion": "Poción Arrojadiza Larga de Energía",
   "item.minecraft.lingering_potion.effect.long_energized_potion": "Poción Persistente Larga de Energía",
   "item.minecraft.tipped_arrow.effect.long_energized_potion": "Flecha Larga de Energía",
-  "enchantment.green_feathers.lightweight": "Ligereza",
-  "enchantment.green_feathers.heavy": "Maldición de Pesadez",
-  "text.green_feathers.tooltip": "+%s de Peso"
+  "enchantment.greenfeathers.lightweight": "Ligereza",
+  "enchantment.greenfeathers.heavy": "Maldición de Pesadez",
+  "text.greenfeathers.tooltip": "+%s de Peso"
 }

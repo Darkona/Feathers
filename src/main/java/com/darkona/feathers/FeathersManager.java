@@ -6,7 +6,7 @@ import com.darkona.feathers.api.IFeathers;
 import com.darkona.feathers.attributes.FeathersAttributes;
 import com.darkona.feathers.capability.Capabilities;
 import com.darkona.feathers.capability.PlayerFeathers;
-import com.darkona.feathers.config.CommonConfig;
+import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.effect.FeathersEffects;
 import com.darkona.feathers.effect.effects.EnduranceEffect;
 import com.darkona.feathers.networking.FeathersMessages;
@@ -122,7 +122,7 @@ public class FeathersManager {
 
     @SubscribeEvent
     public static void onPlayerSleep(PlayerWakeUpEvent event) {
-        if (!CommonConfig.SLEEPING_ALWAYS_RESTORES_FEATHERS.get()) return;
+        if (!FeathersCommonConfig.SLEEPING_ALWAYS_RESTORES_FEATHERS.get()) return;
 
         if (event.getEntity() instanceof ServerPlayer player) {
             player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
@@ -152,12 +152,12 @@ public class FeathersManager {
     public static void assignFeathersAttributes(Player player) {
         var attr = player.getAttribute(FeathersAttributes.MAX_FEATHERS.get());
 
-        if (attr != null && attr.getBaseValue() != CommonConfig.MAX_FEATHERS.get()) {
-            attr.setBaseValue((CommonConfig.MAX_FEATHERS.get()));
+        if (attr != null && attr.getBaseValue() != FeathersCommonConfig.MAX_FEATHERS.get()) {
+            attr.setBaseValue((FeathersCommonConfig.MAX_FEATHERS.get()));
         }
 
-        if (attr != null && attr.getBaseValue() != CommonConfig.REGEN_FEATHERS_PER_SECOND.get()) {
-            attr.setBaseValue((CommonConfig.REGEN_FEATHERS_PER_SECOND.get()));
+        if (attr != null && attr.getBaseValue() != FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get()) {
+            attr.setBaseValue((FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get()));
         }
 
     }

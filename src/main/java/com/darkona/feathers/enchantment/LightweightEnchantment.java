@@ -1,6 +1,6 @@
 package com.darkona.feathers.enchantment;
 
-import com.darkona.feathers.config.CommonConfig;
+import com.darkona.feathers.config.FeathersCommonConfig;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
@@ -18,6 +18,6 @@ public class LightweightEnchantment extends Enchantment {
 
     @Override
     public boolean isTreasureOnly() {
-        return !CommonConfig.LIGHTWEIGHT_ON_TABLE.get();
+        return !FeathersCommonConfig.LIGHTWEIGHT_ON_TABLE.get();
     }
 }

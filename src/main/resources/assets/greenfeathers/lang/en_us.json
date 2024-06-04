@@ -1,12 +1,13 @@
 {
-  "green_feathers.max_feathers": "Max Feathers",
-  "green_feathers.feather_regen": "Feather Recovery",
-  "effect.green_feathers.endurance": "Endurance",
-  "effect.green_feathers.strain": "Strain",
-  "effect.green_feathers.momentum": "Momentum",
-  "effect.green_feathers.cold": "Cold",
-  "effect.green_feathers.hot": "Hot",
-  "effect.green_feathers.energized": "Energized",
+  "greenfeathers.max_feathers": "Max Feathers",
+  "greenfeathers.feathers_per_second": "Feather Recovery",
+  "greenfeathers.usage_multiplier" : "Usage Multiplier",
+  "effect.greenfeathers.endurance": "Endurance",
+  "effect.greenfeathers.strain": "Strain",
+  "effect.greenfeathers.momentum": "Momentum",
+  "effect.greenfeathers.cold": "Cold",
+  "effect.greenfeathers.hot": "Hot",
+  "effect.greenfeathers.energized": "Energized",
   "item.minecraft.potion.effect.endurance_potion": "Potion of Endurance",
   "item.minecraft.splash_potion.effect.endurance_potion": "Splash Potion of Endurance",
   "item.minecraft.lingering_potion.effect.endurance_potion": "Lingering Potion of Endurance",
@@ -51,7 +52,7 @@
   "item.minecraft.splash_potion.effect.long_energized_potion": "Splash Potion of Energy",
   "item.minecraft.lingering_potion.effect.long_energized_potion": "Lingering Potion of Energy",
   "item.minecraft.tipped_arrow.effect.long_energized_potion": "Arrow of Energy",
-  "enchantment.green_feathers.lightweight": "Lightweight",
-  "enchantment.green_feathers.heavy": "Curse of Heaviness",
-  "text.green_feathers.tooltip": "+%s Weight"
+  "enchantment.greenfeathers.lightweight": "Lightweight",
+  "enchantment.greenfeathers.heavy": "Curse of Heaviness",
+  "text.greenfeathers.tooltip": "+%s Weight"
 }

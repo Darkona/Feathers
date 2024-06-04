@@ -3,7 +3,7 @@ package com.darkona.feathers.client.gui;
 import com.darkona.feathers.Feathers;
 import com.darkona.feathers.api.Constants;
 import com.darkona.feathers.client.ClientFeathersData;
-import com.darkona.feathers.config.ClientConfig;
+import com.darkona.feathers.config.FeathersClientConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fuzs.overflowingbars.client.handler.RowCountRenderer;
 import net.minecraft.client.Minecraft;
@@ -29,14 +29,14 @@ public class FeathersHudOverlay {
      */
     public static final IGuiOverlay FEATHERS = (gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
 
-        int fadeCooldown = ClientConfig.FADE_COOLDOWN.get();
-        int fadeIn = ClientConfig.FADE_IN_COOLDOWN.get();
-        int fadeOut = ClientConfig.FADE_OUT_COOLDOWN.get();
-        int yOffset = ClientConfig.Y_OFFSET.get();
+        int fadeCooldown = FeathersClientConfig.FADE_COOLDOWN.get();
+        int fadeIn = FeathersClientConfig.FADE_IN_COOLDOWN.get();
+        int fadeOut = FeathersClientConfig.FADE_OUT_COOLDOWN.get();
+        int yOffset = FeathersClientConfig.Y_OFFSET.get();
 
         int x = screenWidth / 2;
 
-        int rightOffset = ClientConfig.AFFECTED_BY_RIGHT_HEIGHT.get() ? gui.rightHeight : 0;
+        int rightOffset = FeathersClientConfig.AFFECTED_BY_RIGHT_HEIGHT.get() ? gui.rightHeight : 0;
 
         if (Minecraft.getInstance().options.hideGui || !gui.shouldDrawSurvivalElements()) return;
 
@@ -84,7 +84,7 @@ public class FeathersHudOverlay {
 
         energizedK();
 
-        if (ClientConfig.AFFECTED_BY_RIGHT_HEIGHT.get()) {
+        if (FeathersClientConfig.AFFECTED_BY_RIGHT_HEIGHT.get()) {
             rightOffset += ICONS_PER_ROW;
         }
 
@@ -94,12 +94,12 @@ public class FeathersHudOverlay {
          */
         lines = drawEndurance(guiGraphics, screenHeight, lines, x, rightOffset);
 
-        if (ClientConfig.AFFECTED_BY_RIGHT_HEIGHT.get()) {
+        if (FeathersClientConfig.AFFECTED_BY_RIGHT_HEIGHT.get()) {
             gui.rightHeight += ICONS_PER_ROW + lines;
         }
 
         if (Feathers.OB_LOADED) {
-            RowCountRenderer.drawBarRowCount(guiGraphics, x + 100 + ClientConfig.X_OFFSET.get(), screenHeight - rightOffset + ICONS_PER_ROW + yOffset,
+            RowCountRenderer.drawBarRowCount(guiGraphics, x + 100 + FeathersClientConfig.X_OFFSET.get(), screenHeight - rightOffset + ICONS_PER_ROW + yOffset,
                     clientData.getFeathers(), true, Minecraft.getInstance().font);
         }
 
@@ -208,7 +208,7 @@ public class FeathersHudOverlay {
     }
 
     private static void determineFadeEffect(int fadeCooldown, int fadeOut, int fadeIn) {
-        if (ClientConfig.FADE_WHEN_FULL.get()) {
+        if (FeathersClientConfig.FADE_WHEN_FULL.get()) {
             if (clientData.hasFullStamina()) {
                 if (clientData.getFadeCooldown() == fadeCooldown && alpha > 0) {
                     alpha = alpha <= 0.025 ? 0 : alpha - 1.0f / fadeOut;
@@ -228,11 +228,11 @@ public class FeathersHudOverlay {
     }
 
     private static int getYPos(int y, int rightOffset, int height) {
-        return y - rightOffset - height + ClientConfig.X_OFFSET.get();
+        return y - rightOffset - height + FeathersClientConfig.X_OFFSET.get();
     }
 
     private static int getXPos(int x, int i) {
-        return x + 81 - (i * 8) + ClientConfig.X_OFFSET.get();
+        return x + 81 - (i * 8) + FeathersClientConfig.X_OFFSET.get();
     }
 
     private static int getHeight(int i) {
@@ -248,7 +248,7 @@ public class FeathersHudOverlay {
         if (clientData.isHot()) return HOT;
         if (clientData.isEnergized()) return ENERGY;
         if (clientData.isMomentum()) return MOMENTUM;
-        return ClientConfig.ALTERNATIVE_FEATHER_COLOR.get() ? GREEN : NORMAL;
+        return FeathersClientConfig.ALTERNATIVE_FEATHER_COLOR.get() ? GREEN : NORMAL;
     }
 
 

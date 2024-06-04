@@ -1,7 +1,7 @@
 package com.darkona.feathers.api;
 
 import com.darkona.feathers.Feathers;
-import com.darkona.feathers.config.CommonConfig;
+import com.darkona.feathers.config.FeathersCommonConfig;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +21,7 @@ public class ArmorWeightAPI {
 
     public static void populateWeights() {
         map.clear();
-        CommonConfig.ARMOR_WEIGHTS.get().forEach(value -> {
+        FeathersCommonConfig.ARMOR_WEIGHTS.get().forEach(value -> {
             String[] split = value.split(":");
             try {
                 map.putIfAbsent(split[0], Integer.parseInt(split[1]));

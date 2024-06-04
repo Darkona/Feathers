@@ -1,6 +1,6 @@
 package com.darkona.feathers.effect.effects;
 
-import com.darkona.feathers.config.CommonConfig;
+import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.effect.FeathersEffects;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
@@ -33,6 +33,6 @@ public class FatiguedEffect extends FeathersEffects {
 
     @Override
     public boolean canApply(Player player){
-        return super.canApply(player) && CommonConfig.ENABLE_FATIGUE.get();
+        return super.canApply(player) && FeathersCommonConfig.ENABLE_FATIGUE.get();
     }
 }

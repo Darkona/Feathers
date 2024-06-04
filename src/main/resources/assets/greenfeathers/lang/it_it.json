@@ -1,12 +1,12 @@
 {
-  "green_feathers.max_feathers": "Piume Massime",
-  "green_feathers.feather_regen": "Rigenerazione delle Piume",
-  "effect.green_feathers.endurance": "Resistenza",
-  "effect.green_feathers.strain": "Sforzo",
-  "effect.green_feathers.momentum": "Momentum",
-  "effect.green_feathers.cold": "Freddo",
-  "effect.green_feathers.hot": "Caldo",
-  "effect.green_feathers.energized": "Energizzato",
+  "greenfeathers.max_feathers": "Piume Massime",
+  "greenfeathers.feather_regen": "Rigenerazione delle Piume",
+  "effect.greenfeathers.endurance": "Resistenza",
+  "effect.greenfeathers.strain": "Sforzo",
+  "effect.greenfeathers.momentum": "Momentum",
+  "effect.greenfeathers.cold": "Freddo",
+  "effect.greenfeathers.hot": "Caldo",
+  "effect.greenfeathers.energized": "Energizzato",
   "item.minecraft.potion.effect.endurance_potion": "Pozione di Resistenza",
   "item.minecraft.splash_potion.effect.endurance_potion": "Pozione Esplosiva di Resistenza",
   "item.minecraft.lingering_potion.effect.endurance_potion": "Pozione Persistente di Resistenza",
@@ -51,7 +51,7 @@
   "item.minecraft.splash_potion.effect.long_energized_potion": "Pozione Esplosiva Energizzata Lunga",
   "item.minecraft.lingering_potion.effect.long_energized_potion": "Pozione Persistente Energizzata Lunga",
   "item.minecraft.tipped_arrow.effect.long_energized_potion": "Freccia Energizzata Lunga",
-  "enchantment.green_feathers.lightweight": "Leggerezza",
-  "enchantment.green_feathers.heavy": "Maledizione del Peso",
-  "text.green_feathers.tooltip": "+%s di Peso"
+  "enchantment.greenfeathers.lightweight": "Leggerezza",
+  "enchantment.greenfeathers.heavy": "Maledizione del Peso",
+  "text.greenfeathers.tooltip": "+%s di Peso"
 }

@@ -2,7 +2,7 @@ package com.darkona.feathers.effect.effects;
 
 import com.darkona.feathers.compatibility.coldsweat.ColdSweatManager;
 import com.darkona.feathers.compatibility.coldsweat.FeathersColdSweatConfig;
-import com.darkona.feathers.config.CommonConfig;
+import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.effect.FeathersEffects;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
@@ -36,7 +36,7 @@ public class ColdEffect extends FeathersEffects {
 
     @Override
     public boolean canApply(Player player) {
-        if (super.canApply(player) && CommonConfig.ENABLE_COLD.get()) {
+        if (super.canApply(player) && FeathersCommonConfig.ENABLE_COLD.get()) {
             if (FeathersColdSweatConfig.isColdSweatEnabled()) {
                 return ColdSweatManager.canApplyColdEffect(player);
             }

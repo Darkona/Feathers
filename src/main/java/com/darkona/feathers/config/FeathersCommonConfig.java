@@ -1,21 +1,18 @@
 package com.darkona.feathers.config;
 
 import com.google.common.collect.Lists;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommonConfig {
+public class FeathersCommonConfig {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
 
     public static final ForgeConfigSpec SPEC;
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> DEBUG_MODE;
-
 
     public static final ForgeConfigSpec.ConfigValue<Integer> MAX_FEATHERS;
     public static final ForgeConfigSpec.ConfigValue<Double> REGEN_FEATHERS_PER_SECOND;
@@ -132,12 +129,7 @@ public class CommonConfig {
                 .comment("Whether the Lightweight enchantment can be applied in an enchantment table, or if it is treasure only.")
                 .define("Enable Lightweight Enchantment in Table", true);
 
-        ForgeRegistries.ITEMS.forEach(i -> {
-            if (i.asItem() instanceof ArmorItem armor) {
-                int def = armor.getDefense();
-                CommonConfig.armorWeightBuilder.add(i.getDescriptionId() + ":" + def);
-            }
-        });
+
         ARMOR_WEIGHTS = BUILDER
                 .comment("How many half feathers each item weighs.")
                 .defineList("Armor Weights Override", Lists.newArrayList(armorWeightBuilder), o -> o instanceof String);

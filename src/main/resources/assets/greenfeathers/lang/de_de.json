@@ -1,12 +1,12 @@
 {
-  "green_feathers.max_feathers": "Maximale Federn",
-  "green_feathers.feather_regen": "Federregeneration",
-  "effect.green_feathers.endurance": "Ausdauer",
-  "effect.green_feathers.strain": "Belastung",
-  "effect.green_feathers.momentum": "Impuls",
-  "effect.green_feathers.cold": "Kälte",
-  "effect.green_feathers.hot": "Hitze",
-  "effect.green_feathers.energized": "Energiegeladen",
+  "greenfeathers.max_feathers": "Maximale Federn",
+  "greenfeathers.feather_regen": "Federregeneration",
+  "effect.greenfeathers.endurance": "Ausdauer",
+  "effect.greenfeathers.strain": "Belastung",
+  "effect.greenfeathers.momentum": "Impuls",
+  "effect.greenfeathers.cold": "Kälte",
+  "effect.greenfeathers.hot": "Hitze",
+  "effect.greenfeathers.energized": "Energiegeladen",
   "item.minecraft.potion.effect.endurance_potion": "Trank der Ausdauer",
   "item.minecraft.splash_potion.effect.endurance_potion": "Wurftrank der Ausdauer",
   "item.minecraft.lingering_potion.effect.endurance_potion": "Verweiltrank der Ausdauer",
@@ -51,7 +51,7 @@
   "item.minecraft.splash_potion.effect.long_energized_potion": "Wurftrank der langen Energie",
   "item.minecraft.lingering_potion.effect.long_energized_potion": "Verweiltrank der langen Energie",
   "item.minecraft.tipped_arrow.effect.long_energized_potion": "Pfeil der langen Energie",
-  "enchantment.green_feathers.lightweight": "Leichtgewicht",
-  "enchantment.green_feathers.heavy": "Fluch der Schwere",
-  "text.green_feathers.tooltip": "+%s Gewicht"
+  "enchantment.greenfeathers.lightweight": "Leichtgewicht",
+  "enchantment.greenfeathers.heavy": "Fluch der Schwere",
+  "text.greenfeathers.tooltip": "+%s Gewicht"
 }
