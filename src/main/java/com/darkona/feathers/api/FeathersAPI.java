@@ -8,7 +8,6 @@ import com.darkona.feathers.enchantment.FeathersEnchantments;
 import com.darkona.feathers.event.FeatherEvent;
 import com.darkona.feathers.networking.FeathersMessages;
 import com.darkona.feathers.networking.packet.FeatherSyncSTCPacket;
-import com.darkona.feathers.util.ArmorHandler;
 import com.darkona.feathers.util.Calculations;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -34,6 +33,7 @@ public class FeathersAPI {
         return player.getCapability(Capabilities.PLAYER_FEATHERS).map(IFeathers::getAvailableFeathers)
                      .orElse(0);
     }
+
     /**
      * Sets the player's feathers to the specified amount. For tick-based operations, use staminaDeltaModifiers;
      *
@@ -137,9 +137,9 @@ public class FeathersAPI {
 
     public static int getArmorWeightByStack(ItemStack itemStack) {
         if (itemStack.getItem() instanceof ArmorItem armor) {
-            return Math.max(ArmorHandler.getArmorWeight(armor) -
-                    ArmorHandler.getItemEnchantmentLevel(FeathersEnchantments.LIGHTWEIGHT.get(), itemStack) +
-                    (ArmorHandler.getItemEnchantmentLevel(FeathersEnchantments.HEAVY.get(), itemStack) * ArmorHandler.getArmorWeight(armor)), 0);
+            return Math.max(ArmorWeightAPI.getArmorWeight(armor) -
+                    ArmorWeightAPI.getItemEnchantmentLevel(FeathersEnchantments.LIGHTWEIGHT.get(), itemStack) +
+                    (ArmorWeightAPI.getItemEnchantmentLevel(FeathersEnchantments.HEAVY.get(), itemStack) * ArmorWeightAPI.getArmorWeight(armor)), 0);
         } else if (itemStack.getItem() == Items.AIR) {
             return 0;
         }

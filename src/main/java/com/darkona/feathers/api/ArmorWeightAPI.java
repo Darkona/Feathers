@@ -1,18 +1,15 @@
-package com.darkona.feathers.util;
+package com.darkona.feathers.api;
 
 import com.darkona.feathers.Feathers;
 import com.darkona.feathers.config.FeathersCommonConfig;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 
 import java.util.HashMap;
 
-import static com.darkona.feathers.api.FeathersAPI.getArmorWeightByStack;
-
-public class ArmorHandler {
+public class ArmorWeightAPI {
     private static final HashMap<String, Integer> map = new HashMap<>();
 
     public static HashMap<String, Integer> getWeights() {
@@ -37,7 +34,6 @@ public class ArmorHandler {
     public static int getArmorWeight(ArmorItem armor) {
         return getWeights().getOrDefault(armor.getDescriptionId(), armor.getDefense());
     }
-
 
     public static int getTotalEnchantmentLevel(Enchantment enchantment, LivingEntity entity) {
         Iterable<ItemStack> iterable = enchantment.getSlotItems(entity).values();
