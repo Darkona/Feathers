@@ -21,7 +21,6 @@ public class CommonConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> REGEN_FEATHERS_PER_SECOND;
     public static final ForgeConfigSpec.ConfigValue<Boolean> SLEEPING_ALWAYS_RESTORES_FEATHERS;
 
-
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_COLD;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_HEAT;
     public static final ForgeConfigSpec.ConfigValue<Integer> EFFECT_LINGER;
@@ -31,20 +30,10 @@ public class CommonConfig {
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_MOMENTUM;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_FATIGUE;
 
-
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_ARMOR_WEIGHTS;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ARMOR_WEIGHTS;
 
-
-
-
-    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_LIGHTWEIGHT_ENCHANTMENT;
-
-
-
-
-
-
+    public static final ForgeConfigSpec.ConfigValue<Boolean> LIGHTWEIGHT_ON_TABLE;
 
     public static List<String> armorWeightBuilder = new ArrayList<>();
 
@@ -79,11 +68,14 @@ public class CommonConfig {
 
         ENABLE_COLD = BUILDER
                 .comment("Enable the Cold Effect. This effect halves the regeneration speed at Level I and completely negate it at Level II when its active." +
+                        "While the player is in a too cold environment, or experiencing freezing, the effect will be applied." +
                         "Value type: Boolean (Valid values are true and false.)")
                 .define("effect_cold_enabled", true);
 
         ENABLE_HEAT = BUILDER
                 .comment("Enable the Heat Effect. This effect doubles the feather usage when its active." +
+                        "While the player is in a too hot environment, or burning, or in lava, the effect will be applied." +
+                        "Fire resistance will negate this effect." +
                         "Value type: Boolean.")
                 .define("effect_hot_enabled", true);
 
@@ -132,7 +124,7 @@ public class CommonConfig {
                 .comment("If enabled, armor items have weight, this reduces the amount of feathers you can use based on how heavy your armor is.")
                 .define("Enable Armor Weights", false);
 
-        ENABLE_LIGHTWEIGHT_ENCHANTMENT = BUILDER
+        LIGHTWEIGHT_ON_TABLE = BUILDER
                 .comment("Whether the Lightweight enchantment can be applied in an enchantment table, or if it is treasure only.")
                 .define("Enable Lightweight Enchantment in Table", true);
 

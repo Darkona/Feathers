@@ -1,7 +1,9 @@
 package com.darkona.feathers.effect.effects;
 
+import com.darkona.feathers.config.CommonConfig;
 import com.darkona.feathers.effect.FeathersEffects;
 import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.entity.player.Player;
 
 import static com.darkona.feathers.attributes.FeathersAttributes.STAMINA_USAGE_MULTIPLIER;
 import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADDITION;
@@ -20,4 +22,10 @@ public class MomentumEffect extends FeathersEffects {
         super(p_19451_, p_19452_);
         addAttributeModifier(STAMINA_USAGE_MULTIPLIER.get(), MODIFIER_UUID, BASE_STRENGTH, ADDITION);
     }
+
+    @Override
+    public boolean canApply(Player player){
+        return super.canApply(player) && CommonConfig.ENABLE_MOMENTUM.get();
+    }
+
 }

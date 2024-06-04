@@ -3,7 +3,7 @@ package com.darkona.feathers.client;
 import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.Constants;
 import com.darkona.feathers.api.IFeathers;
-import com.darkona.feathers.config.FeathersClientConfig;
+import com.darkona.feathers.config.ClientConfig;
 import com.darkona.feathers.effect.effects.EnduranceEffect;
 import com.darkona.feathers.effect.effects.StrainEffect;
 import lombok.Getter;
@@ -90,16 +90,16 @@ public class ClientFeathersData {
         if (animationCooldown > 0) animationCooldown--;
 
         if (feathers != previousFeathers) {
-            if (feathers > previousFeathers && FeathersClientConfig.REGEN_EFFECT.get() && animationCooldown <= 0) {
+            if (feathers > previousFeathers && ClientConfig.REGEN_EFFECT.get() && animationCooldown <= 0) {
                 animationCooldown = 18;
             }
             previousFeathers = feathers;
         }
 
-        if (FeathersClientConfig.FADE_WHEN_FULL.get()) {
+        if (ClientConfig.FADE_WHEN_FULL.get()) {
             int cooldown = fadeCooldown;
             if (feathers == getMaxFeathers() || enduranceFeathers > 0) {
-                fadeCooldown = cooldown < FeathersClientConfig.FADE_COOLDOWN.get() ? fadeCooldown + 1 : 0;
+                fadeCooldown = cooldown < ClientConfig.FADE_COOLDOWN.get() ? fadeCooldown + 1 : 0;
             }
         }
     }

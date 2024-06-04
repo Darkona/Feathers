@@ -2,6 +2,7 @@ package com.darkona.feathers.compatibility.coldsweat;
 
 import com.darkona.feathers.api.ICapabilityPlugin;
 import com.momosoftworks.coldsweat.api.util.Temperature;
+import com.momosoftworks.coldsweat.config.ColdSweatConfig;
 import com.momosoftworks.coldsweat.util.registries.ModEffects;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
@@ -28,11 +29,11 @@ public class ColdSweatManager implements ICapabilityPlugin {
     }
 
     public static boolean isOverheating(Player player) {
-        return Temperature.get(player, Temperature.Trait.BODY) >= 50;
+        return Temperature.get(player, Temperature.Trait.BODY) >= FeathersColdSweatConfig.HOT_THRESHOLD.get();
     }
 
     public static boolean isFreezing(Player player) {
-        return Temperature.get(player, Temperature.Trait.BODY) <= -50;
+        return Temperature.get(player, Temperature.Trait.BODY) <= FeathersColdSweatConfig.COLD_THRESHOLD.get();
     }
 
 

@@ -2,7 +2,7 @@ package com.darkona.feathers.config;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
-public class FeathersClientConfig {
+public class ClientConfig {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
 

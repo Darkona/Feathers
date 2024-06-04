@@ -103,4 +103,8 @@ public class StrainEffect extends FeathersEffects {
         super.addAttributeModifiers(target, map, strength);
     }
 
+    @Override
+    public boolean canApply(Player player){
+        return super.canApply(player) && CommonConfig.ENABLE_STRAIN.get();
+    }
 }

@@ -6,7 +6,7 @@ import com.darkona.feathers.compatibility.coldsweat.ColdSweatManager;
 import com.darkona.feathers.compatibility.coldsweat.FeathersColdSweatConfig;
 import com.darkona.feathers.compatibility.thirst.FeathersThirstConfig;
 import com.darkona.feathers.compatibility.thirst.ThirstManager;
-import com.darkona.feathers.config.FeathersClientConfig;
+import com.darkona.feathers.config.ClientConfig;
 import com.darkona.feathers.config.CommonConfig;
 import com.darkona.feathers.effect.EffectsHandler;
 import com.darkona.feathers.effect.FeathersEffects;
@@ -40,7 +40,7 @@ public class Feathers {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::commonSetup);
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, FeathersClientConfig.SPEC, "feathers//Feathers-Client.toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC, "feathers//Feathers-Client.toml");
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfig.SPEC, "feathers//Feathers-Common.toml");
 
         if (THIRST_LOADED) {

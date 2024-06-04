@@ -25,4 +25,5 @@ public class FeathersEnchantments {
     public static void register(IEventBus eventBus) {
         ENCHANTMENTS.register(eventBus);
     }
+
 }

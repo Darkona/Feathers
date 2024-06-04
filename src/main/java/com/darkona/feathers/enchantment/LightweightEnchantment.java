@@ -18,6 +18,6 @@ public class LightweightEnchantment extends Enchantment {
 
     @Override
     public boolean isTreasureOnly() {
-        return !CommonConfig.ENABLE_LIGHTWEIGHT_ENCHANTMENT.get();
+        return !CommonConfig.LIGHTWEIGHT_ON_TABLE.get();
     }
 }

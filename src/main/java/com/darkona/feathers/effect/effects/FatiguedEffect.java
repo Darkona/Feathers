@@ -1,9 +1,11 @@
 package com.darkona.feathers.effect.effects;
 
+import com.darkona.feathers.config.CommonConfig;
 import com.darkona.feathers.effect.FeathersEffects;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
 import static com.darkona.feathers.attributes.FeathersAttributes.MAX_FEATHERS;
@@ -27,5 +29,10 @@ public class FatiguedEffect extends FeathersEffects {
     @Override
     public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
         super.removeAttributeModifiers(target, map, strength);
+    }
+
+    @Override
+    public boolean canApply(Player player){
+        return super.canApply(player) && CommonConfig.ENABLE_FATIGUE.get();
     }
 }
