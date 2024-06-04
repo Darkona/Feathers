@@ -74,7 +74,7 @@ public interface IFeathers {
 
     void removeCounter(String name);
 
-    Optional<Double> getCounter(String name);
+    Double getCounter(String name);
 
     void setCounter(String name, double value);
 

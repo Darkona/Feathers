@@ -7,7 +7,7 @@ import com.darkona.feathers.effect.FeathersEffects;
 import com.darkona.feathers.enchantment.FeathersEnchantments;
 import com.darkona.feathers.event.FeatherEvent;
 import com.darkona.feathers.networking.FeathersMessages;
-import com.darkona.feathers.networking.packet.FeatherSyncSTCPacket;
+import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
 import com.darkona.feathers.util.Calculations;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -41,12 +41,12 @@ public class FeathersAPI {
      * @param amount the amount of feathers to set
      * @return the amount of feathers set
      */
-    public static int setFeathers(ServerPlayer player, int amount) {
+    public static int setFeathers(Player player, int amount) {
         AtomicInteger result = new AtomicInteger(0);
         player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.setStamina(amount * 10);
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
+                  FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
                   result.set(f.getFeathers());
               });
         return result.get();
@@ -60,7 +60,7 @@ public class FeathersAPI {
         player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.setMaxStamina((int) player.getAttribute(FeathersAttributes.MAX_FEATHERS.get()).getValue());
-                  FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
+                  FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
               });
     }
 
@@ -82,7 +82,7 @@ public class FeathersAPI {
                       var prev = f.getFeathers();
                       var post = f.gainFeathers(gainEvent.amount);
                       MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, f));
-                      FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
+                      FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
                       result.set(post);
                   }
               });
@@ -118,7 +118,7 @@ public class FeathersAPI {
                       MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, f));
                       result.set(used);
 
-                      if (used) FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
+                      if (used) FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
                   }
               });
         return result.get();
@@ -146,12 +146,11 @@ public class FeathersAPI {
         return 0;
     }
 
-    public static void setCooldown(ServerPlayer player, int cooldownTicks) {
+    public static void setCooldown(Player player, int cooldownTicks) {
         player.getCapability(Capabilities.PLAYER_FEATHERS)
               .ifPresent(f -> f.setCooldown(cooldownTicks));
     }
-
-    public static int getCooldown(ServerPlayer player) {
+    public static int getCooldown(Player player) {
         return player.getCapability(Capabilities.PLAYER_FEATHERS)
                      .map(IFeathers::getCooldown).orElse(0);
     }
@@ -159,50 +158,45 @@ public class FeathersAPI {
     public static boolean isCold(Player player) {
         return player != null && player.hasEffect(FeathersEffects.COLD.get());
     }
-
     public static boolean isHot(Player player) {
         return player != null && player.hasEffect(FeathersEffects.HOT.get());
     }
-
     public static boolean isEnergized(Player player) {
         return player != null && player.hasEffect(FeathersEffects.ENERGIZED.get());
     }
-
     public static boolean isStrained(Player player) {
         return player != null && player.hasEffect(FeathersEffects.STRAINED.get());
     }
-
     public static boolean isEnduring(Player player) {
         return player != null && player.hasEffect(FeathersEffects.ENDURANCE.get());
     }
-
     public static boolean isFatigued(Player player) {
         return player != null && player.hasEffect(FeathersEffects.FATIGUE.get());
     }
-
+    public static boolean isMomentum(Player player) {
+        return player != null && player.hasEffect(FeathersEffects.MOMENTUM.get());
+    }
 
     public static double getPlayerFeatherRegenerationPerSecond(Player player) {
         var regen = player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get());
         return regen != null ? regen.getValue() : CommonConfig.REGEN_FEATHERS_PER_SECOND.get();
     }
+    public static void setPlayerFeatherRegenerationPerSecond(Player player, double amount) {
+        player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get()).setBaseValue(amount);
+    }
 
     public static int getPlayerStaminaRegenerationPerTick(Player player) {
         return Calculations.calculateStaminaPerTick(getPlayerFeatherRegenerationPerSecond(player));
     }
-
     public static int getPlayerMaxFeathers(Player player) {
         var maxFeathers = player.getAttribute(FeathersAttributes.MAX_FEATHERS.get());
         return (int) Math.ceil((maxFeathers != null ? maxFeathers.getValue() : CommonConfig.MAX_FEATHERS.get()));
     }
-
     public static double getPlayerStaminaUsageMultiplier(Player player) {
         var multiplier = player.getAttribute(FeathersAttributes.STAMINA_USAGE_MULTIPLIER.get());
         return multiplier != null ? multiplier.getValue() : 1.0D;
     }
 
-    public static void setFeatherRegen(ServerPlayer player, double amount) {
-        player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get()).setBaseValue(amount);
-    }
 }
 
 

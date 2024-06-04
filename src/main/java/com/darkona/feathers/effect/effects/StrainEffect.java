@@ -40,7 +40,7 @@ public class StrainEffect extends FeathersEffects {
 
         @Override
         public void applyToDelta(Player player, PlayerFeathers f, AtomicInteger staminaDelta) {
-            int currentStrain = (int)Math.ceil(f.getCounter(STRAIN_COUNTER).orElse(0D));
+            int currentStrain = (int)Math.ceil(f.getCounter(STRAIN_COUNTER));
             if (currentStrain > 0) {
                 int recover = currentStrain - staminaDelta.get();
                 if (recover <= 0) {
@@ -57,7 +57,7 @@ public class StrainEffect extends FeathersEffects {
         public void applyToUsage(Player player, PlayerFeathers f, AtomicInteger staminaToUse, AtomicBoolean approve) {
             if (approve.get()) return;
             int use = f.getAvailableStamina() - staminaToUse.get();
-            int strain = (int)Math.ceil(f.getCounter(STRAIN_COUNTER).orElse(0D));
+            int strain = (int)Math.ceil(f.getCounter(STRAIN_COUNTER));
             int maxStrainStamina = CommonConfig.MAX_STRAIN.get() * Constants.STAMINA_PER_FEATHER;
 
             if (use < 0 && (strain - use <= maxStrainStamina)) {

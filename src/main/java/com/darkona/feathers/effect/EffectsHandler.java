@@ -151,14 +151,13 @@ public class EffectsHandler implements ICapabilityPlugin {
     }
 
     private void checkStrain(Player player, IFeathers feathers) {
-        feathers.getCounter(StrainEffect.STRAIN_COUNTER).ifPresent(strain -> {
-            if (strain <= 0) {
-                player.removeEffect(FeathersEffects.STRAINED.get());
-                feathers.markDirty();
-            } else {
-                player.addEffect(new MobEffectInstance(FeathersEffects.STRAINED.get(), -1, 0, false, false, false));
-                feathers.markDirty();
-            }
-        });
+        var strain = feathers.getCounter(StrainEffect.STRAIN_COUNTER);
+        if (strain <= 0) {
+            player.removeEffect(FeathersEffects.STRAINED.get());
+            feathers.markDirty();
+        } else {
+            player.addEffect(new MobEffectInstance(FeathersEffects.STRAINED.get(), -1, 0, false, false, false));
+            feathers.markDirty();
+        }
     }
 }

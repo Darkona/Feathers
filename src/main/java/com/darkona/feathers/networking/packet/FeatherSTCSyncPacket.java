@@ -1,31 +1,29 @@
 package com.darkona.feathers.networking.packet;
 
 import com.darkona.feathers.api.IFeathers;
-import com.darkona.feathers.capability.Capabilities;
-import com.darkona.feathers.client.ClientFeathersData;
-import net.minecraft.client.Minecraft;
+import lombok.Getter;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+public class FeatherSTCSyncPacket {
 
-public class FeatherSyncSTCPacket {
+    public final int stamina;
+    public final int maxStamina;
+    public final int feathers;
+    public final int maxFeathers;
+    public final int staminaDelta;
+    public final int cooldown;
+    public final int counterAmount;
+    public final int weight;
+    public final Map<String, Double> counters;
 
-    private final int stamina;
-    private final int maxStamina;
-    private final int feathers;
-    private final int maxFeathers;
-    private final int staminaDelta;
-    private final int cooldown;
-    private final int counterAmount;
-    private final int weight;
-    private final Map<String, Double> counters;
-
-    public FeatherSyncSTCPacket(IFeathers f) {
+    public FeatherSTCSyncPacket(IFeathers f) {
         stamina = f.getStamina();
         maxStamina = f.getMaxStamina();
         feathers = f.getFeathers();
@@ -37,19 +35,16 @@ public class FeatherSyncSTCPacket {
         weight = f.getWeight();
     }
 
-    public FeatherSyncSTCPacket(FriendlyByteBuf buf) {
-        counters = new HashMap<>();
-
+    public FeatherSTCSyncPacket(FriendlyByteBuf buf) {
         stamina = buf.readInt();
         maxStamina = buf.readInt();
         feathers = buf.readInt();
         maxFeathers = buf.readInt();
         staminaDelta = buf.readInt();
-
         cooldown = buf.readInt();
         weight = buf.readInt();
 
-
+        counters = new HashMap<>();
         counterAmount = buf.readInt();
         for (int i = 0; i < counterAmount; i++) {
             var k = buf.readUtf(512);
@@ -74,22 +69,14 @@ public class FeatherSyncSTCPacket {
         });
     }
 
-    public boolean handle(Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context context = supplier.get();
-        return context.enqueueWork(() -> {
-            Player clientPlayer = Minecraft.getInstance().player;
-            if (clientPlayer != null) {
-                clientPlayer.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-                    f.setStamina(stamina);
-                    f.setMaxStamina(maxStamina);
-                    f.setFeathers(feathers);
-                    f.setStaminaDelta(staminaDelta);
-                    f.setCooldown(cooldown);
-                    f.setWeight(weight);
-                    counters.forEach(f::setCounter);
-                    ClientFeathersData.getInstance().update(clientPlayer, f);
+    public static void handle(FeatherSTCSyncPacket message, Supplier<NetworkEvent.Context> contextSupplier) {
+        NetworkEvent.Context context = contextSupplier.get();
+        if (context.getDirection().getReceptionSide().isClient()) {
+            context.enqueueWork(() -> {
+                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+                    FeatherSTCSyncPacket.handle(message, contextSupplier);
                 });
-            }
-        }).isDone();
+            });
+        }
     }
 }

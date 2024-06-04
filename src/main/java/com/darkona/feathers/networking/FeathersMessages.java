@@ -1,8 +1,8 @@
 package com.darkona.feathers.networking;
 
 import com.darkona.feathers.Feathers;
-import com.darkona.feathers.networking.packet.ClientFeatherSpendPacket;
-import com.darkona.feathers.networking.packet.FeatherSyncSTCPacket;
+import com.darkona.feathers.networking.packet.FeatherSpendCTSPacket;
+import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -28,17 +28,17 @@ public class FeathersMessages {
                                               .simpleChannel();
         INSTANCE = network;
 
-        network.messageBuilder(ClientFeatherSpendPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-               .decoder(ClientFeatherSpendPacket::new)
-               .encoder(ClientFeatherSpendPacket::toBytes)
-               .consumerMainThread(ClientFeatherSpendPacket::handle)
+        network.messageBuilder(FeatherSpendCTSPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+               .decoder(FeatherSpendCTSPacket::new)
+               .encoder(FeatherSpendCTSPacket::toBytes)
+               .consumerMainThread(FeatherSpendCTSPacket::handle)
                .add();
 
 
-        network.messageBuilder(FeatherSyncSTCPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-               .decoder(FeatherSyncSTCPacket::new)
-               .encoder(FeatherSyncSTCPacket::toBytes)
-               .consumerMainThread(FeatherSyncSTCPacket::handle)
+        network.messageBuilder(FeatherSTCSyncPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+               .decoder(FeatherSTCSyncPacket::new)
+               .encoder(FeatherSTCSyncPacket::toBytes)
+               .consumerMainThread(FeatherSTCSyncPacket::handle)
                .add();
 
     }

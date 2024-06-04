@@ -38,26 +38,21 @@ public class EnduranceEffect extends FeathersEffects {
         }
 
         @Override
-        public void applyToDelta(Player player, PlayerFeathers iFeathers, AtomicInteger staminaToUse) {
-
-
-        }
+        public void applyToDelta(Player player, PlayerFeathers iFeathers, AtomicInteger staminaToUse) {}
 
         @Override
         public void applyToUsage(Player player, PlayerFeathers iFeathers, AtomicInteger staminaToUse, AtomicBoolean result) {
             if (player.hasEffect(FeathersEffects.ENDURANCE.get())) {
-                iFeathers.getCounter(ENDURANCE_COUNTER).ifPresent(enduranceFeathers -> {
+                var enduranceFeathers = iFeathers.getCounter(ENDURANCE_COUNTER);
 
-                    int availableEnduranceStamina = (int)Math.ceil(enduranceFeathers * Constants.STAMINA_PER_FEATHER);
+                int availableEnduranceStamina = (int) Math.ceil(enduranceFeathers * Constants.STAMINA_PER_FEATHER);
+                int remaining = availableEnduranceStamina - staminaToUse.get();
+                if (remaining <= 0) {
+                    resetEndurance(player, iFeathers, staminaToUse, remaining);
+                } else {
+                    updateEndurance(iFeathers, staminaToUse, remaining);
+                }
 
-                    int remaining = availableEnduranceStamina - staminaToUse.get();
-
-                    if (remaining <= 0) {
-                        resetEndurance(player, iFeathers, staminaToUse, remaining);
-                    } else {
-                        updateEndurance(iFeathers, staminaToUse, remaining);
-                    }
-                });
             }
         }
 

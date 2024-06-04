@@ -125,8 +125,8 @@ public class PlayerFeathers implements IFeathers {
         return counters.containsKey(name);
     }
 
-    public Optional<Double> getCounter(String name) {
-        return Optional.ofNullable(counters.get(name));
+    public Double getCounter(String name) {
+        return Optional.ofNullable(counters.get(name)).orElse(0D);
     }
 
     public void setCounter(String name, double value) {

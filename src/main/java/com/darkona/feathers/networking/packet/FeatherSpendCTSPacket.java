@@ -6,15 +6,16 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class ClientFeatherSpendPacket {
+
+public class FeatherSpendCTSPacket {
 
     private final int feathers;
 
-    public ClientFeatherSpendPacket(int feathers) {
+    public FeatherSpendCTSPacket(int feathers) {
         this.feathers = feathers;
     }
 
-    public ClientFeatherSpendPacket(FriendlyByteBuf buf) {
+    public FeatherSpendCTSPacket(FriendlyByteBuf buf) {
         this.feathers = buf.readInt();
     }
 

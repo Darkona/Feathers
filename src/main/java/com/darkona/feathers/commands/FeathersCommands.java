@@ -147,7 +147,7 @@ public class FeathersCommands extends BaseCommand {
         if (x != null) return x;
         for (Entity entity : entities) {
             if (entity instanceof ServerPlayer player) {
-                FeathersAPI.setFeatherRegen(player, amount);
+                FeathersAPI.setPlayerFeatherRegenerationPerSecond(player, amount);
                 source.sendSuccess(() -> Component.literal(String.format("Set base feather regeneration to %.2f feathers per second for %s", amount, player.getName())), true);
             }
         }

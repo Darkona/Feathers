@@ -1,5 +1,9 @@
 package com.darkona.feathers.client.gui;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+
+@OnlyIn(Dist.CLIENT)
 public class Icons {
 
     static final Set NORMAL = new Set(GuiIcon.featherIcon(0, 0),

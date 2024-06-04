@@ -10,7 +10,7 @@ import com.darkona.feathers.config.CommonConfig;
 import com.darkona.feathers.effect.FeathersEffects;
 import com.darkona.feathers.effect.effects.EnduranceEffect;
 import com.darkona.feathers.networking.FeathersMessages;
-import com.darkona.feathers.networking.packet.FeatherSyncSTCPacket;
+import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -113,7 +113,7 @@ public class FeathersManager {
 
             player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
                 f.markDirty();
-                FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
+                FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
             });
 
             plugins.forEach(p -> p.onPlayerJoin(event));
@@ -129,7 +129,7 @@ public class FeathersManager {
 
                 f.setStamina(f.getMaxStamina());
                 f.setStrainFeathers(0);
-                FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
+                FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
             });
         }
 
@@ -138,7 +138,7 @@ public class FeathersManager {
     @SubscribeEvent
     public static void onPlayerChangeArmor(LivingEquipmentChangeEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && event.getSlot().getType() == EquipmentSlot.Type.ARMOR) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player));
+            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player));
         }
     }
 
@@ -179,12 +179,10 @@ public class FeathersManager {
 
     private static void checkEffects(Player player) {
         player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-            if (FeathersAPI.isEnduring(player) && f.getCounter(EnduranceEffect.ENDURANCE_COUNTER).orElse(0D) == 0) {
-
+            if (FeathersAPI.isEnduring(player) && f.getCounter(EnduranceEffect.ENDURANCE_COUNTER) == 0) {
                 player.removeEffect(FeathersEffects.ENDURANCE.get());
             }
         });
-
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -194,7 +192,7 @@ public class FeathersManager {
             player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
 
                 f.setWeight(FeathersAPI.getPlayerWeight(player));
-                FeathersMessages.sendToPlayer(new FeatherSyncSTCPacket(f), player);
+                FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
 
             });
         }

@@ -101,22 +101,22 @@ public class ThirstManager implements ICapabilityPlugin {
         if (!(event.player.tickCount % 20 == 0)) return;
         event.player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> event.player.getCapability(PLAYER_THIRST).ifPresent(t -> {
 
-            f.getCounter(LAST_THIRST_LEVEL).ifPresent(lastThirst -> {
-                if (lastThirst != t.getThirst()) {
-                    f.setCounter(LAST_THIRST_LEVEL, t.getThirst());
-                    recalculateThirst(event.player, f);
-                }
-            });
+            var lastThirst = f.getCounter(LAST_THIRST_LEVEL);
+            var lastQuench = f.getCounter(LAST_QUENCH_LEVEL);
+            if (lastThirst != t.getThirst()) {
+                f.setCounter(LAST_THIRST_LEVEL, t.getThirst());
+                recalculateThirst(event.player, f);
+            }
 
-            f.getCounter(LAST_QUENCH_LEVEL).ifPresent(lastQuench -> {
-                if (lastQuench != t.getQuenched()) {
-                    f.setCounter(LAST_QUENCH_LEVEL, t.getQuenched());
-                    recalculateQuench(event.player, f);
-                }
-            });
+            if (lastQuench != t.getQuenched()) {
+                f.setCounter(LAST_QUENCH_LEVEL, t.getQuenched());
+                recalculateQuench(event.player, f);
+            }
+
         }));
 
     }
+
     @Override
     public void onPlayerTickAfter(TickEvent.PlayerTickEvent event) {
 
@@ -130,12 +130,12 @@ public class ThirstManager implements ICapabilityPlugin {
 
             f.incrementCounterBy(THIRST_FEATHER_COUNTER, f.getStaminaDelta());
 
-            if(f.getCounter(THIRST_FEATHER_COUNTER).orElse(0.0) >= Constants.STAMINA_PER_FEATHER){
+            if (f.getCounter(THIRST_FEATHER_COUNTER) >= Constants.STAMINA_PER_FEATHER) {
                 f.incrementCounterBy(THIRST_FEATHER_COUNTER, -Constants.STAMINA_PER_FEATHER);
                 f.incrementCounterBy(THIRST_ACCUMULATOR, FeathersThirstConfig.THIRST_CONSUMPTION_BY_FEATHER.get());
             }
 
-            if(f.getCounter(THIRST_ACCUMULATOR).orElse(0.0) >= 1){
+            if (f.getCounter(THIRST_ACCUMULATOR) >= 1) {
                 f.incrementCounterBy(THIRST_ACCUMULATOR, -1);
                 player.getCapability(PLAYER_THIRST).ifPresent(thirst -> thirst.setThirst(thirst.getThirst() - 1));
             }
