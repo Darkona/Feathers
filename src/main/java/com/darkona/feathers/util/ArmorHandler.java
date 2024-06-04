@@ -38,17 +38,6 @@ public class ArmorHandler {
         return getWeights().getOrDefault(armor.getDescriptionId(), armor.getDefense());
     }
 
-    public static int getPlayerWeight(Player player) {
-        if (!FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
-            return 0;
-        }
-        int weight = 0;
-        for (ItemStack i : player.getArmorSlots()) {
-            weight += getArmorWeightByStack(i);
-        }
-        return weight;
-    }
-
 
     public static int getTotalEnchantmentLevel(Enchantment enchantment, LivingEntity entity) {
         Iterable<ItemStack> iterable = enchantment.getSlotItems(entity).values();

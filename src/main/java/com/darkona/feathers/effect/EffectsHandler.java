@@ -142,9 +142,7 @@ public class EffectsHandler implements ICapabilityPlugin {
     @Override
     public void onPlayerTickAfter(TickEvent.PlayerTickEvent event) {
         if (event.player.level().isClientSide()) return;
-        event.player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-            checkStrain(event.player, f);
-        });
+        event.player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> checkStrain(event.player, f));
     }
 
     @Override
