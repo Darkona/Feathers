@@ -44,7 +44,7 @@ public class FeathersAttributes {
     }
 
     public static RegistryObject<Attribute> registerAttribute(String name, Function<String, Attribute> attribute, UUID uuid) {
-        RegistryObject<Attribute> registryObject = ATTRIBUTES.register(name,() -> attribute.apply(name));
+        RegistryObject<Attribute> registryObject = ATTRIBUTES.register(name, () -> attribute.apply(name));
         UUIDS.put(registryObject, uuid);
         return registryObject;
     }

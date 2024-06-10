@@ -49,4 +49,5 @@ public class ColdSweatManager implements ICapabilityPlugin {
     public void onPlayerTickAfter(TickEvent.PlayerTickEvent event) {
 
     }
+
 }

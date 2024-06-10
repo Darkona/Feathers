@@ -1,6 +1,5 @@
 package com.darkona.feathers.api;
 
-import com.darkona.feathers.event.FeatherEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 
@@ -13,9 +12,6 @@ public interface ICapabilityPlugin {
     void onPlayerTickBefore(TickEvent.PlayerTickEvent event);
 
     void onPlayerTickAfter(TickEvent.PlayerTickEvent event);
-
-    void onFeathersUsed(FeatherEvent.Use event);
-
 
 
 }

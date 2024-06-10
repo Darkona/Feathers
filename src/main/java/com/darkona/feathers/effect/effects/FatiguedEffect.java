@@ -32,7 +32,7 @@ public class FatiguedEffect extends FeathersEffects {
     }
 
     @Override
-    public boolean canApply(Player player){
+    public boolean canApply(Player player) {
         return super.canApply(player) && FeathersCommonConfig.ENABLE_FATIGUE.get();
     }
 }

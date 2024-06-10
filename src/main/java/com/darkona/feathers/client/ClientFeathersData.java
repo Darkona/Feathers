@@ -51,7 +51,7 @@ public class ClientFeathersData {
         return instance;
     }
 
-    public void update(Player player, IFeathers f){
+    public void update(Player player, IFeathers f) {
         stamina = f.getStamina();
         maxStamina = f.getMaxStamina();
         feathers = f.getFeathers();
@@ -61,8 +61,8 @@ public class ClientFeathersData {
 
         synchronizeEffects(player);
 
-        strainFeathers = (int)Math.ceil(f.getCounter(StrainEffect.STRAIN_COUNTER));
-        enduranceFeathers = (int)Math.ceil(f.getCounter(EnduranceEffect.ENDURANCE_COUNTER));
+        strainFeathers = (int) Math.ceil(f.getCounter(StrainEffect.STRAIN_COUNTER));
+        enduranceFeathers = (int) Math.ceil(f.getCounter(EnduranceEffect.ENDURANCE_COUNTER));
     }
 
     public void update(FeatherSTCSyncPacket message, Supplier<NetworkEvent.Context> supplier) {
@@ -108,7 +108,7 @@ public class ClientFeathersData {
     public void tick() {
         var player = Minecraft.getInstance().player;
 
-        if(player != null)
+        if (player != null)
             player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> update(player, f));
 
         if (animationCooldown > 0) animationCooldown--;

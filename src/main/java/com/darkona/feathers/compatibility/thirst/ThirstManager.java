@@ -29,20 +29,39 @@ import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operati
 public class ThirstManager implements ICapabilityPlugin {
 
 
-    private static ICapabilityPlugin instance;
     private static final UUID QUENCH_UUID = UUID.fromString("08c665cf-0c4a-4f87-92da-c63972f19b73");
     private static final UUID THIRST_UUID = UUID.fromString("9f2141c4-33bc-4245-97bd-b64a3eceafda");
-
     private static final String LAST_THIRST_LEVEL = "lastThirst";
     private static final String LAST_QUENCH_LEVEL = "lastQuench";
     private static final String THIRST_FEATHER_COUNTER = "thirstFeather";
     private static final String THIRST_ACCUMULATOR = "thirstAcc";
+    private static ICapabilityPlugin instance;
 
     public static ICapabilityPlugin getInstance() {
         if (instance == null) {
             instance = new ThirstManager();
         }
         return instance;
+    }
+
+    @SubscribeEvent
+    public static void onStaminaChanged(StaminaChangeEvent.Post event) {
+        var player = event.getEntity();
+        var f = event.feathers;
+        if (f.getStamina() > f.getPrevStamina()) {
+
+            f.incrementCounterBy(THIRST_FEATHER_COUNTER, f.getStaminaDelta());
+
+            if (f.getCounter(THIRST_FEATHER_COUNTER) >= Constants.STAMINA_PER_FEATHER) {
+                f.incrementCounterBy(THIRST_FEATHER_COUNTER, -Constants.STAMINA_PER_FEATHER);
+                f.incrementCounterBy(THIRST_ACCUMULATOR, FeathersThirstConfig.THIRST_CONSUMPTION_BY_FEATHER.get());
+            }
+
+            if (f.getCounter(THIRST_ACCUMULATOR) >= 1) {
+                f.incrementCounterBy(THIRST_ACCUMULATOR, -1);
+                player.getCapability(PLAYER_THIRST).ifPresent(thirst -> thirst.setThirst(thirst.getThirst() - 1));
+            }
+        }
     }
 
     @Override
@@ -120,26 +139,6 @@ public class ThirstManager implements ICapabilityPlugin {
     @Override
     public void onPlayerTickAfter(TickEvent.PlayerTickEvent event) {
 
-    }
-
-    @SubscribeEvent
-    public static void onStaminaChanged(StaminaChangeEvent.Post event) {
-        var player = event.getEntity();
-        var f = event.feathers;
-        if (f.getStamina() > f.getPrevStamina()) {
-
-            f.incrementCounterBy(THIRST_FEATHER_COUNTER, f.getStaminaDelta());
-
-            if (f.getCounter(THIRST_FEATHER_COUNTER) >= Constants.STAMINA_PER_FEATHER) {
-                f.incrementCounterBy(THIRST_FEATHER_COUNTER, -Constants.STAMINA_PER_FEATHER);
-                f.incrementCounterBy(THIRST_ACCUMULATOR, FeathersThirstConfig.THIRST_CONSUMPTION_BY_FEATHER.get());
-            }
-
-            if (f.getCounter(THIRST_ACCUMULATOR) >= 1) {
-                f.incrementCounterBy(THIRST_ACCUMULATOR, -1);
-                player.getCapability(PLAYER_THIRST).ifPresent(thirst -> thirst.setThirst(thirst.getThirst() - 1));
-            }
-        }
     }
 
     public static class ThirstEvent extends PlayerEvent {

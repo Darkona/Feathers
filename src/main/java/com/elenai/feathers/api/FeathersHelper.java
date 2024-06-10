@@ -15,9 +15,9 @@ public class FeathersHelper {
     }
 
     @Deprecated
-    public static boolean spendFeathers(int amount, int cooldown){
+    public static boolean spendFeathers(int amount, int cooldown) {
         var player = Minecraft.getInstance().player;
-        if(player == null) return false;
+        if (player == null) return false;
         return FeathersAPI.spendFeathers(player, amount, cooldown);
     }
 

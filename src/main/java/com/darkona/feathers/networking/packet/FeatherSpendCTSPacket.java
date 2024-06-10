@@ -20,11 +20,6 @@ public class FeatherSpendCTSPacket {
         this.cooldown = cooldown;
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
-        buf.writeInt(feathersToSpend);
-        buf.writeInt(cooldown);
-    }
-
     public FeatherSpendCTSPacket(FriendlyByteBuf buf) {
         this.feathersToSpend = buf.readInt();
         this.cooldown = buf.readInt();
@@ -35,7 +30,7 @@ public class FeatherSpendCTSPacket {
         if (context.getDirection().getReceptionSide().isServer()) {
             context.enqueueWork(() -> {
                 Player player = context.getSender();
-                if(player != null) {
+                if (player != null) {
                     Level level = player.level();
                     FeathersAPI.spendFeathers(player, message.feathersToSpend, message.cooldown);
                 }
@@ -43,5 +38,10 @@ public class FeatherSpendCTSPacket {
         }
 
         context.setPacketHandled(true);
+    }
+
+    public void toBytes(FriendlyByteBuf buf) {
+        buf.writeInt(feathersToSpend);
+        buf.writeInt(cooldown);
     }
 }

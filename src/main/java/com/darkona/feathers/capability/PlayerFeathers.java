@@ -130,17 +130,18 @@ public class PlayerFeathers implements IFeathers {
     }
 
     public void setCounter(String name, double value) {
-        if(name.length() > 16) name = name.substring(0, 16);
+        if (name.length() > 16) name = name.substring(0, 16);
         counters.put(name, value);
     }
 
-    public void incrementCounterBy(String name, double amount){
-        counters.computeIfPresent(name, (k,v) -> v + amount);
+    public void incrementCounterBy(String name, double amount) {
+        counters.computeIfPresent(name, (k, v) -> v + amount);
     }
 
-    public void multiplyCounterBy(String name, double amount){
-        counters.computeIfPresent(name, (k,v) -> v * amount);
+    public void multiplyCounterBy(String name, double amount) {
+        counters.computeIfPresent(name, (k, v) -> v * amount);
     }
+
     /* Markers */
     @Override
     public int getMaxFeathers() {
@@ -309,7 +310,7 @@ public class PlayerFeathers implements IFeathers {
             doStaminaChange(player);
         }
 
-        if(player.tickCount % 20 == 0){
+        if (player.tickCount % 20 == 0) {
             FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(this), player);
         }
     }
@@ -327,7 +328,7 @@ public class PlayerFeathers implements IFeathers {
         var preChangeEvent = new StaminaChangeEvent.Pre(player, staminaDelta, stamina);
         if (MinecraftForge.EVENT_BUS.post(preChangeEvent)) return;
 
-        if (preChangeEvent.getResult() == Event.Result.DEFAULT){
+        if (preChangeEvent.getResult() == Event.Result.DEFAULT) {
 
             staminaDelta = preChangeEvent.staminaDelta;
             stamina = preChangeEvent.stamina;

@@ -52,6 +52,13 @@ public class FeatherSTCSyncPacket {
         }
     }
 
+    public static void handle(FeatherSTCSyncPacket message, Supplier<NetworkEvent.Context> contextSupplier) {
+        NetworkEvent.Context context = contextSupplier.get();
+        if (context.getDirection().getReceptionSide().isClient()) {
+            context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> FeatherSTCSyncPacket.handle(message, contextSupplier)));
+        }
+    }
+
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(stamina);
         buf.writeInt(maxStamina);
@@ -66,12 +73,5 @@ public class FeatherSTCSyncPacket {
             buf.writeUtf(k);
             buf.writeDouble(v);
         });
-    }
-
-    public static void handle(FeatherSTCSyncPacket message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        if (context.getDirection().getReceptionSide().isClient()) {
-            context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> FeatherSTCSyncPacket.handle(message, contextSupplier)));
-        }
     }
 }

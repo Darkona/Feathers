@@ -48,27 +48,29 @@ public class FeathersCommands extends BaseCommand {
                                                             IntegerArgumentType.getInteger(source, "amount"))
                                             )));
     }
+
     private int executeGetFeathers(CommandSourceStack source, Collection<? extends Entity> entities) {
         Integer x = checkError(source, entities);
         for (Entity entity : entities) {
             if (entity instanceof ServerPlayer player) {
                 source.sendSuccess(() -> Component.literal(
-                        String.format("%s has %d feathers, %d available.",
-                                player.getName().getString(),
-                                FeathersAPI.getFeathers(player),
-                                FeathersAPI.getAvailableFeathers(player))),
+                                String.format("%s has %d feathers, %d available.",
+                                        player.getName().getString(),
+                                        FeathersAPI.getFeathers(player),
+                                        FeathersAPI.getAvailableFeathers(player))),
                         true);
             }
         }
         return entities.size();
     }
+
     private int executeSetFeathers(CommandSourceStack source, Collection<? extends Entity> entities, int amount) {
         Integer x = checkError(source, entities);
         if (x != null) return x;
         for (Entity entity : entities) {
             if (entity instanceof ServerPlayer player) {
                 source.sendSuccess(() -> Component.literal(
-                        String.format("Set %s feathers to %d", player.getName().getString(), FeathersAPI.setFeathers(player, amount))),true);
+                        String.format("Set %s feathers to %d", player.getName().getString(), FeathersAPI.setFeathers(player, amount))), true);
             }
         }
         return entities.size();
@@ -89,6 +91,7 @@ public class FeathersCommands extends BaseCommand {
                                                  executeGetMaxFeathers(source.getSource(), EntityArgument.getEntities(source, "entities"))
                                          )));
     }
+
     private int executeGetMaxFeathers(CommandSourceStack source, Collection<? extends Entity> entities) {
 
         Integer x = checkError(source, entities);
@@ -96,14 +99,15 @@ public class FeathersCommands extends BaseCommand {
         for (Entity entity : entities) {
             if (entity instanceof ServerPlayer player) {
                 source.sendSuccess(() -> Component.literal(
-                        String.format("%s has a maximum of %d feathers",
-                                player.getName(),
-                                FeathersAPI.getPlayerMaxFeathers(player))),
+                                String.format("%s has a maximum of %d feathers",
+                                        player.getName(),
+                                        FeathersAPI.getPlayerMaxFeathers(player))),
                         true);
             }
         }
         return entities.size();
     }
+
     private int executeSetMaxFeathers(CommandSourceStack source, Collection<? extends Entity> entities, int amount) {
         Integer x = checkError(source, entities);
         if (x != null) return x;
@@ -111,7 +115,8 @@ public class FeathersCommands extends BaseCommand {
             if (entity instanceof ServerPlayer player) {
                 FeathersAPI.setMaxFeathers(player, amount);
                 source.sendSuccess(() -> Component.literal(
-                        String.format("Set maximum feathers to %d feathers for %s",FeathersAPI.getPlayerMaxFeathers(player),player.getName().getString())),true);
+                        String.format("Set maximum feathers to %d feathers for %s", FeathersAPI.getPlayerMaxFeathers(player), player.getName()
+                                                                                                                                    .getString())), true);
             }
         }
         return entities.size();
@@ -132,6 +137,7 @@ public class FeathersCommands extends BaseCommand {
                                                          DoubleArgumentType.getDouble(source, "amount"))
                                          )));
     }
+
     private int executeGetFeatherRegen(CommandSourceStack source, Collection<? extends Entity> entities) {
         Integer x = checkError(source, entities);
         for (Entity entity : entities) {
@@ -142,6 +148,7 @@ public class FeathersCommands extends BaseCommand {
         }
         return entities.size();
     }
+
     private int executeSetFeatherRegen(CommandSourceStack source, Collection<? extends Entity> entities, double amount) {
         Integer x = checkError(source, entities);
         if (x != null) return x;

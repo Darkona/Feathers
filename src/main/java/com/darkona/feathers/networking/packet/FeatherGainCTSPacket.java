@@ -20,10 +20,6 @@ public class FeatherGainCTSPacket {
         this.feathersToGain = buf.readInt();
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
-        buf.writeInt(feathersToGain);
-    }
-
     public static void handle(FeatherGainCTSPacket message, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         if (context.getDirection().getReceptionSide().isServer()) {
@@ -36,5 +32,9 @@ public class FeatherGainCTSPacket {
             });
         }
         context.setPacketHandled(true);
+    }
+
+    public void toBytes(FriendlyByteBuf buf) {
+        buf.writeInt(feathersToGain);
     }
 }
