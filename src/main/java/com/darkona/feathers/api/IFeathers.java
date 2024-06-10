@@ -5,7 +5,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.AutoRegisterCapability;
 
 import java.util.Map;
-import java.util.Optional;
 
 @AutoRegisterCapability
 public interface IFeathers {

@@ -1,7 +1,9 @@
 package com.darkona.feathers.config;
 
 import com.google.common.collect.Lists;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,7 @@ public class FeathersCommonConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> REGEN_FEATHERS_PER_SECOND;
     public static final ForgeConfigSpec.ConfigValue<Boolean> SLEEPING_ALWAYS_RESTORES_FEATHERS;
     public static final ForgeConfigSpec.ConfigValue<Integer> DEFAULT_USAGE_COOLDOWN;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> REGEN_USES_HUNGER;
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_COLD;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_HEAT;
@@ -63,6 +66,11 @@ public class FeathersCommonConfig {
                 .comment("How many ticks need to pass after using feathers for them to start regenerating again." +
                         "Value type: Integer.")
                 .define("default_usage_cooldown", 30);
+
+        REGEN_USES_HUNGER = BUILDER
+                .comment("Whether feather regeneration uses hunger. If enabled, the player will need to have a certain amount of hunger to regenerate feathers." +
+                        "Value type: Boolean.")
+                .define("regen_uses_hunger", false);
         BUILDER.pop();
 
         BUILDER.push("Effects");
@@ -129,6 +137,12 @@ public class FeathersCommonConfig {
                 .comment("Whether the Lightweight enchantment can be applied in an enchantment table, or if it is treasure only.")
                 .define("Enable Lightweight Enchantment in Table", true);
 
+        ForgeRegistries.ITEMS.forEach(i -> {
+            if (i.asItem() instanceof ArmorItem armor) {
+                int def = armor.getDefense();
+                FeathersCommonConfig.armorWeightBuilder.add(i.getDescriptionId() + ":" + def);
+            }
+        });
 
         ARMOR_WEIGHTS = BUILDER
                 .comment("How many half feathers each item weighs.")

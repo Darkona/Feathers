@@ -85,7 +85,9 @@ public class StrainEffect extends FeathersEffects {
             return "strain";
         }
     };
+
     private static final String MODIFIER_UUID = "735f6a64-a3f9-4a0b-bee8-51a243097c07";
+
     private static final double BASE_STRENGTH = 0.1D;
 
     public StrainEffect(MobEffectCategory p_19451_, int p_19452_) {

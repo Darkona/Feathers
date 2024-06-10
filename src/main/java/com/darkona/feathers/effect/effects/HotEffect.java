@@ -37,4 +37,5 @@ public class HotEffect extends FeathersEffects {
         return false;
     }
 
+
 }

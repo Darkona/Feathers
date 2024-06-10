@@ -2,8 +2,8 @@ package com.darkona.feathers.networking;
 
 import com.darkona.feathers.Feathers;
 import com.darkona.feathers.networking.packet.FeatherGainCTSPacket;
-import com.darkona.feathers.networking.packet.FeatherSpendCTSPacket;
 import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
+import com.darkona.feathers.networking.packet.FeatherSpendCTSPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;

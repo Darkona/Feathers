@@ -124,7 +124,7 @@ public class EffectsHandler implements ICapabilityPlugin {
         boolean isInHotBiome = player.level().getBiome(player.blockPosition()).get().getModifiedClimateSettings().temperature() > 0.45f ||
                 player.level().dimension().equals(Level.NETHER);
 
-        return isBurning || isInHotBiome;
+        return isBurning || (isInHotBiome && !player.isInPowderSnow && player.level().isDay() && !player.isInWaterOrRain());
     }
 
 

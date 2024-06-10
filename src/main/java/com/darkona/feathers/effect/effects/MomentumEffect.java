@@ -14,7 +14,7 @@ import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operati
 public class MomentumEffect extends FeathersEffects {
 
     public static final String MODIFIER_UUID = "d454fe2d-dbf1-4f6d-9a59-5c62f6dd430f";
-    public static final double BASE_STRENGTH = -0.5d;
+    public static final double BASE_STRENGTH = -1d;
 
     /**
      * Halves the amount of stamina used.

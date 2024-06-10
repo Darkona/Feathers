@@ -104,7 +104,7 @@ public class FeathersAPI {
 
         var result = new AtomicBoolean(false);
 
-        if (player.isCreative() || player.isSpectator()) return true;
+        if (player.isCreative() || player.isSpectator() || !player.isAddedToWorld() || !player.isAlive()) return true;
 
         player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
 

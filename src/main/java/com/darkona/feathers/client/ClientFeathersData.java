@@ -22,6 +22,7 @@ public class ClientFeathersData {
 
     //Use singleton for sanity
     private static ClientFeathersData instance;
+
     private int stamina = 2000;
     private int feathers = 0;
     private int maxStamina = 2000;

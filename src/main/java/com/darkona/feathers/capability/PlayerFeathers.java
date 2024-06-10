@@ -47,7 +47,6 @@ public class PlayerFeathers implements IFeathers {
 
     private Map<String, Double> counters = new HashMap<>();
 
-
     private Map<String, IModifier> staminaDeltaModifiers = new HashMap<>();
     private List<IModifier> staminaDeltaModifierList = new ArrayList<>();
 
@@ -310,7 +309,7 @@ public class PlayerFeathers implements IFeathers {
             doStaminaChange(player);
         }
 
-        if(player.tickCount % 10 == 0){
+        if(player.tickCount % 20 == 0){
             FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(this), player);
         }
     }

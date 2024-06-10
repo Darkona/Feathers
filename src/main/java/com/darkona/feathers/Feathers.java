@@ -12,7 +12,6 @@ import com.darkona.feathers.effect.EffectsHandler;
 import com.darkona.feathers.effect.FeathersEffects;
 import com.darkona.feathers.enchantment.FeathersEnchantments;
 import com.darkona.feathers.networking.FeathersMessages;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.alchemy.Potions;
@@ -25,7 +24,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -68,6 +66,7 @@ public class Feathers {
         MinecraftForge.EVENT_BUS.register(this);
 
         FeathersManager.registerPlugin(EffectsHandler.getInstance());
+
         if (THIRST_LOADED) {
             FeathersManager.registerPlugin(ThirstManager.getInstance());
         }
@@ -83,13 +82,6 @@ public class Feathers {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         event.enqueueWork(FeathersMessages::register);
         registerBrewingRecipes();
-
-        ForgeRegistries.ITEMS.forEach(i -> {
-            if (i.asItem() instanceof ArmorItem armor) {
-                int def = armor.getDefense();
-                FeathersCommonConfig.armorWeightBuilder.add(i.getDescriptionId() + ":" + def);
-            }
-        });
     }
 
     private void registerBrewingRecipes() {
