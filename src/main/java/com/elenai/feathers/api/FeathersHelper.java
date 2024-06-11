@@ -18,7 +18,9 @@ public class FeathersHelper {
     public static boolean spendFeathers(int amount, int cooldown) {
         var player = Minecraft.getInstance().player;
         if (player == null) return false;
-        return FeathersAPI.spendFeathers(player, amount, cooldown);
+        boolean could = FeathersAPI.spendFeathers(player, amount, cooldown);
+        FeathersAPI.spendFeathersRequest(player, amount, cooldown);
+        return could;
     }
 
 }

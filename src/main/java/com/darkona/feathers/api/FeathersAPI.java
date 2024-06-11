@@ -4,12 +4,15 @@ import com.darkona.feathers.attributes.FeathersAttributes;
 import com.darkona.feathers.capability.Capabilities;
 import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.effect.FeathersEffects;
+import com.darkona.feathers.effect.effects.StrainEffect;
 import com.darkona.feathers.enchantment.FeathersEnchantments;
 import com.darkona.feathers.event.FeatherEvent;
 import com.darkona.feathers.networking.FeathersMessages;
 import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
 import com.darkona.feathers.networking.packet.FeatherSpendCTSPacket;
 import com.darkona.feathers.util.Calculations;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
@@ -30,6 +33,14 @@ public class FeathersAPI {
     }
 
     public static int getAvailableFeathers(Player player) {
+        if (isStrained(player)) {
+            var total = new AtomicInteger(0);
+            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+                int strain = FeathersCommonConfig.MAX_STRAIN.get() - (int) Math.ceil(f.getCounter(StrainEffect.STRAIN_COUNTER));
+                total.set(Math.max(strain, 0));
+            });
+            return total.get();
+        }
         return player.getCapability(Capabilities.PLAYER_FEATHERS).map(IFeathers::getAvailableFeathers)
                      .orElse(0);
     }
@@ -121,8 +132,6 @@ public class FeathersAPI {
 
                 if (result.get() && !player.level().isClientSide) {
                     FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-                } else {
-                    FeathersMessages.sendToServer(new FeatherSpendCTSPacket(amount, cooldown));
                 }
             }
         });
@@ -130,6 +139,11 @@ public class FeathersAPI {
         return result.get();
     }
 
+    public static void spendFeathersRequest(LocalPlayer player, int amount, int cooldown){
+        if (player.level().isClientSide) {
+            FeathersMessages.sendToServer(new FeatherSpendCTSPacket(amount, cooldown));
+        }
+    }
     public static int getPlayerWeight(Player player) {
         if (!FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
             return 0;
