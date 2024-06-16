@@ -1,12 +1,14 @@
 package com.darkona.feathers.api;
 
+import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.capabilities.AutoRegisterCapability;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
-@AutoRegisterCapability
+
 public interface IFeathers {
 
 
@@ -100,4 +102,7 @@ public interface IFeathers {
     int getPrevFeathers();
 
     int getPrevStamina();
+
+    void updateInClient(FeatherSTCSyncPacket message, Supplier<NetworkEvent.Context> contextSupplier);
+
 }

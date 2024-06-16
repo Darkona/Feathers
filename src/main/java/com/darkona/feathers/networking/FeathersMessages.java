@@ -1,6 +1,7 @@
 package com.darkona.feathers.networking;
 
 import com.darkona.feathers.Feathers;
+import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.networking.packet.FeatherGainCTSPacket;
 import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
 import com.darkona.feathers.networking.packet.FeatherSpendCTSPacket;
@@ -55,7 +56,12 @@ public class FeathersMessages {
     }
 
     public static <MSG> void sendToPlayer(MSG message, Player player) {
-        if (player instanceof ServerPlayer p)
-            INSTANCE.send(PacketDistributor.PLAYER.with(() -> p), message);
+        if (player instanceof ServerPlayer p && !player.level().isClientSide) {
+            if (FeathersCommonConfig.DEBUG_MODE.get()) {
+                Feathers.logger.info("Sending synchronization packet to client");
+                INSTANCE.send(PacketDistributor.PLAYER.with(() -> p), message);
+            }
+        }
+
     }
 }

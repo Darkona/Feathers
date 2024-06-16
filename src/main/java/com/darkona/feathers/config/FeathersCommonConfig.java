@@ -21,15 +21,21 @@ public class FeathersCommonConfig {
     public static final ForgeConfigSpec.ConfigValue<Boolean> SLEEPING_ALWAYS_RESTORES_FEATHERS;
     public static final ForgeConfigSpec.ConfigValue<Integer> DEFAULT_USAGE_COOLDOWN;
     public static final ForgeConfigSpec.ConfigValue<Boolean> REGEN_USES_HUNGER;
+    public static final ForgeConfigSpec.ConfigValue<Integer> MAX_COOLDOWN;
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_COLD;
+    public static final ForgeConfigSpec.ConfigValue<Double> COLD_TEMPERATURE;
+
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_HEAT;
+    public static final ForgeConfigSpec.ConfigValue<Double> HOT_TEMPERATURE;
+
     public static final ForgeConfigSpec.ConfigValue<Integer> EFFECT_LINGER;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_ENDURANCE;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_STRAIN;
     public static final ForgeConfigSpec.ConfigValue<Integer> MAX_STRAIN;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_MOMENTUM;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_FATIGUE;
+
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_ARMOR_WEIGHTS;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ARMOR_WEIGHTS;
@@ -71,6 +77,12 @@ public class FeathersCommonConfig {
                 .comment("Whether feather regeneration uses hunger. If enabled, the player will need to have a certain amount of hunger to regenerate feathers." +
                         "Value type: Boolean.")
                 .define("regen_uses_hunger", false);
+
+        MAX_COOLDOWN = BUILDER
+                .comment("Maximum cooldown the player can have. This is the maximum amount of time in seconds the player has to wait before feathers start regenerating again." +
+                        "Value type: Integer.")
+                .define("max_cooldown", 5);
+
         BUILDER.pop();
 
         BUILDER.push("Effects");
@@ -81,12 +93,24 @@ public class FeathersCommonConfig {
                         "Value type: Boolean (Valid values are true and false.)")
                 .define("effect_cold_enabled", true);
 
+        COLD_TEMPERATURE = BUILDER
+                .comment("Temperature at which the Cold Effect is applied." +
+                        "Cold biomes begin at temperature 0.05 and below, down to -0.7" +
+                        "Value type: Double (Numbers with decimals.)")
+                .define("cold_temperature", -0.3);
+
         ENABLE_HEAT = BUILDER
                 .comment("Enable the Heat Effect. This effect doubles the feather usage when its active." +
                         "While the player is in a too hot environment, or burning, or in lava, the effect will be applied." +
                         "Fire resistance will negate this effect." +
                         "Value type: Boolean.")
                 .define("effect_hot_enabled", true);
+
+        HOT_TEMPERATURE = BUILDER
+                .comment("Temperature at which the Heat Effect is applied." +
+                        "The hottest biomes are at temperature 0.95 (Jungle) and above. up to 2.0" +
+                        "Value type: Double (Numbers with decimals.)")
+                .define("hot_temperature", 1.8);
 
         EFFECT_LINGER = BUILDER
                 .comment("How long do the Cold and the Heat Effect linger after the player is no longer under the circumstances that provoke them." +

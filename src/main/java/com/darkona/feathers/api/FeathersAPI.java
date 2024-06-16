@@ -130,7 +130,7 @@ public class FeathersAPI {
                 MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, f));
                 result.set(used);
 
-                if (result.get() && !player.level().isClientSide) {
+                if (result.get() && player instanceof ServerPlayer) {
                     FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
                 }
             }
@@ -139,11 +139,17 @@ public class FeathersAPI {
         return result.get();
     }
 
-    public static void spendFeathersRequest(LocalPlayer player, int amount, int cooldown){
+    public static void spendFeathersRequest(LocalPlayer player, int amount, int cooldown) {
         if (player.level().isClientSide) {
             FeathersMessages.sendToServer(new FeatherSpendCTSPacket(amount, cooldown));
         }
     }
+
+    public static boolean canSpendFeathers(Player player, int amount) {
+
+        return getAvailableFeathers(player) >= amount;
+    }
+
     public static int getPlayerWeight(Player player) {
         if (!FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
             return 0;

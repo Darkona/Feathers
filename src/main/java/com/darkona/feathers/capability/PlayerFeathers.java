@@ -5,6 +5,7 @@ import com.darkona.feathers.api.Constants;
 import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.IFeathers;
 import com.darkona.feathers.api.IModifier;
+import com.darkona.feathers.client.ClientFeathersData;
 import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.effect.effects.StrainEffect;
 import com.darkona.feathers.event.FeatherAmountEvent;
@@ -15,14 +16,17 @@ import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 @Getter
 @Setter
@@ -140,6 +144,21 @@ public class PlayerFeathers implements IFeathers {
 
     public void multiplyCounterBy(String name, double amount) {
         counters.computeIfPresent(name, (k, v) -> v * amount);
+    }
+
+    @Override
+    public void updateInClient(FeatherSTCSyncPacket message, Supplier<NetworkEvent.Context> contextSupplier) {
+        assert Minecraft.getInstance().level != null;
+        if (Minecraft.getInstance().level.isClientSide) {
+            this.stamina = message.stamina;
+            this.maxStamina = message.maxStamina;
+            this.feathers = message.feathers;
+            this.staminaDelta = message.staminaDelta;
+            this.cooldown = message.cooldown;
+            this.weight = message.weight;
+            message.counters.forEach(this::setCounter);
+            ClientFeathersData.getInstance().update(message, contextSupplier);
+        }
     }
 
     /* Markers */
@@ -275,10 +294,10 @@ public class PlayerFeathers implements IFeathers {
 
         if (approve.get()) {
             if (FeathersCommonConfig.DEBUG_MODE.get() && !player.level().isClientSide) {
-                Feathers.logger.info("After modifiers will use {} stamina.", staminaToUse);
+                Feathers.logger.info("Using {} stamina.", staminaToUse);
             }
             subtractStamina(staminaToUse.get());
-            this.cooldown += cooldown;
+            this.cooldown = Math.min(cooldown + this.cooldown, FeathersCommonConfig.MAX_COOLDOWN.get() * 20);
             synchronizeFeathers();
         }
 
@@ -308,11 +327,10 @@ public class PlayerFeathers implements IFeathers {
         if (--cooldown <= 0) {
             cooldown = 0;
             doStaminaChange(player);
+        } else if (FeathersCommonConfig.DEBUG_MODE.get() && !player.level().isClientSide) {
+            Feathers.logger.info("In cooldown: {}", cooldown);
         }
 
-        if (player.tickCount % 20 == 0) {
-            FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(this), player);
-        }
     }
 
     private void calculateStaminaDelta(Player player) {
@@ -359,6 +377,7 @@ public class PlayerFeathers implements IFeathers {
             if (FeathersCommonConfig.DEBUG_MODE.get() && player.level().isClientSide) {
                 Feathers.logger.info("Feathers: {}", feathers);
             }
+            FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(this), player);
         }
         prevFeathers = feathers;
         prevStamina = stamina;

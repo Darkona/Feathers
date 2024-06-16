@@ -88,8 +88,8 @@ public class EffectsHandler implements ICapabilityPlugin {
         boolean isExposedToWeather = player.level().isRaining() && player.level().isRainingAt(player.blockPosition()) &&
                 player.level().canSeeSky(player.blockPosition());
 
-        boolean isInColdBiome = player.level().getBiome(player.blockPosition()).get().coldEnoughToSnow(player.blockPosition());
-
+        boolean isInColdBiome = player.level().getBiome(player.blockPosition()).get().coldEnoughToSnow(player.blockPosition()) ||
+                player.level().getBiome(player.blockPosition()).get().getModifiedClimateSettings().temperature() < FeathersCommonConfig.COLD_TEMPERATURE.get();
         return (isInColdBiome && isExposedToWeather) || player.isFreezing();
     }
 
@@ -121,10 +121,18 @@ public class EffectsHandler implements ICapabilityPlugin {
             return ColdSweatManager.isOverheating(player) || isBurning;
         }
 
-        boolean isInHotBiome = player.level().getBiome(player.blockPosition()).get().getModifiedClimateSettings().temperature() > 0.45f ||
+        boolean isInHotBiome = player.level().getBiome(player.blockPosition()).get().getModifiedClimateSettings().temperature()
+                >= FeathersCommonConfig.HOT_TEMPERATURE.get() ||
                 player.level().dimension().equals(Level.NETHER);
 
-        return isBurning || (isInHotBiome && !player.isInPowderSnow && player.level().isDay() && !player.isInWaterOrRain());
+        boolean isUnderTheSun = player.level().isDay()
+                && player.level().canSeeSky(player.blockPosition());
+
+        return isBurning ||
+                (isInHotBiome
+                        && !player.isInPowderSnow
+                        && isUnderTheSun
+                        && !player.isInWaterOrRain());
     }
 
 

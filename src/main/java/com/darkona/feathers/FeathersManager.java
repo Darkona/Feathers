@@ -19,10 +19,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
@@ -42,7 +41,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mod.EventBusSubscriber(modid = Feathers.MODID)
+@Mod.EventBusSubscriber
 public class FeathersManager {
 
     private static final String THIRST_COUNTER = "thirst";
@@ -69,9 +68,9 @@ public class FeathersManager {
     }
 
     @NotNull
-    private static ICapabilityProvider getProvider() {
-        final Capability<com.darkona.feathers.api.IFeathers> capability = Capabilities.PLAYER_FEATHERS;
-        return new ICapabilitySerializable<CompoundTag>() {
+    private static ICapabilitySerializable<CompoundTag> getProvider() {
+        final Capability<IFeathers> capability = Capabilities.PLAYER_FEATHERS;
+        return new ICapabilitySerializable<>() {
 
             final IFeathers feathersCapability = new PlayerFeathers();
             final LazyOptional<IFeathers> capOptional = LazyOptional.of(() -> feathersCapability);
@@ -95,27 +94,56 @@ public class FeathersManager {
     public static void onPlayerCloned(PlayerEvent.Clone event) {
         if (!event.isWasDeath() && !event.getEntity().level().isClientSide) {
             Player oldPlayer = event.getOriginal();
+            Player newPlayer = event.getEntity();
             oldPlayer.reviveCaps();
 
             event.getOriginal().getCapability(Capabilities.PLAYER_FEATHERS)
-                 .ifPresent(oldStore -> event.getOriginal().getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(newStore -> newStore.copyFrom(oldStore)));
+                 .ifPresent(oldStore -> newPlayer.getCapability(Capabilities.PLAYER_FEATHERS)
+                                             .ifPresent(newStore -> {
+                              newStore.copyFrom(oldStore);
+                              FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(newStore), newPlayer);
+                          }));
 
             oldPlayer.invalidateCaps();
+
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
+
+        if (event.getEntity() instanceof ServerPlayer player) {
+            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+                f.setStamina(f.getMaxStamina());
+                f.setStrainFeathers(0);
+                FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
+            });
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            player.getCapability(Capabilities.PLAYER_FEATHERS)
+                  .ifPresent(f -> FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player));
         }
     }
 
     @SubscribeEvent
     public static void onPlayerJoinWorld(EntityJoinLevelEvent event) {
-        Level level = event.getLevel();
-
-        if (event.getEntity() instanceof Player player) {
+        if (event.getEntity() instanceof ServerPlayer player) {
 
             assignFeathersAttributes(player);
 
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
-                f.markDirty();
-                FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-            });
+            player.getCapability(Capabilities.PLAYER_FEATHERS)
+                  .ifPresent(f -> FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player));
 
             plugins.forEach(p -> p.onPlayerJoin(event));
         }
@@ -138,8 +166,9 @@ public class FeathersManager {
 
     @SubscribeEvent
     public static void onPlayerChangeArmor(LivingEquipmentChangeEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player && event.getSlot().getType() == EquipmentSlot.Type.ARMOR) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player));
+        if (event.getEntity() instanceof Player player && event.getSlot().getType() == EquipmentSlot.Type.ARMOR) {
+            player.getCapability(Capabilities.PLAYER_FEATHERS)
+                  .ifPresent(f -> FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player));
         }
     }
 
@@ -197,6 +226,11 @@ public class FeathersManager {
 
             });
         }
+    }
+
+    @SubscribeEvent
+    public void registerCaps(RegisterCapabilitiesEvent event) {
+        event.register(IFeathers.class);
     }
 
 }
