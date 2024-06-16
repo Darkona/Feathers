@@ -4,7 +4,7 @@ import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.ICapabilityPlugin;
 import com.darkona.feathers.api.IFeathers;
 import com.darkona.feathers.attributes.FeathersAttributes;
-import com.darkona.feathers.capability.Capabilities;
+import com.darkona.feathers.capability.FeathersCapabilities;
 import com.darkona.feathers.capability.PlayerFeathers;
 import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.effect.FeathersEffects;
@@ -61,7 +61,7 @@ public class FeathersManager {
     @SubscribeEvent
     public static void attachCapabilityToEntity(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof Player player) {
-            if (!event.getObject().getCapability(Capabilities.PLAYER_FEATHERS).isPresent()) {
+            if (!event.getObject().getCapability(FeathersCapabilities.PLAYER_FEATHERS).isPresent()) {
                 event.addCapability(new ResourceLocation(Feathers.MODID, "properties"), getProvider());
             }
         }
@@ -69,7 +69,7 @@ public class FeathersManager {
 
     @NotNull
     private static ICapabilitySerializable<CompoundTag> getProvider() {
-        final Capability<IFeathers> capability = Capabilities.PLAYER_FEATHERS;
+        final Capability<IFeathers> capability = FeathersCapabilities.PLAYER_FEATHERS;
         return new ICapabilitySerializable<>() {
 
             final IFeathers feathersCapability = new PlayerFeathers();
@@ -97,8 +97,8 @@ public class FeathersManager {
             Player newPlayer = event.getEntity();
             oldPlayer.reviveCaps();
 
-            event.getOriginal().getCapability(Capabilities.PLAYER_FEATHERS)
-                 .ifPresent(oldStore -> newPlayer.getCapability(Capabilities.PLAYER_FEATHERS)
+            event.getOriginal().getCapability(FeathersCapabilities.PLAYER_FEATHERS)
+                 .ifPresent(oldStore -> newPlayer.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
                                              .ifPresent(newStore -> {
                               newStore.copyFrom(oldStore);
                               FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(newStore), newPlayer);
@@ -112,7 +112,7 @@ public class FeathersManager {
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player));
+            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player));
         }
     }
 
@@ -120,7 +120,7 @@ public class FeathersManager {
     public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
 
         if (event.getEntity() instanceof ServerPlayer player) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> {
                 f.setStamina(f.getMaxStamina());
                 f.setStrainFeathers(0);
                 FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
@@ -131,7 +131,7 @@ public class FeathersManager {
     @SubscribeEvent
     public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS)
+            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
                   .ifPresent(f -> FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player));
         }
     }
@@ -142,7 +142,7 @@ public class FeathersManager {
 
             assignFeathersAttributes(player);
 
-            player.getCapability(Capabilities.PLAYER_FEATHERS)
+            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
                   .ifPresent(f -> FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player));
 
             plugins.forEach(p -> p.onPlayerJoin(event));
@@ -154,7 +154,7 @@ public class FeathersManager {
         if (!FeathersCommonConfig.SLEEPING_ALWAYS_RESTORES_FEATHERS.get()) return;
 
         if (event.getEntity() instanceof ServerPlayer player) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> {
 
                 f.setStamina(f.getMaxStamina());
                 f.setStrainFeathers(0);
@@ -167,7 +167,7 @@ public class FeathersManager {
     @SubscribeEvent
     public static void onPlayerChangeArmor(LivingEquipmentChangeEvent event) {
         if (event.getEntity() instanceof Player player && event.getSlot().getType() == EquipmentSlot.Type.ARMOR) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS)
+            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
                   .ifPresent(f -> FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player));
         }
     }
@@ -200,7 +200,7 @@ public class FeathersManager {
 
         plugins.forEach(p -> p.onPlayerTickBefore(event));
 
-        player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> f.tick(player));
+        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> f.tick(player));
 
         plugins.forEach(p -> p.onPlayerTickAfter(event));
 
@@ -208,7 +208,7 @@ public class FeathersManager {
     }
 
     private static void checkEffects(Player player) {
-        player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> {
             if (FeathersAPI.isEnduring(player) && f.getCounter(EnduranceEffect.ENDURANCE_COUNTER) == 0) {
                 player.removeEffect(FeathersEffects.ENDURANCE.get());
             }
@@ -219,7 +219,7 @@ public class FeathersManager {
     public static void onPlayerWearArmor(LivingEquipmentChangeEvent event) {
         if (event.getEntity() instanceof Player player &&
                 event.getSlot().getType() == EquipmentSlot.Type.ARMOR) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> {
 
                 f.setWeight(FeathersAPI.getPlayerWeight(player));
                 FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);

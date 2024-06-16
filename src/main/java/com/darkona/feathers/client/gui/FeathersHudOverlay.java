@@ -2,8 +2,10 @@ package com.darkona.feathers.client.gui;
 
 import com.darkona.feathers.Feathers;
 import com.darkona.feathers.api.Constants;
+import com.darkona.feathers.api.IModifier;
 import com.darkona.feathers.client.ClientFeathersData;
 import com.darkona.feathers.config.FeathersClientConfig;
+import com.darkona.feathers.config.FeathersCommonConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fuzs.overflowingbars.client.handler.RowCountRenderer;
 import net.minecraft.client.Minecraft;
@@ -13,6 +15,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+
+import java.util.Map;
 
 import static com.darkona.feathers.client.gui.Icons.*;
 
@@ -103,6 +107,36 @@ public class FeathersHudOverlay {
                     clientData.getFeathers(), true, Minecraft.getInstance().font);
         }
 
+
+        if (FeathersCommonConfig.DEBUG_MODE.get()) {
+            byte l = 1;
+            var debugInfo = "Debug ON:Feathers: " + clientData.getFeathers() + " / " + clientData.getMaxFeathers() +
+                    " | Stamina: " + clientData.getStamina() + " / " + clientData.getMaxStamina();
+
+            guiGraphics.drawString(Minecraft.getInstance().font, debugInfo, 0, l+=10, 0xFFFFFF);
+            debugInfo = "Cooldown: " + clientData.getCooldown() + " | Weight: " + clientData.getWeight();
+            guiGraphics.drawString(Minecraft.getInstance().font, debugInfo, 0, l+=10, 0xFFFFFF);
+            if (clientData.isStrained()){
+                debugInfo = "Strained Feathers: " + clientData.getStrainFeathers() + " / " + FeathersCommonConfig.MAX_STRAIN.get();
+                guiGraphics.drawString(Minecraft.getInstance().font, debugInfo, 0, l+=10, 0x991212);
+            }
+            debugInfo = "Stamina Delta: " + clientData.getStaminaDelta();
+            guiGraphics.drawString(Minecraft.getInstance().font, debugInfo, 0, l+=10, 0xAAAA00);
+            if(FeathersCommonConfig.EXTENDED_LOGGING.get()){
+                guiGraphics.drawString(Minecraft.getInstance().font, "Delta Modifiers:", 0, l += 10, 0xFFFFFF);
+                for (Map.Entry<String, IModifier> entry : clientData.getDeltaMods().entrySet()) {
+                    String n = entry.getKey();
+                    IModifier m = entry.getValue();
+                    guiGraphics.drawString(Minecraft.getInstance().font, "Modifier: " + m.getName() + " | Order: " + m.getDeltaOrdinal(), 5, l += 10, 0x00FFFF);
+                }
+                guiGraphics.drawString(Minecraft.getInstance().font, "Usage Modifiers: " , 0, l += 10, 0xFFFFFF);
+                for (Map.Entry<String, IModifier> entry : clientData.getUsageMods().entrySet()) {
+                    String n = entry.getKey();
+                    IModifier m = entry.getValue();
+                    guiGraphics.drawString(Minecraft.getInstance().font, "Modifier: " + m.getName() + " | Order: " + m.getDeltaOrdinal(), 5, l += 10, 0x00FFFF);
+                }
+            }
+        }
         RenderSystem.disableBlend();
     };
 
@@ -193,6 +227,8 @@ public class FeathersHudOverlay {
 
         }
         return lines;
+
+
     }
 
     private static void energizedK() {

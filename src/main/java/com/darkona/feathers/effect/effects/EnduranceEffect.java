@@ -3,7 +3,7 @@ package com.darkona.feathers.effect.effects;
 import com.darkona.feathers.api.Constants;
 import com.darkona.feathers.api.IModifier;
 import com.darkona.feathers.api.StaminaAPI;
-import com.darkona.feathers.capability.Capabilities;
+import com.darkona.feathers.capability.FeathersCapabilities;
 import com.darkona.feathers.capability.PlayerFeathers;
 import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.effect.FeathersEffects;
@@ -100,7 +100,7 @@ public class EnduranceEffect extends FeathersEffects {
     }
 
     public void applyEffect(LivingEntity entity, MobEffectInstance effect) {
-        entity.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+        entity.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> {
             f.setCounter(EnduranceEffect.ENDURANCE_COUNTER, (effect.getAmplifier() + 1) * 8);
             StaminaAPI.addStaminaUsageModifier((Player) entity, EnduranceEffect.ENDURANCE);
         });
@@ -108,7 +108,7 @@ public class EnduranceEffect extends FeathersEffects {
     }
 
     public void removeEffect(LivingEntity entity, MobEffectInstance effectInstance) {
-        entity.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+        entity.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> {
             f.removeCounter(EnduranceEffect.ENDURANCE_COUNTER);
             StaminaAPI.removeStaminaUsageModifier((Player) entity, EnduranceEffect.ENDURANCE);
         });

@@ -1,7 +1,7 @@
 package com.darkona.feathers.effect.effects;
 
 import com.darkona.feathers.api.IFeathers;
-import com.darkona.feathers.capability.Capabilities;
+import com.darkona.feathers.capability.FeathersCapabilities;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
@@ -23,14 +23,14 @@ public class EnergizedEffect extends MobEffect {
 
     @Override
     public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        target.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(IFeathers::isDirty);
+        target.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(IFeathers::isDirty);
         super.addAttributeModifiers(target, map, strength);
     }
 
     @Override
     public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
         super.removeAttributeModifiers(target, map, strength);
-        target.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(IFeathers::isDirty);
+        target.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(IFeathers::isDirty);
 
     }
 

@@ -1,7 +1,7 @@
 package com.darkona.feathers.api;
 
 import com.darkona.feathers.attributes.FeathersAttributes;
-import com.darkona.feathers.capability.Capabilities;
+import com.darkona.feathers.capability.FeathersCapabilities;
 import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.effect.FeathersEffects;
 import com.darkona.feathers.effect.effects.StrainEffect;
@@ -28,20 +28,20 @@ import static net.minecraftforge.eventbus.api.Event.Result.DEFAULT;
 public class FeathersAPI {
 
     public static int getFeathers(Player player) {
-        return player.getCapability(Capabilities.PLAYER_FEATHERS).map(IFeathers::getFeathers)
+        return player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).map(IFeathers::getFeathers)
                      .orElse(0);
     }
 
     public static int getAvailableFeathers(Player player) {
         if (isStrained(player)) {
             var total = new AtomicInteger(0);
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> {
                 int strain = FeathersCommonConfig.MAX_STRAIN.get() - (int) Math.ceil(f.getCounter(StrainEffect.STRAIN_COUNTER));
                 total.set(Math.max(strain, 0));
             });
             return total.get();
         }
-        return player.getCapability(Capabilities.PLAYER_FEATHERS).map(IFeathers::getAvailableFeathers)
+        return player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).map(IFeathers::getAvailableFeathers)
                      .orElse(0);
     }
 
@@ -54,7 +54,7 @@ public class FeathersAPI {
      */
     public static int setFeathers(Player player, int amount) {
         AtomicInteger result = new AtomicInteger(0);
-        player.getCapability(Capabilities.PLAYER_FEATHERS)
+        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.setStamina(amount * 10);
                   FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
@@ -68,7 +68,7 @@ public class FeathersAPI {
             player.getAttribute(FeathersAttributes.MAX_FEATHERS.get())
                   .setBaseValue(amount * Constants.STAMINA_PER_FEATHER);
         }
-        player.getCapability(Capabilities.PLAYER_FEATHERS)
+        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   f.setMaxStamina((int) player.getAttribute(FeathersAttributes.MAX_FEATHERS.get()).getValue());
                   FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
@@ -85,7 +85,7 @@ public class FeathersAPI {
      */
     public static boolean gainFeathers(Player player, int amount) {
         var result = new AtomicBoolean(false);
-        player.getCapability(Capabilities.PLAYER_FEATHERS)
+        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
               .ifPresent(f -> {
                   var gainEvent = new FeatherEvent.Gain(player, amount);
                   boolean cancelled = MinecraftForge.EVENT_BUS.post(gainEvent);
@@ -117,7 +117,7 @@ public class FeathersAPI {
 
         if (player.isCreative() || player.isSpectator() || !player.isAddedToWorld() || !player.isAlive()) return true;
 
-        player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> {
 
             var useFeatherEvent = new FeatherEvent.Use(player, amount);
             boolean cancelled = MinecraftForge.EVENT_BUS.post(useFeatherEvent);
@@ -137,6 +137,11 @@ public class FeathersAPI {
         });
 
         return result.get();
+    }
+
+    public static void syncToClient(Player player) {
+        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
+              .ifPresent(f -> FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player));
     }
 
     public static void spendFeathersRequest(LocalPlayer player, int amount, int cooldown) {
@@ -173,12 +178,12 @@ public class FeathersAPI {
     }
 
     public static void setCooldown(Player player, int cooldownTicks) {
-        player.getCapability(Capabilities.PLAYER_FEATHERS)
+        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
               .ifPresent(f -> f.setCooldown(cooldownTicks));
     }
 
     public static int getCooldown(Player player) {
-        return player.getCapability(Capabilities.PLAYER_FEATHERS)
+        return player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
                      .map(IFeathers::getCooldown).orElse(0);
     }
 

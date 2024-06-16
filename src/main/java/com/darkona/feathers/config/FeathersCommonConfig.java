@@ -15,6 +15,7 @@ public class FeathersCommonConfig {
     public static final ForgeConfigSpec SPEC;
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> DEBUG_MODE;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> EXTENDED_LOGGING;
 
     public static final ForgeConfigSpec.ConfigValue<Integer> MAX_FEATHERS;
     public static final ForgeConfigSpec.ConfigValue<Double> REGEN_FEATHERS_PER_SECOND;
@@ -47,11 +48,6 @@ public class FeathersCommonConfig {
     static {
 
         BUILDER.push("General");
-
-        DEBUG_MODE = BUILDER
-                .comment("Whether debug mode is enabled. This will print debug messages to the console. Useful only for developers or to submit issues. " +
-                        "Will vomit a log of spam to the logs so don't enable this unless you know what you're doing.")
-                .define("Debug Mode", false);
 
         MAX_FEATHERS = BUILDER.comment("Maximum Feathers the player can have. Every two feathers is a full icon, just like hearts." +
                                       "By default, 20 feathers means a full row of ten feathers." +
@@ -174,6 +170,20 @@ public class FeathersCommonConfig {
 
         BUILDER.pop();
 
+        BUILDER.push("Debugging");
+
+
+        DEBUG_MODE = BUILDER
+                .comment("Whether debug mode is enabled. This will print debug messages to the console. Useful only for developers or to submit issues. " +
+                        "Will vomit a log of spam to the logs so don't enable this unless you know what you're doing.")
+                .define("Debug Mode", false);
+
+        EXTENDED_LOGGING = BUILDER
+                .comment("Whether extended logging is enabled. This will print more detailed logs to the console. Useful for debugging issues." +
+                        "Value type: Boolean.")
+                .define("Extended Logging", false);
+
+        BUILDER.pop();
         SPEC = BUILDER.build();
     }
 }

@@ -4,7 +4,7 @@ import com.darkona.feathers.Feathers;
 import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.ICapabilityPlugin;
 import com.darkona.feathers.api.IFeathers;
-import com.darkona.feathers.capability.Capabilities;
+import com.darkona.feathers.capability.FeathersCapabilities;
 import com.darkona.feathers.compatibility.coldsweat.ColdSweatManager;
 import com.darkona.feathers.compatibility.coldsweat.FeathersColdSweatConfig;
 import com.darkona.feathers.config.FeathersCommonConfig;
@@ -150,7 +150,7 @@ public class EffectsHandler implements ICapabilityPlugin {
     @Override
     public void onPlayerTickAfter(TickEvent.PlayerTickEvent event) {
         if (event.player.level().isClientSide()) return;
-        event.player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> checkStrain(event.player, f));
+        event.player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> checkStrain(event.player, f));
     }
 
     @Override

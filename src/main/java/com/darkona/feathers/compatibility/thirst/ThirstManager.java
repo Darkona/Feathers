@@ -5,7 +5,7 @@ import com.darkona.feathers.api.Constants;
 import com.darkona.feathers.api.ICapabilityPlugin;
 import com.darkona.feathers.api.IFeathers;
 import com.darkona.feathers.attributes.FeathersAttributes;
-import com.darkona.feathers.capability.Capabilities;
+import com.darkona.feathers.capability.FeathersCapabilities;
 import com.darkona.feathers.event.StaminaChangeEvent;
 import dev.ghen.thirst.foundation.common.capability.IThirst;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -67,7 +67,7 @@ public class ThirstManager implements ICapabilityPlugin {
     @Override
     public void onPlayerJoin(EntityJoinLevelEvent event) {
         if (event.getEntity() instanceof Player player) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> {
                 f.setCounter(LAST_THIRST_LEVEL, 0);
                 f.setCounter(LAST_QUENCH_LEVEL, 0);
                 f.setCounter(THIRST_FEATHER_COUNTER, 0);
@@ -118,7 +118,7 @@ public class ThirstManager implements ICapabilityPlugin {
 
         if (!FeathersThirstConfig.isThirstOn()) return;
         if (!(event.player.tickCount % 20 == 0)) return;
-        event.player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> event.player.getCapability(PLAYER_THIRST).ifPresent(t -> {
+        event.player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> event.player.getCapability(PLAYER_THIRST).ifPresent(t -> {
 
             var lastThirst = f.getCounter(LAST_THIRST_LEVEL);
             var lastQuench = f.getCounter(LAST_QUENCH_LEVEL);

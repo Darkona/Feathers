@@ -3,7 +3,8 @@ package com.darkona.feathers.client;
 import com.darkona.feathers.api.Constants;
 import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.IFeathers;
-import com.darkona.feathers.capability.Capabilities;
+import com.darkona.feathers.api.IModifier;
+import com.darkona.feathers.capability.FeathersCapabilities;
 import com.darkona.feathers.config.FeathersClientConfig;
 import com.darkona.feathers.effect.effects.EnduranceEffect;
 import com.darkona.feathers.effect.effects.StrainEffect;
@@ -14,6 +15,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.NetworkEvent;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 @Setter
@@ -34,6 +37,7 @@ public class ClientFeathersData {
     private int animationCooldown = 0;
     private int fadeCooldown = 0;
     private int strainFeathers = 0;
+    private int cooldown = 0;
     private boolean hot = false;
     private boolean cold = false;
     private boolean energized = false;
@@ -41,6 +45,8 @@ public class ClientFeathersData {
     private boolean fatigued = false;
     private boolean endurance = false;
     private boolean strained = false;
+    private Map<String, IModifier> deltaMods = new HashMap<>();
+    private Map<String, IModifier> usageMods = new HashMap<>();
 
     private ClientFeathersData() {}
 
@@ -58,6 +64,9 @@ public class ClientFeathersData {
         maxFeathers = f.getMaxFeathers();
         staminaDelta = f.getStaminaDelta();
         weight = f.getWeight();
+        cooldown = f.getCooldown();
+        deltaMods = f.getStaminaDeltaModifiers();
+        usageMods = f.getStaminaUsageModifiers();
 
         synchronizeEffects(player);
 
@@ -68,7 +77,7 @@ public class ClientFeathersData {
     public void update(FeatherSTCSyncPacket message, Supplier<NetworkEvent.Context> supplier) {
         Player player = Minecraft.getInstance().player;
         if (player != null) {
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> {
+            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> {
                 update(player, f);
                 supplier.get().setPacketHandled(true);
             });
@@ -109,7 +118,7 @@ public class ClientFeathersData {
         var player = Minecraft.getInstance().player;
 
         if (player != null)
-            player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> update(player, f));
+            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> update(player, f));
 
         if (animationCooldown > 0) animationCooldown--;
 

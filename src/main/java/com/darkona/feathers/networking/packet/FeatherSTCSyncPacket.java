@@ -1,7 +1,7 @@
 package com.darkona.feathers.networking.packet;
 
 import com.darkona.feathers.api.IFeathers;
-import com.darkona.feathers.capability.Capabilities;
+import com.darkona.feathers.capability.FeathersCapabilities;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
@@ -60,7 +60,7 @@ public class FeatherSTCSyncPacket {
             context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
                 var player = Minecraft.getInstance().player;
                 if (player != null) {
-                    player.getCapability(Capabilities.PLAYER_FEATHERS).ifPresent(f -> f.updateInClient(message, contextSupplier));
+                    player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> f.updateInClient(message, contextSupplier));
                 }
             }));
         }
