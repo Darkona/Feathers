@@ -26,7 +26,7 @@ public class ArmorWeightAPI {
             try {
                 map.putIfAbsent(split[0], Integer.parseInt(split[1]));
             } catch (Exception e) {
-                Feathers.logger.warn(e + " error! Armor value not set as an integer.");
+                Feathers.logger.error("error! Armor value not set as an integer.", e);
             }
         });
     }

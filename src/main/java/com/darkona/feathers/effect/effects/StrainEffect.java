@@ -65,7 +65,7 @@ public class StrainEffect extends FeathersEffects {
                 approve.set(true);
                 staminaToUse.set(f.getAvailableStamina());
                 if (FeathersCommonConfig.DEBUG_MODE.get() && !player.level().isClientSide()) {
-                    Feathers.logger.info("Used " + staminaToUse.get() + " stamina, generated " + -use + " strain stamina.");
+                    Feathers.logger.info("Used {} stamina, generated {} strain stamina.",  staminaToUse.get(), -use);
                 }
             }
         }
