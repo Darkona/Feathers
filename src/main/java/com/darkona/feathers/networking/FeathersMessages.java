@@ -55,6 +55,7 @@ public class FeathersMessages {
                .encoder(FeatherSTCDebugPacket::toBytes)
                .consumerMainThread(FeatherSTCDebugPacket::handle)
                .add();
+
     }
 
     public static <MSG> void sendToServer(MSG message) {

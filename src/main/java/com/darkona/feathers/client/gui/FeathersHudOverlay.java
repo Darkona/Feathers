@@ -16,8 +16,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
-import java.util.Map;
-
 import static com.darkona.feathers.client.gui.Icons.*;
 
 @OnlyIn(Dist.CLIENT)
@@ -199,7 +197,6 @@ public class FeathersHudOverlay {
                     }
                 }
             }
-
         }
         return lines;
 
@@ -278,17 +275,15 @@ public class FeathersHudOverlay {
             debugInfo = "Stamina Delta: " + clientData.getStaminaDelta();
             guiGraphics.drawString(Minecraft.getInstance().font, debugInfo, 0, l += 10, 0xAAAA00);
             if (FeathersCommonConfig.EXTENDED_LOGGING.get()) {
+
                 guiGraphics.drawString(Minecraft.getInstance().font, "Delta Modifiers:", 0, l += 10, 0xFFFFFF);
-                for (Map.Entry<String, IModifier> entry : clientData.getDeltaMods().entrySet()) {
-                    String n = entry.getKey();
-                    IModifier m = entry.getValue();
-                    guiGraphics.drawString(Minecraft.getInstance().font, "Modifier: " + m.getName() + " | Order: " + m.getDeltaOrdinal(), 5, l += 10, 0x00FFFF);
+                for (IModifier m : clientData.getDeltaMods()) {
+                    guiGraphics.drawString(Minecraft.getInstance().font, "Modifier: " + m.getName() + " | Ordinal: " + m.getDeltaOrdinal(), 5, l += 10, 0x00FFFF);
                 }
+
                 guiGraphics.drawString(Minecraft.getInstance().font, "Usage Modifiers: ", 0, l += 10, 0xFFFFFF);
-                for (Map.Entry<String, IModifier> entry : clientData.getUsageMods().entrySet()) {
-                    String n = entry.getKey();
-                    IModifier m = entry.getValue();
-                    guiGraphics.drawString(Minecraft.getInstance().font, "Modifier: " + m.getName() + " | Order: " + m.getDeltaOrdinal(), 5, l += 10, 0x00FFFF);
+                for (IModifier m : clientData.getUsageMods()) {
+                    guiGraphics.drawString(Minecraft.getInstance().font, "Modifier: " + m.getName() + " | Ordinal: " + m.getUsageOrdinal(), 5, l += 10, 0x00FFFF);
                 }
 
                 if (clientData.isUsed() && clientData.fadeDebugUse > 0) {

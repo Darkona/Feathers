@@ -62,6 +62,4 @@ public class FeatherSTCDebugPacket {
         buf.writeBoolean(used);
         buf.writeBoolean(gained);
     }
-
-
 }

@@ -112,7 +112,8 @@ public class FeathersManager {
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player));
+            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
+                  .ifPresent(f -> FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player));
         }
     }
 

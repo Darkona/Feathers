@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.NetworkEvent;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -108,4 +109,7 @@ public interface IFeathers {
 
     void updateInClient(FeatherSTCSyncPacket message, Supplier<NetworkEvent.Context> contextSupplier);
 
+    List<IModifier> getStaminaDeltaModifierList();
+
+    List<IModifier> getFeatherUsageModifiersList();
 }

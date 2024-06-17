@@ -14,8 +14,7 @@ import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @Setter
 @Getter
@@ -45,8 +44,8 @@ public class ClientFeathersData {
     private boolean fatigued = false;
     private boolean endurance = false;
     private boolean strained = false;
-    private Map<String, IModifier> deltaMods = new HashMap<>();
-    private Map<String, IModifier> usageMods = new HashMap<>();
+    private List<IModifier> deltaMods;
+    private List<IModifier> usageMods;
     private int usedFeathers = 0;
     private int gainedFeathers = 0;
     private String reasonGain = "";
@@ -81,8 +80,8 @@ public class ClientFeathersData {
         staminaDelta = f.getStaminaDelta();
         weight = f.getWeight();
         cooldown = f.getCooldown();
-        deltaMods = f.getStaminaDeltaModifiers();
-        usageMods = f.getStaminaUsageModifiers();
+        deltaMods = f.getStaminaDeltaModifierList();
+        usageMods = f.getFeatherUsageModifiersList();
 
         synchronizeEffects(player);
 

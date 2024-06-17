@@ -275,8 +275,6 @@ public class PlayerFeathers implements IFeathers {
     @Override
     public boolean useFeathers(Player player, int feathers, int cooldown) {
 
-        if (staminaUsageModifiers.isEmpty()) attachDefaultUsageModifiers();
-
         if (FeathersCommonConfig.DEBUG_MODE.get() && !player.level().isClientSide) {
             Feathers.logger.info("Requested to use {} feathers.", feathers);
         }
@@ -325,7 +323,7 @@ public class PlayerFeathers implements IFeathers {
         if (cooldown <= 0) {
             cooldown = 0;
             doStaminaChange(player);
-        } else if (FeathersCommonConfig.DEBUG_MODE.get()) {
+        } else if (FeathersCommonConfig.EXTENDED_LOGGING.get()) {
             Feathers.logger.info("{} cooldown: {}", player.level().isClientSide ? "Clientside:" : "Serverside:", cooldown);
         }
 
