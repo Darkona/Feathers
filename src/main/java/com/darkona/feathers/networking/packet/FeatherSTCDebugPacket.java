@@ -19,14 +19,6 @@ public class FeatherSTCDebugPacket {
     private final boolean used;
     private final boolean gained;
 
-    public static FeatherSTCDebugPacket usedPacket(int usedFeathers, String reason){
-        return new FeatherSTCDebugPacket(usedFeathers, 0, reason, true, false);
-    }
-
-    public static FeatherSTCDebugPacket gainedPacket(int gainedFeathers, String reason){
-        return new FeatherSTCDebugPacket(0, gainedFeathers, reason, false, true);
-    }
-
     public FeatherSTCDebugPacket(int usedFeathers, int gainedFeathers, String reason, boolean used, boolean gained) {
         this.usedFeathers = usedFeathers;
         this.gainedFeathers = gainedFeathers;
@@ -43,12 +35,12 @@ public class FeatherSTCDebugPacket {
         gained = buf.readBoolean();
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
-        buf.writeInt(usedFeathers);
-        buf.writeInt(gainedFeathers);
-        buf.writeUtf(reason);
-        buf.writeBoolean(used);
-        buf.writeBoolean(gained);
+    public static FeatherSTCDebugPacket usedPacket(int usedFeathers, String reason) {
+        return new FeatherSTCDebugPacket(usedFeathers, 0, reason, true, false);
+    }
+
+    public static FeatherSTCDebugPacket gainedPacket(int gainedFeathers, String reason) {
+        return new FeatherSTCDebugPacket(0, gainedFeathers, reason, false, true);
     }
 
     public static void handle(FeatherSTCDebugPacket message, Supplier<NetworkEvent.Context> contextSupplier) {
@@ -63,6 +55,13 @@ public class FeatherSTCDebugPacket {
         }
     }
 
+    public void toBytes(FriendlyByteBuf buf) {
+        buf.writeInt(usedFeathers);
+        buf.writeInt(gainedFeathers);
+        buf.writeUtf(reason);
+        buf.writeBoolean(used);
+        buf.writeBoolean(gained);
+    }
 
 
 }

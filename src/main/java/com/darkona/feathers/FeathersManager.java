@@ -99,10 +99,10 @@ public class FeathersManager {
 
             event.getOriginal().getCapability(FeathersCapabilities.PLAYER_FEATHERS)
                  .ifPresent(oldStore -> newPlayer.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
-                                             .ifPresent(newStore -> {
-                              newStore.copyFrom(oldStore);
-                              FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(newStore), newPlayer);
-                          }));
+                                                 .ifPresent(newStore -> {
+                                                     newStore.copyFrom(oldStore);
+                                                     FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(newStore), newPlayer);
+                                                 }));
 
             oldPlayer.invalidateCaps();
 
@@ -194,7 +194,7 @@ public class FeathersManager {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void playerTickEvent(TickEvent.PlayerTickEvent event) {
-        if(event.phase == TickEvent.Phase.START) return;
+        if (event.phase == TickEvent.Phase.START) return;
 
         Player player = event.player;
 

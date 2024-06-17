@@ -11,9 +11,9 @@ import java.util.function.Supplier;
 
 public interface IFeathers {
 
-    void setShouldCooldown(boolean shouldCooldown);
-
     boolean isShouldCooldown();
+
+    void setShouldCooldown(boolean shouldCooldown);
 
     int getStamina();
 

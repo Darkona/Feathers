@@ -5,7 +5,6 @@ import com.darkona.feathers.api.Constants;
 import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.IFeathers;
 import com.darkona.feathers.api.IModifier;
-import com.darkona.feathers.client.ClientFeathersData;
 import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.effect.effects.StrainEffect;
 import com.darkona.feathers.event.FeatherAmountEvent;
@@ -321,7 +320,7 @@ public class PlayerFeathers implements IFeathers {
     public void tick(Player player) {
 
         calculateStaminaDelta(player);
-        if(shouldCooldown) --cooldown;
+        if (shouldCooldown) --cooldown;
 
         if (cooldown <= 0) {
             cooldown = 0;
