@@ -8,6 +8,7 @@ import com.darkona.feathers.capability.FeathersCapabilities;
 import com.darkona.feathers.config.FeathersClientConfig;
 import com.darkona.feathers.effect.effects.EnduranceEffect;
 import com.darkona.feathers.effect.effects.StrainEffect;
+import com.darkona.feathers.networking.packet.FeatherSTCDebugPacket;
 import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
 import lombok.Getter;
 import lombok.Setter;
@@ -48,7 +49,26 @@ public class ClientFeathersData {
     private Map<String, IModifier> deltaMods = new HashMap<>();
     private Map<String, IModifier> usageMods = new HashMap<>();
 
+    private int usedFeathers = 0;
+    private int gainedFeathers = 0;
+    private String reasonGain = "";
+    private String reasonUse = "";
+    private boolean used = false;
+    private boolean gained = false;
+    public static final int fadeDebugTicks = 40;
+    public int fadeDebugUse = 40;
+    public int fadeDebugGain = 40;
+
     private ClientFeathersData() {}
+
+    public void setExtendedDebugInfo(FeatherSTCDebugPacket packet) {
+        usedFeathers  = packet.getUsedFeathers();
+        gainedFeathers = packet.getGainedFeathers();
+        gained = packet.isGained();
+        used = packet.isUsed();
+        if(gained) reasonGain = packet.getReason();
+        if(used) reasonUse = packet.getReason();
+    }
 
     public static ClientFeathersData getInstance() {
         if (instance == null) {
@@ -58,6 +78,7 @@ public class ClientFeathersData {
     }
 
     public void update(Player player, IFeathers f) {
+
         stamina = f.getStamina();
         maxStamina = f.getMaxStamina();
         feathers = f.getFeathers();
@@ -72,16 +93,9 @@ public class ClientFeathersData {
 
         strainFeathers = (int) Math.ceil(f.getCounter(StrainEffect.STRAIN_COUNTER));
         enduranceFeathers = (int) Math.ceil(f.getCounter(EnduranceEffect.ENDURANCE_COUNTER));
-    }
+        fadeDebugUse--;
+        fadeDebugGain--;
 
-    public void update(FeatherSTCSyncPacket message, Supplier<NetworkEvent.Context> supplier) {
-        Player player = Minecraft.getInstance().player;
-        if (player != null) {
-            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> {
-                update(player, f);
-                supplier.get().setPacketHandled(true);
-            });
-        }
     }
 
     private void synchronizeEffects(Player player) {

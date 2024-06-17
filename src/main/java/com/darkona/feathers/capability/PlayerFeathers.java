@@ -42,7 +42,7 @@ public class PlayerFeathers implements IFeathers {
     private int strainFeathers;
     private int maxStrained;
     private int weight;
-
+    private boolean shouldCooldown = true;
     private int staminaDelta;
 
     @Setter(AccessLevel.NONE)
@@ -94,7 +94,6 @@ public class PlayerFeathers implements IFeathers {
             staminaDeltaModifiers.put(m.getName(), m);
             m.onAdd(this);
         });
-
 
         sortDeltaModifiers();
     }
@@ -157,7 +156,6 @@ public class PlayerFeathers implements IFeathers {
             this.cooldown = message.cooldown;
             this.weight = message.weight;
             message.counters.forEach(this::setCounter);
-            ClientFeathersData.getInstance().update(message, contextSupplier);
         }
     }
 
@@ -322,13 +320,14 @@ public class PlayerFeathers implements IFeathers {
     /* Tick */
     public void tick(Player player) {
 
-        if (staminaDeltaModifiers.isEmpty()) attachDefaultDeltaModifiers();
+        calculateStaminaDelta(player);
+        if(shouldCooldown) --cooldown;
 
-        if (--cooldown <= 0) {
+        if (cooldown <= 0) {
             cooldown = 0;
             doStaminaChange(player);
-        } else if (FeathersCommonConfig.DEBUG_MODE.get() && !player.level().isClientSide) {
-            Feathers.logger.info("In cooldown: {}", cooldown);
+        } else if (FeathersCommonConfig.DEBUG_MODE.get()) {
+            Feathers.logger.info("{} cooldown: {}", player.level().isClientSide ? "Clientside:" : "Serverside:", cooldown);
         }
 
     }
@@ -341,9 +340,8 @@ public class PlayerFeathers implements IFeathers {
 
     private void doStaminaChange(Player player) {
 
-        calculateStaminaDelta(player);
-
         var preChangeEvent = new StaminaChangeEvent.Pre(player, staminaDelta, stamina);
+
         if (MinecraftForge.EVENT_BUS.post(preChangeEvent)) return;
 
         if (preChangeEvent.getResult() == Event.Result.DEFAULT) {
@@ -363,9 +361,8 @@ public class PlayerFeathers implements IFeathers {
     }
 
     private void postStaminaChange(Player player) {
-
-
         MinecraftForge.EVENT_BUS.post(new StaminaChangeEvent.Post(player, this));
+
         if (stamina <= ZERO) {
             MinecraftForge.EVENT_BUS.post(new FeatherAmountEvent.Empty(player, prevStamina));
         } else if (stamina == maxStamina) {
@@ -374,14 +371,15 @@ public class PlayerFeathers implements IFeathers {
 
         if (prevFeathers != feathers) {
             MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, this));
-            if (FeathersCommonConfig.DEBUG_MODE.get() && player.level().isClientSide) {
-                Feathers.logger.info("Feathers: {}", feathers);
-            }
             FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(this), player);
+
+            if (FeathersCommonConfig.DEBUG_MODE.get())
+                Feathers.logger.info("{} Feathers: {}", player.level().isClientSide ? "Clientside: " : "ServerSide: ", feathers);
+
         }
+
         prevFeathers = feathers;
         prevStamina = stamina;
-
     }
 
     /* Save and load */

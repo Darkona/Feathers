@@ -192,8 +192,10 @@ public class FeathersManager {
 
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOW)
     public static void playerTickEvent(TickEvent.PlayerTickEvent event) {
+        if(event.phase == TickEvent.Phase.START) return;
+
         Player player = event.player;
 
         if (!player.isAlive() || player.isCreative() || player.isSpectator()) return;

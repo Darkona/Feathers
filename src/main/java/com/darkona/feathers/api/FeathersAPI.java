@@ -8,11 +8,11 @@ import com.darkona.feathers.effect.effects.StrainEffect;
 import com.darkona.feathers.enchantment.FeathersEnchantments;
 import com.darkona.feathers.event.FeatherEvent;
 import com.darkona.feathers.networking.FeathersMessages;
+import com.darkona.feathers.networking.packet.FeatherSTCDebugPacket;
 import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
 import com.darkona.feathers.networking.packet.FeatherSpendCTSPacket;
 import com.darkona.feathers.util.Calculations;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
@@ -94,6 +94,10 @@ public class FeathersAPI {
                       var post = f.gainFeathers(gainEvent.amount);
                       MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, f));
                       FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
+                      if (FeathersCommonConfig.EXTENDED_LOGGING.get()) {
+                          StackTraceElement caller = Thread.currentThread().getStackTrace()[2];
+                          FeathersMessages.sendToPlayer(FeatherSTCDebugPacket.gainedPacket(gainEvent.amount, caller.getMethodName()), player);
+                      }
                       result.set(post);
                   }
               });
@@ -130,9 +134,16 @@ public class FeathersAPI {
                 MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, f));
                 result.set(used);
 
-                if (result.get() && player instanceof ServerPlayer) {
+                if (result.get()) {
                     FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
+                    if (FeathersCommonConfig.EXTENDED_LOGGING.get()) {
+                        var trace = Thread.currentThread().getStackTrace();
+                        var caller = trace[4];
+                        FeathersMessages.sendToPlayer(FeatherSTCDebugPacket.usedPacket(useFeatherEvent.amount, caller.getMethodName()), player);
+                    }
                 }
+
+
             }
         });
 
@@ -153,6 +164,16 @@ public class FeathersAPI {
     public static boolean canSpendFeathers(Player player, int amount) {
 
         return getAvailableFeathers(player) >= amount;
+    }
+
+    public static void disableCooldown(Player player) {
+        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
+              .ifPresent(f -> f.setShouldCooldown(false));
+    }
+
+    public static void enableCooldown(Player player) {
+        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
+              .ifPresent(f -> f.setShouldCooldown(true));
     }
 
     public static int getPlayerWeight(Player player) {

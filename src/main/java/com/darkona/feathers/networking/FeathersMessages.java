@@ -3,6 +3,7 @@ package com.darkona.feathers.networking;
 import com.darkona.feathers.Feathers;
 import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.networking.packet.FeatherGainCTSPacket;
+import com.darkona.feathers.networking.packet.FeatherSTCDebugPacket;
 import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
 import com.darkona.feathers.networking.packet.FeatherSpendCTSPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -49,6 +50,11 @@ public class FeathersMessages {
                .consumerMainThread(FeatherSTCSyncPacket::handle)
                .add();
 
+        network.messageBuilder(FeatherSTCDebugPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+               .decoder(FeatherSTCDebugPacket::new)
+               .encoder(FeatherSTCDebugPacket::toBytes)
+               .consumerMainThread(FeatherSTCDebugPacket::handle)
+               .add();
     }
 
     public static <MSG> void sendToServer(MSG message) {
@@ -58,7 +64,7 @@ public class FeathersMessages {
     public static <MSG> void sendToPlayer(MSG message, Player player) {
         if (player instanceof ServerPlayer p && !player.level().isClientSide) {
             if (FeathersCommonConfig.DEBUG_MODE.get()) {
-                Feathers.logger.info("Sending synchronization packet to client");
+                Feathers.logger.info("Sending {} packet to client", message.getClass().getSimpleName());
                 INSTANCE.send(PacketDistributor.PLAYER.with(() -> p), message);
             }
         }
