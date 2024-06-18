@@ -1,10 +1,8 @@
 package com.darkona.feathers.capability;
 
 import com.darkona.feathers.Feathers;
-import com.darkona.feathers.api.Constants;
-import com.darkona.feathers.api.FeathersAPI;
-import com.darkona.feathers.api.IFeathers;
-import com.darkona.feathers.api.IModifier;
+import com.darkona.feathers.FeathersManager;
+import com.darkona.feathers.api.*;
 import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.effect.effects.StrainEffect;
 import com.darkona.feathers.event.FeatherAmountEvent;
@@ -69,6 +67,9 @@ public class PlayerFeathers implements IFeathers {
         attachDefaultDeltaModifiers();
 
         attachDefaultUsageModifiers();
+
+        FeathersManager.getPlugins().forEach(ICapabilityPlugin::attachDeltaModifiers);
+        FeathersManager.getPlugins().forEach(ICapabilityPlugin::attackUsageModifiers);
 
         synchronizeFeathers();
 

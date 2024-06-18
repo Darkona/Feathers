@@ -11,4 +11,7 @@ public interface ICapabilityPlugin {
 
     void onPlayerTickAfter(TickEvent.PlayerTickEvent event);
 
+    void attachDeltaModifiers();
+
+    void attackUsageModifiers();
 }

@@ -50,4 +50,14 @@ public class ColdSweatManager implements ICapabilityPlugin {
 
     }
 
+    @Override
+    public void attachDeltaModifiers() {
+
+    }
+
+    @Override
+    public void attackUsageModifiers() {
+
+    }
+
 }

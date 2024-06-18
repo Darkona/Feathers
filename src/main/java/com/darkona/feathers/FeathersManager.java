@@ -11,6 +11,7 @@ import com.darkona.feathers.effect.FeathersEffects;
 import com.darkona.feathers.effect.effects.EnduranceEffect;
 import com.darkona.feathers.networking.FeathersMessages;
 import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
+import lombok.Getter;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -46,6 +47,7 @@ public class FeathersManager {
 
     private static final String THIRST_COUNTER = "thirst";
 
+    @Getter
     private static final List<ICapabilityPlugin> plugins = new ArrayList<>();
 
     private FeathersManager() {}

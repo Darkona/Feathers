@@ -141,6 +141,16 @@ public class ThirstManager implements ICapabilityPlugin {
 
     }
 
+    @Override
+    public void attachDeltaModifiers() {
+
+    }
+
+    @Override
+    public void attackUsageModifiers() {
+
+    }
+
     public static class ThirstEvent extends PlayerEvent {
 
         public double calculationResult;

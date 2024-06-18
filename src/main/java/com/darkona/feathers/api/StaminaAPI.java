@@ -1,6 +1,8 @@
 package com.darkona.feathers.api;
 
 import com.darkona.feathers.capability.FeathersCapabilities;
+import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.effect.effects.StrainEffect;
 import com.darkona.feathers.networking.FeathersMessages;
 import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -8,6 +10,35 @@ import net.minecraft.world.entity.player.Player;
 
 public class StaminaAPI {
 
+    public static int getAvailableStamina(Player player) {
+        return FeathersCommonConfig.MAX_STRAIN.get() - getStrainedStamina(player) + getStamina(player);
+    }
+
+    public static int getStrainedStamina(Player player){
+        return player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
+              .map(f -> (int)Math.round(f.getCounter(StrainEffect.STRAIN_COUNTER))).orElse(0);
+    }
+
+
+    public static boolean canSpendStamina(Player player, int amount) {
+        return getStamina(player) >= amount;
+    }
+
+    public static boolean useStamina(Player player, int amount) {
+        if (getStamina(player) >= amount) {
+            removeStamina(player, amount);
+            return true;
+        }
+        return false;
+    }
+
+    public static void setStamina(Player player, int amount) {
+        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
+              .ifPresent(f -> {
+                  f.setStamina(amount);
+                  FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
+              });
+    }
 
     public static void addStamina(Player player, int amount) {
         player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)

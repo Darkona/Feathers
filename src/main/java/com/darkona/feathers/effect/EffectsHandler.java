@@ -154,6 +154,16 @@ public class EffectsHandler implements ICapabilityPlugin {
     }
 
     @Override
+    public void attachDeltaModifiers() {
+
+    }
+
+    @Override
+    public void attackUsageModifiers() {
+
+    }
+
+    @Override
     public void onPlayerJoin(EntityJoinLevelEvent event) {
 
     }
