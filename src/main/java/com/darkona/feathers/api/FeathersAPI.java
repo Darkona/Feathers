@@ -27,22 +27,38 @@ import static net.minecraftforge.eventbus.api.Event.Result.DEFAULT;
 @SuppressWarnings({"UnusedReturnValue", "DataFlowIssue"})
 public class FeathersAPI {
 
+    public static void resetFeathers(Player player) {
+        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> {
+            f.setStamina(f.getMaxStamina());
+            if (FeathersCommonConfig.ENABLE_STRAIN.get()) {
+                f.setCounter(StrainEffect.STRAIN_COUNTER, 0);
+            }
+            FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
+        });
+    }
+
     public static int getFeathers(Player player) {
         return player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).map(IFeathers::getFeathers)
                      .orElse(0);
     }
 
+    public static boolean canSpendFeathers(Player p, int amount) {
+        if (p.isCreative() || p.isSpectator()) return true;
+        if (!p.isAddedToWorld() || !p.isAlive()) return false;
+        return getAvailableFeathers(p) >= amount;
+    }
+
     public static int getAvailableFeathers(Player player) {
-        if (isStrained(player)) {
-            var total = new AtomicInteger(0);
-            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> {
+        int total = 0;
+        if (FeathersCommonConfig.ENABLE_STRAIN.get()) {
+            total += player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).map(f -> {
                 int strain = FeathersCommonConfig.MAX_STRAIN.get() - (int) Math.ceil(f.getCounter(StrainEffect.STRAIN_COUNTER));
-                total.set(Math.max(strain, 0));
-            });
-            return total.get();
+                return Math.max(strain, 0);
+            }).orElse(0);
         }
-        return player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).map(IFeathers::getAvailableFeathers)
-                     .orElse(0);
+        total += player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).map(IFeathers::getAvailableFeathers)
+                       .orElse(0);
+        return total;
     }
 
     /**
@@ -114,27 +130,21 @@ public class FeathersAPI {
      */
     public static boolean spendFeathers(Player player, int amount, int cooldown) throws UnsupportedOperationException {
         if (amount < 0) {
-            throw new UnsupportedOperationException("Cannot spend negative feathers");
+            return false;
         }
+        return player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).map(f -> {
 
-        var result = new AtomicBoolean(false);
-
-        if (player.isCreative() || player.isSpectator() || !player.isAddedToWorld() || !player.isAlive()) return true;
-
-        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> {
-
+            boolean result = false;
             var useFeatherEvent = new FeatherEvent.Use(player, amount);
             boolean cancelled = MinecraftForge.EVENT_BUS.post(useFeatherEvent);
 
             if (!cancelled && useFeatherEvent.getResult() == DEFAULT) {
 
                 var prev = f.getFeathers();
-                var used = f.useFeathers(player, useFeatherEvent.amount, cooldown);
-
+                result = f.useFeathers(player, useFeatherEvent.amount, cooldown);
                 MinecraftForge.EVENT_BUS.post(new FeatherEvent.Changed(player, f));
-                result.set(used);
 
-                if (result.get()) {
+                if (result) {
                     FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
                     if (FeathersCommonConfig.EXTENDED_LOGGING.get()) {
                         var trace = Thread.currentThread().getStackTrace();
@@ -142,12 +152,9 @@ public class FeathersAPI {
                         FeathersMessages.sendToPlayer(FeatherSTCDebugPacket.usedPacket(useFeatherEvent.amount, caller.getMethodName()), player);
                     }
                 }
-
-
             }
-        });
-
-        return result.get();
+            return result;
+        }).orElse(false);
     }
 
     public static void syncToClient(Player player) {
@@ -159,11 +166,6 @@ public class FeathersAPI {
         if (player.level().isClientSide) {
             FeathersMessages.sendToServer(new FeatherSpendCTSPacket(amount, cooldown));
         }
-    }
-
-    public static boolean canSpendFeathers(Player player, int amount) {
-
-        return getAvailableFeathers(player) >= amount;
     }
 
     public static void disableCooldown(Player player) {

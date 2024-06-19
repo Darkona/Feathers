@@ -36,7 +36,6 @@ public class PlayerFeathers implements IFeathers {
     private int feathers;
     private int prevFeathers;
     private int cooldown;
-    private int strainFeathers;
     private int maxStrained;
     private int weight;
     private boolean shouldCooldown = true;
@@ -44,7 +43,6 @@ public class PlayerFeathers implements IFeathers {
 
     @Setter(AccessLevel.NONE)
     private boolean dirty;
-
 
     private Map<String, Double> counters = new HashMap<>();
 
@@ -61,11 +59,9 @@ public class PlayerFeathers implements IFeathers {
         stamina = maxStamina;
 
         cooldown = ZERO;
-        strainFeathers = ZERO;
         maxStrained = FeathersCommonConfig.MAX_STRAIN.get();
 
         attachDefaultDeltaModifiers();
-
         attachDefaultUsageModifiers();
 
         FeathersManager.getPlugins().forEach(ICapabilityPlugin::attachDeltaModifiers);
@@ -169,7 +165,6 @@ public class PlayerFeathers implements IFeathers {
         dirty = true;
     }
 
-
     /* Normal getters and setters */
     @Override
     public int getFeathers() {
@@ -184,17 +179,11 @@ public class PlayerFeathers implements IFeathers {
 
     @Override
     public int getAvailableFeathers() {
-        if (FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
-            return Math.max(feathers - weight, ZERO);
-        }
-        return feathers;
+        return Math.max(feathers - weight, ZERO);
     }
 
     public int getAvailableStamina() {
-        if (FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) {
-            return Math.max(stamina - (weight * Constants.STAMINA_PER_FEATHER), ZERO);
-        }
-        return stamina;
+        return Math.max(stamina - (weight * Constants.STAMINA_PER_FEATHER), ZERO);
     }
 
     @Override
@@ -223,7 +212,6 @@ public class PlayerFeathers implements IFeathers {
         }
     }
 
-
     private void sortDeltaModifiers() {
         staminaDeltaModifierList = new ArrayList<>(staminaDeltaModifiers.values());
         staminaDeltaModifierList.sort(Comparator.comparingInt(IModifier::getDeltaOrdinal));
@@ -242,7 +230,6 @@ public class PlayerFeathers implements IFeathers {
             modifier.onRemove(this);
             sortUsageModifiers();
         }
-
     }
 
     private void sortUsageModifiers() {
@@ -250,19 +237,6 @@ public class PlayerFeathers implements IFeathers {
         featherUsageModifiersList.sort(Comparator.comparingInt(IModifier::getUsageOrdinal));
     }
 
-
-    /*Stamina delta calculations*/
-
-    public void applyStaminaDelta() {
-
-        stamina += staminaDelta;
-
-        if (stamina > maxStamina) stamina = maxStamina;
-
-        if (stamina < ZERO) stamina = ZERO;
-
-        synchronizeFeathers();
-    }
 
 
     /* Usage */
@@ -284,9 +258,8 @@ public class PlayerFeathers implements IFeathers {
         var staminaToUse = new AtomicInteger((int) (feathers * multiplier * Constants.STAMINA_PER_FEATHER));
         var approve = new AtomicBoolean(false);
 
-        for (IModifier m : featherUsageModifiersList) {
-            m.applyToUsage(player, this, staminaToUse, approve);
-        }
+
+        featherUsageModifiersList.forEach(m -> m.applyToUsage(player, this, staminaToUse, approve));
 
         if (approve.get()) {
             if (FeathersCommonConfig.DEBUG_MODE.get() && !player.level().isClientSide) {
@@ -317,17 +290,11 @@ public class PlayerFeathers implements IFeathers {
 
     /* Tick */
     public void tick(Player player) {
+        if (shouldCooldown) --cooldown;
+        if (cooldown <= 0) cooldown = 0;
 
         calculateStaminaDelta(player);
-        if (shouldCooldown) --cooldown;
-
-        if (cooldown <= 0) {
-            cooldown = 0;
-            doStaminaChange(player);
-        } else if (FeathersCommonConfig.EXTENDED_LOGGING.get()) {
-            Feathers.logger.info("{} cooldown: {}", player.level().isClientSide ? "Clientside:" : "Serverside:", cooldown);
-        }
-
+        doStaminaChange(player);
     }
 
     private void calculateStaminaDelta(Player player) {
@@ -343,21 +310,41 @@ public class PlayerFeathers implements IFeathers {
         if (MinecraftForge.EVENT_BUS.post(preChangeEvent)) return;
 
         if (preChangeEvent.getResult() == Event.Result.DEFAULT) {
-
             staminaDelta = preChangeEvent.staminaDelta;
             stamina = preChangeEvent.stamina;
         }
 
         if (staminaDelta == ZERO) return;
 
-
-        if ((staminaDelta > ZERO && stamina < maxStamina) || (staminaDelta < ZERO && stamina > ZERO)) applyStaminaDelta();
+        if ((staminaDelta > ZERO && stamina < maxStamina) ||
+                (staminaDelta < ZERO && getAvailableStamina() > ZERO)) applyStaminaDelta();
 
 
         if (stamina != prevStamina) postStaminaChange(player);
 
     }
 
+    /*Stamina delta calculations*/
+    public void applyStaminaDelta() {
+
+        stamina += staminaDelta;
+
+        if (stamina > maxStamina) stamina = maxStamina;
+
+        if (stamina < ZERO) {
+
+            if (FeathersCommonConfig.ENABLE_STRAIN.get()) {
+                var strainDelta = (ZERO - stamina) * -1;
+                if (getCounter(StrainEffect.STRAIN_COUNTER) + strainDelta <= maxStrained * Constants.STAMINA_PER_FEATHER) {
+                    incrementCounterBy(StrainEffect.STRAIN_COUNTER, strainDelta);
+                }
+            }
+
+            stamina = ZERO;
+        }
+
+        synchronizeFeathers();
+    }
     private void postStaminaChange(Player player) {
         MinecraftForge.EVENT_BUS.post(new StaminaChangeEvent.Post(player, this));
 

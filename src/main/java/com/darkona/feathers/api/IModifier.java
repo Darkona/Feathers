@@ -27,27 +27,27 @@ public interface IModifier {
      */
     IModifier NON_LINEAR_REGENERATION = new IModifier() {
         @Override
-        public void onAdd(PlayerFeathers iFeathers) {
+        public void onAdd(IFeathers iFeathers) {
 
         }
 
         @Override
-        public void onRemove(PlayerFeathers iFeathers) {
+        public void onRemove(IFeathers iFeathers) {
 
         }
 
         @Override
-        public void applyToDelta(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta) {
-
+        public void applyToDelta(Player player, IFeathers f, AtomicInteger staminaDelta) {
+            if (f.getCooldown() > 0) return;
             var staminaPerSecond = FeathersAPI.getPlayerStaminaRegenerationPerTick(player);
-            var maxStamina = iFeathers.getMaxStamina();
-            var value = Math.max((int) (1 / Math.log(iFeathers.getFeathers() / 40d + 1.4) - 3.5) * staminaPerSecond, 1);
+            var maxStamina = f.getMaxStamina();
+            var value = Math.max((int) (1 / Math.log(f.getFeathers() / 40d + 1.4) - 3.5) * staminaPerSecond, 1);
             staminaDelta.set(value);
 
         }
 
         @Override
-        public void applyToUsage(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+        public void applyToUsage(Player player, IFeathers f, AtomicInteger staminaDelta, AtomicBoolean result) {
 
         }
 
@@ -71,22 +71,23 @@ public interface IModifier {
 
 
         @Override
-        public void onAdd(PlayerFeathers iFeathers) {
+        public void onAdd(IFeathers iFeathers) {
 
         }
 
         @Override
-        public void onRemove(PlayerFeathers iFeathers) {
+        public void onRemove(IFeathers iFeathers) {
 
         }
 
         @Override
-        public void applyToDelta(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta) {
+        public void applyToDelta(Player player, IFeathers f, AtomicInteger staminaDelta) {
+            if (f.getCooldown() > 0) return;
             staminaDelta.set(staminaDelta.get() - FeathersAPI.getPlayerStaminaRegenerationPerTick(player));
         }
 
         @Override
-        public void applyToUsage(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+        public void applyToUsage(Player player, IFeathers f, AtomicInteger staminaDelta, AtomicBoolean result) {
 
         }
 
@@ -114,22 +115,23 @@ public interface IModifier {
     IModifier REGENERATION = new IModifier() {
 
         @Override
-        public void onAdd(PlayerFeathers iFeathers) {
+        public void onAdd(IFeathers iFeathers) {
 
         }
 
         @Override
-        public void onRemove(PlayerFeathers iFeathers) {
+        public void onRemove(IFeathers iFeathers) {
 
         }
 
         @Override
-        public void applyToDelta(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta) {
+        public void applyToDelta(Player player, IFeathers f, AtomicInteger staminaDelta) {
+            if (f.getCooldown() > 0) return;
             staminaDelta.set(staminaDelta.get() + FeathersAPI.getPlayerStaminaRegenerationPerTick(player));
         }
 
         @Override
-        public void applyToUsage(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
+        public void applyToUsage(Player player, IFeathers iFeathers, AtomicInteger staminaDelta, AtomicBoolean result) {
 
         }
 
@@ -153,22 +155,22 @@ public interface IModifier {
 
 
         @Override
-        public void onAdd(PlayerFeathers iFeathers) {
+        public void onAdd(IFeathers iFeathers) {
 
         }
 
         @Override
-        public void onRemove(PlayerFeathers iFeathers) {
+        public void onRemove(IFeathers iFeathers) {
 
         }
 
         @Override
-        public void applyToDelta(Player player, PlayerFeathers f, AtomicInteger usingFeathers) {
+        public void applyToDelta(Player player, IFeathers f, AtomicInteger usingFeathers) {
             //Do nothing
         }
 
         @Override
-        public void applyToUsage(Player player, PlayerFeathers f, AtomicInteger staminaToUse, AtomicBoolean approve) {
+        public void applyToUsage(Player player, IFeathers f, AtomicInteger staminaToUse, AtomicBoolean approve) {
             if (approve.get()) return;
             approve.set(f.getAvailableStamina() - staminaToUse.get() >= 0);
         }
@@ -189,13 +191,13 @@ public interface IModifier {
         }
     };
 
-    void onAdd(PlayerFeathers iFeathers);
+    void onAdd(IFeathers iFeathers);
 
-    void onRemove(PlayerFeathers iFeathers);
+    void onRemove(IFeathers iFeathers);
 
-    void applyToDelta(Player player, PlayerFeathers iFeathers, AtomicInteger staminaDelta);
+    void applyToDelta(Player player, IFeathers f, AtomicInteger staminaDelta);
 
-    void applyToUsage(Player player, PlayerFeathers iFeathers, AtomicInteger staminaToUse, AtomicBoolean result);
+    void applyToUsage(Player player, IFeathers f, AtomicInteger staminaToUse, AtomicBoolean result);
 
     int getUsageOrdinal();
 

@@ -1,6 +1,7 @@
 package com.darkona.feathers.effect.effects;
 
 import com.darkona.feathers.api.Constants;
+import com.darkona.feathers.api.IFeathers;
 import com.darkona.feathers.api.IModifier;
 import com.darkona.feathers.api.StaminaAPI;
 import com.darkona.feathers.capability.FeathersCapabilities;
@@ -28,42 +29,42 @@ public class EnduranceEffect extends FeathersEffects {
      */
     public static final IModifier ENDURANCE = new IModifier() {
         @Override
-        public void onAdd(PlayerFeathers iFeathers) {
+        public void onAdd(IFeathers iFeathers) {
 
         }
 
         @Override
-        public void onRemove(PlayerFeathers iFeathers) {
+        public void onRemove(IFeathers iFeathers) {
 
         }
 
         @Override
-        public void applyToDelta(Player player, PlayerFeathers iFeathers, AtomicInteger staminaToUse) {}
+        public void applyToDelta(Player player, IFeathers iFeathers, AtomicInteger staminaToUse) {}
 
         @Override
-        public void applyToUsage(Player player, PlayerFeathers iFeathers, AtomicInteger staminaToUse, AtomicBoolean result) {
+        public void applyToUsage(Player player, IFeathers f, AtomicInteger staminaToUse, AtomicBoolean result) {
             if (player.hasEffect(FeathersEffects.ENDURANCE.get())) {
-                var enduranceFeathers = iFeathers.getCounter(ENDURANCE_COUNTER);
+                var enduranceFeathers = f.getCounter(ENDURANCE_COUNTER);
 
                 int availableEnduranceStamina = (int) Math.ceil(enduranceFeathers * Constants.STAMINA_PER_FEATHER);
                 int remaining = availableEnduranceStamina - staminaToUse.get();
                 if (remaining <= 0) {
-                    resetEndurance(player, iFeathers, staminaToUse, remaining);
+                    resetEndurance(player, f, staminaToUse, remaining);
                 } else {
-                    updateEndurance(iFeathers, staminaToUse, remaining);
+                    updateEndurance(f, staminaToUse, remaining);
                 }
 
             }
         }
 
-        private void resetEndurance(Player player, PlayerFeathers iFeathers, AtomicInteger staminaToUse, int remainingStamina) {
-            iFeathers.setCounter(ENDURANCE_COUNTER, 0);
+        private void resetEndurance(Player player, IFeathers f, AtomicInteger staminaToUse, int remainingStamina) {
+            f.setCounter(ENDURANCE_COUNTER, 0);
             staminaToUse.addAndGet(-remainingStamina);
             player.removeEffect(FeathersEffects.ENDURANCE.get());
         }
 
-        private void updateEndurance(PlayerFeathers iFeathers, AtomicInteger staminaToUse, int remainingStamina) {
-            iFeathers.setCounter(ENDURANCE_COUNTER, (double) remainingStamina / Constants.STAMINA_PER_FEATHER);
+        private void updateEndurance(IFeathers f, AtomicInteger staminaToUse, int remainingStamina) {
+            f.setCounter(ENDURANCE_COUNTER, (double) remainingStamina / Constants.STAMINA_PER_FEATHER);
             staminaToUse.set(0);
         }
 

@@ -59,10 +59,6 @@ public interface IFeathers {
 
     void setWeight(int weight);
 
-    int getStrainFeathers();
-
-    void setStrainFeathers(int strainFeathers);
-
     int getMaxStrained();
 
     void setMaxStrained(int maxStrained);

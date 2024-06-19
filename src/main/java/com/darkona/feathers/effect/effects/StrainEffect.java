@@ -2,6 +2,7 @@ package com.darkona.feathers.effect.effects;
 
 import com.darkona.feathers.Feathers;
 import com.darkona.feathers.api.Constants;
+import com.darkona.feathers.api.IFeathers;
 import com.darkona.feathers.api.IModifier;
 import com.darkona.feathers.capability.PlayerFeathers;
 import com.darkona.feathers.config.FeathersCommonConfig;
@@ -29,17 +30,18 @@ public class StrainEffect extends FeathersEffects {
     public static final IModifier STRAIN_MODIFIER = new IModifier() {
 
         @Override
-        public void onAdd(PlayerFeathers iFeathers) {
-            iFeathers.setCounter(STRAIN_COUNTER, 0);
+        public void onAdd(IFeathers f) {
+            f.setCounter(STRAIN_COUNTER, 0);
         }
 
         @Override
-        public void onRemove(PlayerFeathers iFeathers) {
-            iFeathers.removeCounter(STRAIN_COUNTER);
+        public void onRemove(IFeathers f) {
+            f.removeCounter(STRAIN_COUNTER);
         }
 
         @Override
-        public void applyToDelta(Player player, PlayerFeathers f, AtomicInteger staminaDelta) {
+        public void applyToDelta(Player player, IFeathers f, AtomicInteger staminaDelta) {
+            if(f.getCooldown() > 0) return;
             int currentStrain = (int) Math.ceil(f.getCounter(STRAIN_COUNTER));
             if (currentStrain > 0) {
                 int recover = currentStrain - staminaDelta.get();
@@ -54,7 +56,7 @@ public class StrainEffect extends FeathersEffects {
         }
 
         @Override
-        public void applyToUsage(Player player, PlayerFeathers f, AtomicInteger staminaToUse, AtomicBoolean approve) {
+        public void applyToUsage(Player player, IFeathers f, AtomicInteger staminaToUse, AtomicBoolean approve) {
             if (approve.get()) return;
             int use = f.getAvailableStamina() - staminaToUse.get();
             int strain = (int) Math.ceil(f.getCounter(STRAIN_COUNTER));

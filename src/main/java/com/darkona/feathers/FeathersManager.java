@@ -9,6 +9,7 @@ import com.darkona.feathers.capability.PlayerFeathers;
 import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.effect.FeathersEffects;
 import com.darkona.feathers.effect.effects.EnduranceEffect;
+import com.darkona.feathers.effect.effects.StrainEffect;
 import com.darkona.feathers.networking.FeathersMessages;
 import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
 import lombok.Getter;
@@ -119,15 +120,12 @@ public class FeathersManager {
         }
     }
 
+
     @SubscribeEvent
     public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
 
         if (event.getEntity() instanceof ServerPlayer player) {
-            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> {
-                f.setStamina(f.getMaxStamina());
-                f.setStrainFeathers(0);
-                FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-            });
+            FeathersAPI.resetFeathers(player);
         }
     }
 
@@ -157,12 +155,7 @@ public class FeathersManager {
         if (!FeathersCommonConfig.SLEEPING_ALWAYS_RESTORES_FEATHERS.get()) return;
 
         if (event.getEntity() instanceof ServerPlayer player) {
-            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> {
-
-                f.setStamina(f.getMaxStamina());
-                f.setStrainFeathers(0);
-                FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-            });
+            FeathersAPI.resetFeathers(player);
         }
 
     }
