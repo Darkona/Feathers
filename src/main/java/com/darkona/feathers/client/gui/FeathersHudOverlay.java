@@ -268,23 +268,26 @@ public class FeathersHudOverlay {
             guiGraphics.drawString(Minecraft.getInstance().font, debugInfo, 0, l += 10, 0xFFFFFF);
             debugInfo = "Cooldown: " + clientData.getCooldown() + " | Weight: " + clientData.getWeight();
             guiGraphics.drawString(Minecraft.getInstance().font, debugInfo, 0, l += 10, 0xFFFFFF);
-            if (clientData.isStrained()) {
-                debugInfo = "Strained Feathers: " + clientData.getStrainFeathers() + " / " + FeathersCommonConfig.MAX_STRAIN.get();
-                guiGraphics.drawString(Minecraft.getInstance().font, debugInfo, 0, l += 10, 0x991212);
-            }
-            debugInfo = "Stamina Delta: " + clientData.getStaminaDelta();
-            guiGraphics.drawString(Minecraft.getInstance().font, debugInfo, 0, l += 10, 0xAAAA00);
+            // if (clientData.isStrained()) {
+            debugInfo = "Strained Feathers: " + clientData.getStrainFeathers() + " / " + FeathersCommonConfig.MAX_STRAIN.get();
+            debugInfo += " Strained Stamina: " + clientData.getStrainStamina() + " / " + FeathersCommonConfig.MAX_STRAIN.get() * Constants.STAMINA_PER_FEATHER;
+            guiGraphics.drawString(Minecraft.getInstance().font, debugInfo, 0, l += 10, 0x991212);
+            // }
+            debugInfo = "Base regeneration: " + clientData.getRegenAttrValue() + " | Stamina Delta: " + clientData.getStaminaDelta() + " | Usage: " + clientData.getStaminaUsageMultiplier();
+            guiGraphics.drawString(Minecraft.getInstance().font, debugInfo, 0, l += 10, 0xDDDD00);
             if (FeathersCommonConfig.EXTENDED_LOGGING.get()) {
 
                 guiGraphics.drawString(Minecraft.getInstance().font, "Delta Modifiers:", 0, l += 10, 0xFFFFFF);
-                for (IModifier m : clientData.getDeltaMods()) {
-                    guiGraphics.drawString(Minecraft.getInstance().font, "Modifier: " + m.getName() + " | Ordinal: " + m.getDeltaOrdinal(), 5, l += 10, 0x00FFFF);
-                }
+                if(clientData.getDeltaMods() != null)
+                    for (IModifier m : clientData.getDeltaMods()) {
+                        guiGraphics.drawString(Minecraft.getInstance().font, "Modifier: " + m.getName() + " | Ordinal: " + m.getDeltaOrdinal(), 5, l += 10, 0x00FFFF);
+                    }
 
                 guiGraphics.drawString(Minecraft.getInstance().font, "Usage Modifiers: ", 0, l += 10, 0xFFFFFF);
-                for (IModifier m : clientData.getUsageMods()) {
-                    guiGraphics.drawString(Minecraft.getInstance().font, "Modifier: " + m.getName() + " | Ordinal: " + m.getUsageOrdinal(), 5, l += 10, 0x00FFFF);
-                }
+                if(clientData.getUsageMods() != null)
+                    for (IModifier m : clientData.getUsageMods()) {
+                        guiGraphics.drawString(Minecraft.getInstance().font, "Modifier: " + m.getName() + " | Ordinal: " + m.getUsageOrdinal(), 5, l += 10, 0x00FFFF);
+                    }
 
                 if (clientData.isUsed() && clientData.fadeDebugUse > 0) {
                     guiGraphics.drawString(Minecraft.getInstance().font, "Used: " + clientData.getUsedFeathers() + " feathers from: " + clientData.getReasonUse(), 0, l += 10, 0x00FF00);

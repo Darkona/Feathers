@@ -4,6 +4,7 @@ import com.darkona.feathers.api.Constants;
 import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.IFeathers;
 import com.darkona.feathers.api.IModifier;
+import com.darkona.feathers.attributes.FeathersAttributes;
 import com.darkona.feathers.capability.FeathersCapabilities;
 import com.darkona.feathers.config.FeathersClientConfig;
 import com.darkona.feathers.effect.effects.EnduranceEffect;
@@ -15,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.List;
+import java.util.Objects;
 
 @Setter
 @Getter
@@ -37,6 +39,7 @@ public class ClientFeathersData {
     private int fadeCooldown = 0;
     private int strainFeathers = 0;
     private int cooldown = 0;
+    private int strainStamina = 0;
     private boolean hot = false;
     private boolean cold = false;
     private boolean energized = false;
@@ -82,7 +85,7 @@ public class ClientFeathersData {
         cooldown = f.getCooldown();
         deltaMods = f.getStaminaDeltaModifierList();
         usageMods = f.getFeatherUsageModifiersList();
-
+        strainStamina = f.getCounter(StrainEffect.STRAIN_COUNTER).intValue();
         synchronizeEffects(player);
 
         strainFeathers = (int) Math.ceil(f.getCounter(StrainEffect.STRAIN_COUNTER));
@@ -151,5 +154,15 @@ public class ClientFeathersData {
 
     public int getAvailableFeathers() {
         return feathers - weight;
+    }
+
+    public String getRegenAttrValue() {
+        assert Minecraft.getInstance().player != null;
+        return Objects.requireNonNull(Minecraft.getInstance().player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get())).getValue() + " f/s";
+    }
+
+    public String getStaminaUsageMultiplier() {
+        var p = Minecraft.getInstance().player;
+        return p != null ? FeathersAPI.getPlayerFeatherRegenerationPerSecond(Minecraft.getInstance().player) + " f/s": "0 f/s";
     }
 }

@@ -14,7 +14,7 @@ import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operati
 public class EnergizedEffect extends MobEffect {
 
     public static final String MODIFIER_UUID = "848704c2-d3b5-4b71-9e96-7ab5c42095e2";
-    public static final double BASE_STRENGTH = 1.5D;
+    public static final double BASE_STRENGTH = 1;
 
     public EnergizedEffect(MobEffectCategory mobEffectCategory, int color) {
         super(mobEffectCategory, color);

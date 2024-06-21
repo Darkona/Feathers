@@ -144,6 +144,10 @@ public class PlayerFeathers implements IFeathers {
     @Override
     public void updateInClient(FeatherSTCSyncPacket message, Supplier<NetworkEvent.Context> contextSupplier) {
         assert Minecraft.getInstance().level != null;
+        if (FeathersCommonConfig.DEBUG_MODE.get()) {
+            Feathers.logger.info("Received FeatherSTCSyncPacket: {}", message);
+        }
+
         if (Minecraft.getInstance().level.isClientSide) {
             this.stamina = message.stamina;
             this.maxStamina = message.maxStamina;
@@ -236,7 +240,6 @@ public class PlayerFeathers implements IFeathers {
         featherUsageModifiersList = new ArrayList<>(staminaUsageModifiers.values());
         featherUsageModifiersList.sort(Comparator.comparingInt(IModifier::getUsageOrdinal));
     }
-
 
 
     /* Usage */
@@ -345,6 +348,7 @@ public class PlayerFeathers implements IFeathers {
 
         synchronizeFeathers();
     }
+
     private void postStaminaChange(Player player) {
         MinecraftForge.EVENT_BUS.post(new StaminaChangeEvent.Post(player, this));
 

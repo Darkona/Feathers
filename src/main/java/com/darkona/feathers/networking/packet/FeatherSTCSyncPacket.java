@@ -1,5 +1,6 @@
 package com.darkona.feathers.networking.packet;
 
+import com.darkona.feathers.Feathers;
 import com.darkona.feathers.api.IFeathers;
 import com.darkona.feathers.capability.FeathersCapabilities;
 import net.minecraft.client.Minecraft;
@@ -24,6 +25,23 @@ public class FeatherSTCSyncPacket {
     public final int weight;
     public final Map<String, Double> counters;
 
+    public String toString(){
+        StringBuilder b = new StringBuilder("Stamina:")
+                .append(stamina)
+                .append(", maxStamina: ")
+                .append(maxStamina)
+                .append(", feathers: ")
+                .append(feathers)
+                .append(", staminaDelta: ")
+                .append(staminaDelta)
+                .append(", cooldown: ")
+                .append(cooldown)
+                .append(", weight: ")
+                .append(weight)
+                .append(", counters: ");
+        counters.forEach((k, v) -> b.append(k).append(": ").append(v).append("\n"));
+        return b.toString();
+    }
     public FeatherSTCSyncPacket(IFeathers f) {
         stamina = f.getStamina();
         maxStamina = f.getMaxStamina();

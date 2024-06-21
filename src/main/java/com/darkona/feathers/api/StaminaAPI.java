@@ -3,8 +3,6 @@ package com.darkona.feathers.api;
 import com.darkona.feathers.capability.FeathersCapabilities;
 import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.effect.effects.StrainEffect;
-import com.darkona.feathers.networking.FeathersMessages;
-import com.darkona.feathers.networking.packet.FeatherSTCSyncPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -14,119 +12,75 @@ public class StaminaAPI {
         return FeathersCommonConfig.MAX_STRAIN.get() - getStrainedStamina(player) + getStamina(player);
     }
 
-    public static int getStrainedStamina(Player player){
+    public static int getStrainedStamina(Player player) {
         return player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
-              .map(f -> (int)Math.round(f.getCounter(StrainEffect.STRAIN_COUNTER))).orElse(0);
+                     .map(f -> (int) Math.round(f.getCounter(StrainEffect.STRAIN_COUNTER))).orElse(0);
     }
 
 
-    public static boolean canSpendStamina(Player player, int amount) {
-        return getStamina(player) >= amount;
+    public static boolean canUseStamina(Player player, int amount) {
+        return player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
+              .map(f -> {
+                  int toUse = f.getStamina() - amount;
+                  if (toUse >= 0) {
+                      return true;
+                  } else if (f.hasCounter(StrainEffect.STRAIN_COUNTER)) {
+                      double strain = f.getCounter(StrainEffect.STRAIN_COUNTER);
+                      return (strain - toUse) <= FeathersCommonConfig.MAX_STRAIN.get() * Constants.STAMINA_PER_FEATHER;
+                  }
+                  return false;
+              }).orElse(false);
+
     }
 
     public static boolean useStamina(Player player, int amount) {
-        if (getStamina(player) >= amount) {
-            removeStamina(player, amount);
-            return true;
-        }
-        return false;
+        return player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
+                 .map(f -> {
+                     if (canUseStamina(player, amount)) {
+                         int toUse = f.getStamina() - amount;
+                         f.setStamina(toUse);
+                         if (toUse < 0) f.incrementCounterBy(StrainEffect.STRAIN_COUNTER, -toUse);
+                         return true;
+                     }
+                     return false;
+                 }).orElse(false);
+
     }
 
     public static void setStamina(Player player, int amount) {
         player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setStamina(amount);
-                  FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-              });
+              .ifPresent(f -> f.setStamina(amount));
     }
 
     public static void addStamina(Player player, int amount) {
         player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setStamina(f.getStamina() + amount);
-                  FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-              });
+              .ifPresent(f -> f.setStamina(f.getStamina() + amount));
     }
 
     public static void removeStamina(Player player, int amount) {
         player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setStamina(f.getStamina() - amount);
-                  FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-              });
+              .ifPresent(f -> f.setStamina(f.getStamina() - amount));
     }
 
     public static void setMaxStamina(Player player, int maxStamina) {
         player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setMaxStamina(maxStamina);
-                  FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-              });
+              .ifPresent(f -> f.setMaxStamina(maxStamina));
     }
 
 
     public static void addMaxStamina(Player player, int amount) {
         player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setMaxStamina(f.getMaxStamina() + amount);
-                  FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-              });
+              .ifPresent(f -> f.setMaxStamina(f.getMaxStamina() + amount));
     }
 
     public static void removeMaxStamina(Player player, int amount) {
         player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setMaxStamina(f.getMaxStamina() - amount);
-                  FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-              });
-    }
-
-    public static void addStaminaDeltaModifier(Player player, String name, IModifier modifier) {
-        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.addDeltaModifier(modifier);
-                  FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-              });
-    }
-
-    public static void removeStaminaDeltaModifier(Player player, IModifier modifier) {
-        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.removeDeltaModifier(modifier);
-                  FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-              });
-    }
-
-    public static void addStaminaUsageModifier(Player player, IModifier modifier) {
-        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.addUsageModifier(modifier);
-                  FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-              });
-    }
-
-    public static void removeStaminaUsageModifier(Player player, IModifier modifier) {
-        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.removeUsageModifier(modifier);
-                  FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-              });
-    }
-
-    public static void setStaminaDelta(Player player, int delta) {
-        player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setStaminaDelta(delta);
-                  FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-              });
+              .ifPresent(f -> f.setMaxStamina(f.getMaxStamina() - amount));
     }
 
     public static void setStamina(ServerPlayer player, int amount) {
         player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setStamina(amount);
-                  FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-              });
+              .ifPresent(f -> f.setStamina(amount));
 
     }
 
@@ -142,10 +96,7 @@ public class StaminaAPI {
 
     public static void setMaxStamina(ServerPlayer player, int maxStamina) {
         player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
-              .ifPresent(f -> {
-                  f.setMaxStamina(maxStamina);
-                  FeathersMessages.sendToPlayer(new FeatherSTCSyncPacket(f), player);
-              });
+              .ifPresent(f -> f.setMaxStamina(maxStamina));
     }
 
     public static int getStaminaDelta(Player player) {

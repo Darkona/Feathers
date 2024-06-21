@@ -22,7 +22,6 @@ import java.util.List;
 
 public class ClientEventsManager {
 
-    public static int currentWeight;
 
     @Mod.EventBusSubscriber(modid = Feathers.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class ClientModBusEvents {
@@ -46,6 +45,7 @@ public class ClientEventsManager {
 
         @SubscribeEvent
         public static void tooltipRenderer(ItemTooltipEvent event) {
+            int currentWeight =  ClientFeathersData.getInstance().getWeight();
             if (Minecraft.getInstance().level != null) {
                 if (!event.getItemStack().isEmpty() && event.getItemStack().getItem() instanceof ArmorItem
                         && FeathersClientConfig.DISPLAY_WEIGHTS.get()) {

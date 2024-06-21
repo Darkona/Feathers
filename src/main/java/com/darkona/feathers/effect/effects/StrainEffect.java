@@ -4,20 +4,25 @@ import com.darkona.feathers.Feathers;
 import com.darkona.feathers.api.Constants;
 import com.darkona.feathers.api.IFeathers;
 import com.darkona.feathers.api.IModifier;
+import com.darkona.feathers.capability.FeathersCapabilities;
 import com.darkona.feathers.capability.PlayerFeathers;
 import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.effect.FeathersEffects;
 import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.darkona.feathers.attributes.FeathersAttributes.FEATHERS_PER_SECOND;
-import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.MULTIPLY_TOTAL;
+import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.*;
 
 public class StrainEffect extends FeathersEffects {
     public static final String STRAIN_COUNTER = "strain";
@@ -44,7 +49,7 @@ public class StrainEffect extends FeathersEffects {
             if(f.getCooldown() > 0) return;
             int currentStrain = (int) Math.ceil(f.getCounter(STRAIN_COUNTER));
             if (currentStrain > 0) {
-                int recover = currentStrain - staminaDelta.get();
+                int recover = currentStrain - (staminaDelta.get());
                 if (recover <= 0) {
                     f.setCounter(STRAIN_COUNTER, 0);
                     staminaDelta.set(-recover);
@@ -89,22 +94,42 @@ public class StrainEffect extends FeathersEffects {
     };
 
     private static final String MODIFIER_UUID = "735f6a64-a3f9-4a0b-bee8-51a243097c07";
+    private static final double BASE_STRENGTH = -0.75D;
+    /*
+        This is the craziness Minecraft does internally, so this results in a 0.1x multiplier.
 
-    private static final double BASE_STRENGTH = 0.1D;
+        double additionValue = baseValue;
+        for(AttributeModifier attributemodifier : this.getModifiersOrEmpty(AttributeModifier.Operation.ADDITION)) {
+            additionValue += attributemodifier.getAmount();
+        }
+
+        double multiplyValue = additionValue;
+
+        for(AttributeModifier attributemodifier1 : this.getModifiersOrEmpty(AttributeModifier.Operation.MULTIPLY_BASE)) {
+            multiplyValue += additionValue * attributemodifier1.getAmount();
+        }
+
+        for(AttributeModifier attributemodifier2 : this.getModifiersOrEmpty(AttributeModifier.Operation.MULTIPLY_TOTAL)) {
+            multiplyValue *= 1.0D + attributemodifier2.getAmount();
+        }
+     */
 
     public StrainEffect(MobEffectCategory p_19451_, int p_19452_) {
         super(p_19451_, p_19452_);
         addAttributeModifier(FEATHERS_PER_SECOND.get(), MODIFIER_UUID, BASE_STRENGTH, MULTIPLY_TOTAL);
     }
 
-    @Override
-    public void addAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        super.addAttributeModifiers(target, map, strength);
+    public void applyEffect(LivingEntity entity, MobEffectInstance effect) {
+       /* if (entity instanceof Player player) {
+            var attr = Objects.requireNonNull(player.getAttribute(FEATHERS_PER_SECOND.get()));
+            attr.setBaseValue(attr.getBaseValue() * BASE_STRENGTH);
+        }*/
     }
 
-    @Override
-    public void removeAttributeModifiers(@NotNull LivingEntity target, @NotNull AttributeMap map, int strength) {
-        super.addAttributeModifiers(target, map, strength);
+    public void removeEffect(LivingEntity entity, MobEffectInstance effectInstance) {
+        /*if (entity instanceof Player player) {
+            Objects.requireNonNull(player.getAttribute(FEATHERS_PER_SECOND.get())).setBaseValue(BASE_STRENGTH);
+        }*/
     }
 
     @Override

@@ -49,17 +49,12 @@ public class FeathersAPI {
     }
 
     public static int getAvailableFeathers(Player player) {
-        int total = 0;
-        if (FeathersCommonConfig.ENABLE_STRAIN.get()) {
-            total += player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).map(f -> {
-                int strain = FeathersCommonConfig.MAX_STRAIN.get() - (int) Math.ceil(f.getCounter(StrainEffect.STRAIN_COUNTER));
-                return Math.max(strain, 0);
-            }).orElse(0);
-        }
-        total += player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).map(IFeathers::getAvailableFeathers)
-                       .orElse(0);
-        return total;
+        return player
+                .getCapability(FeathersCapabilities.PLAYER_FEATHERS)
+                .map(f -> f.getAvailableFeathers() + (FeathersCommonConfig.MAX_STRAIN.get() - (int) Math.ceil(f.getCounter(StrainEffect.STRAIN_COUNTER) / Constants.STAMINA_PER_FEATHER)))
+                .orElse(0);
     }
+
 
     /**
      * Sets the player's feathers to the specified amount. For tick-based operations, use staminaDeltaModifiers;
@@ -240,7 +235,7 @@ public class FeathersAPI {
 
     public static double getPlayerFeatherRegenerationPerSecond(Player player) {
         var regen = player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get());
-        return regen != null ? regen.getValue() : FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get();
+        return regen != null ? regen.getValue() : 0D;
     }
 
     public static void setPlayerFeatherRegenerationPerSecond(Player player, double amount) {
