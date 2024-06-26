@@ -51,7 +51,13 @@ public class FeathersAPI {
     public static int getAvailableFeathers(Player player) {
         return player
                 .getCapability(FeathersCapabilities.PLAYER_FEATHERS)
-                .map(f -> f.getAvailableFeathers() + (FeathersCommonConfig.MAX_STRAIN.get() - (int) Math.ceil(f.getCounter(StrainEffect.STRAIN_COUNTER) / Constants.STAMINA_PER_FEATHER)))
+                .map(f -> {
+                    int available = f.getAvailableFeathers();
+                    if(f.hasCounter(StrainEffect.STRAIN_COUNTER)) {
+                        available += (int) Math.ceil((FeathersCommonConfig.MAX_STRAIN.get() - (f.getCounter(StrainEffect.STRAIN_COUNTER) / Constants.STAMINA_PER_FEATHER)));
+                    }
+                    return Math.max(available, 0);
+                })
                 .orElse(0);
     }
 
@@ -123,7 +129,7 @@ public class FeathersAPI {
      * @return true if the player has enough feathers to spend, false otherwise
      * @throws UnsupportedOperationException if the amount is negative
      */
-    public static boolean spendFeathers(Player player, int amount, int cooldown) throws UnsupportedOperationException {
+    public static boolean spendFeathers(Player player, int amount, int cooldown) {
         if (amount < 0) {
             return false;
         }
@@ -171,6 +177,11 @@ public class FeathersAPI {
     public static void enableCooldown(Player player) {
         player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
               .ifPresent(f -> f.setShouldCooldown(true));
+    }
+
+    public static boolean isCooldownEnabled(Player player) {
+        return player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
+                     .map(IFeathers::isShouldCooldown).orElse(false);
     }
 
     public static int getPlayerWeight(Player player) {

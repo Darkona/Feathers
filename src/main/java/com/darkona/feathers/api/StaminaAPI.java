@@ -5,26 +5,27 @@ import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.effect.effects.StrainEffect;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import org.checkerframework.checker.units.qual.C;
 
 public class StaminaAPI {
 
-    public static int getAvailableStamina(Player player) {
-        return FeathersCommonConfig.MAX_STRAIN.get() - getStrainedStamina(player) + getStamina(player);
-    }
 
     public static int getStrainedStamina(Player player) {
         return player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
                      .map(f -> (int) Math.round(f.getCounter(StrainEffect.STRAIN_COUNTER))).orElse(0);
     }
 
+    public static int getAvailableStamina(Player player) {
+        return FeathersAPI.getAvailableFeathers(player) * Constants.STAMINA_PER_FEATHER;
+    }
 
     public static boolean canUseStamina(Player player, int amount) {
         return player.getCapability(FeathersCapabilities.PLAYER_FEATHERS)
               .map(f -> {
-                  int toUse = f.getStamina() - amount;
+                  int toUse = f.getStamina() - amount - f.getWeight() * Constants.STAMINA_PER_FEATHER ;
                   if (toUse >= 0) {
                       return true;
-                  } else if (f.hasCounter(StrainEffect.STRAIN_COUNTER)) {
+                  } else if (FeathersCommonConfig.ENABLE_STRAIN.get() && f.hasCounter(StrainEffect.STRAIN_COUNTER)) {
                       double strain = f.getCounter(StrainEffect.STRAIN_COUNTER);
                       return (strain - toUse) <= FeathersCommonConfig.MAX_STRAIN.get() * Constants.STAMINA_PER_FEATHER;
                   }
@@ -39,7 +40,8 @@ public class StaminaAPI {
                      if (canUseStamina(player, amount)) {
                          int toUse = f.getStamina() - amount;
                          f.setStamina(toUse);
-                         if (toUse < 0) f.incrementCounterBy(StrainEffect.STRAIN_COUNTER, -toUse);
+                         if (toUse < 0 && FeathersCommonConfig.ENABLE_STRAIN.get() &&  f.hasCounter(StrainEffect.STRAIN_COUNTER))
+                             f.incrementCounterBy(StrainEffect.STRAIN_COUNTER, -toUse);
                          return true;
                      }
                      return false;

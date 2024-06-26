@@ -364,7 +364,6 @@ public class PlayerFeathers implements IFeathers {
 
             if (FeathersCommonConfig.DEBUG_MODE.get())
                 Feathers.logger.info("{} Feathers: {}", player.level().isClientSide ? "Clientside: " : "ServerSide: ", feathers);
-
         }
 
         prevFeathers = feathers;
@@ -403,7 +402,9 @@ public class PlayerFeathers implements IFeathers {
         this.cooldown = nbt.getInt("cooldown");
         CompoundTag tagCounters = nbt.getCompound("counters");
         tagCounters.getAllKeys().forEach(key -> counters.put(key, tagCounters.getDouble(key)));
-
+        if(!FeathersCommonConfig.ENABLE_STRAIN.get() && hasCounter(StrainEffect.STRAIN_COUNTER)) {
+            removeCounter(StrainEffect.STRAIN_COUNTER);
+        }
         synchronizeFeathers();
     }
 }
